@@ -1,0 +1,30 @@
+post:
+  operationId: deleteCurrentSession
+  tags:
+    - Authentication
+  summary: 現在の Aster Session を破棄する
+  description: |
+    Bearer Access Token が示す Session と、Request の Refresh Token が同じ Session に属する場合に破棄します。
+    破棄後は、その Session から派生した Access Token と Refresh Token を再利用できません。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/LogoutRequest.yaml
+        example:
+          refresh_token: example-refresh-token
+  responses:
+    "204":
+      description: Aster Session を破棄しました。Response Body はありません。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

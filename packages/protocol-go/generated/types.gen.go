@@ -9,6 +9,24 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for AuthenticationMethod.
+const (
+	AuthenticationMethodGoogle   AuthenticationMethod = "GOOGLE"
+	AuthenticationMethodPassword AuthenticationMethod = "PASSWORD"
+)
+
+// Valid indicates whether the value is a known member of the AuthenticationMethod enum.
+func (e AuthenticationMethod) Valid() bool {
+	switch e {
+	case AuthenticationMethodGoogle:
+		return true
+	case AuthenticationMethodPassword:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for HealthResponseStatus.
 const (
 	Ok HealthResponseStatus = "ok"
@@ -38,6 +56,36 @@ func (e RateLimitErrorCode) Valid() bool {
 		return false
 	}
 }
+
+// Defines values for SessionTokenResponseTokenType.
+const (
+	Bearer SessionTokenResponseTokenType = "Bearer"
+)
+
+// Valid indicates whether the value is a known member of the SessionTokenResponseTokenType enum.
+func (e SessionTokenResponseTokenType) Valid() bool {
+	switch e {
+	case Bearer:
+		return true
+	default:
+		return false
+	}
+}
+
+// AccessToken Aster API の認可に使用する、短時間有効な不透明 Token です。
+//
+// Examples: example-access-token
+type AccessToken = string
+
+// AuthenticationMethod User Account に Link された認証方法です。
+//
+// Examples: PASSWORD
+type AuthenticationMethod string
+
+// Email Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
+//
+// Examples: alice@example.com
+type Email = openapi_types.Email
 
 // Error API Error の共通形式です。
 type Error struct {
@@ -79,6 +127,33 @@ type HealthResponse struct {
 // HealthResponseStatus HTTP Server が稼働している場合は `ok` です。
 type HealthResponseStatus string
 
+// LoginPasswordRequest Email Address と Password で Aster Session を作成する Request です。
+//
+// Examples: {"email":"alice@example.com","password":"\u003cpassword-with-15-or-more-characters\u003e"}
+type LoginPasswordRequest struct {
+	// Email Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
+	//
+	// Examples: alice@example.com
+	Email Email `json:"email"`
+
+	// Password User が設定する Password です。空白を含む Unicode 文字列を許可します。
+	// Client は文字種の組み合わせを強制せず、Server は漏えい Password を拒否できます。
+	//
+	//
+	// Examples: <password-with-15-or-more-characters>
+	Password Password `json:"password"`
+}
+
+// LogoutRequest 破棄する Aster Session の Refresh Token を指定する Request です。
+//
+// Examples: {"refresh_token":"example-refresh-token"}
+type LogoutRequest struct {
+	// RefreshToken Aster Session を更新するための、一度だけ使用できる不透明 Token です。
+	//
+	// Examples: example-refresh-token
+	RefreshToken RefreshToken `json:"refresh_token"`
+}
+
 // PageInfo Cursor Pagination の継続情報です。
 //
 // Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
@@ -94,6 +169,12 @@ type PageInfo struct {
 //
 // Examples: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
 type PaginationCursor = string
+
+// Password User が設定する Password です。空白を含む Unicode 文字列を許可します。
+// Client は文字種の組み合わせを強制せず、Server は漏えい Password を拒否できます。
+//
+// Examples: <password-with-15-or-more-characters>
+type Password = string
 
 // RateLimitDetails Rate Limit Error に固有の再試行情報です。
 type RateLimitDetails struct {
@@ -125,10 +206,75 @@ type RateLimitError struct {
 // RateLimitErrorCode Rate Limit Error を表す固定 Code です。
 type RateLimitErrorCode string
 
+// RefreshSessionRequest Refresh Token を Rotation して Aster Session を更新する Request です。
+//
+// Examples: {"refresh_token":"example-refresh-token"}
+type RefreshSessionRequest struct {
+	// RefreshToken Aster Session を更新するための、一度だけ使用できる不透明 Token です。
+	//
+	// Examples: example-refresh-token
+	RefreshToken RefreshToken `json:"refresh_token"`
+}
+
+// RefreshToken Aster Session を更新するための、一度だけ使用できる不透明 Token です。
+//
+// Examples: example-refresh-token
+type RefreshToken = string
+
+// RegisterPasswordRequest Password を使用して User Account を作成する Request です。
+//
+// Examples: {"display_name":"Alice","email":"alice@example.com","password":"\u003cpassword-with-15-or-more-characters\u003e"}
+type RegisterPasswordRequest struct {
+	// DisplayName 他の User に表示する名前です。
+	DisplayName string `json:"display_name"`
+
+	// Email Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
+	//
+	// Examples: alice@example.com
+	Email Email `json:"email"`
+
+	// Password User が設定する Password です。空白を含む Unicode 文字列を許可します。
+	// Client は文字種の組み合わせを強制せず、Server は漏えい Password を拒否できます。
+	//
+	//
+	// Examples: <password-with-15-or-more-characters>
+	Password Password `json:"password"`
+}
+
 // RequestId Request と Log を対応づける UUID です。
 //
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 type RequestId = openapi_types.UUID
+
+// SessionTokenResponse 認証方法に依存しない Aster Session の Token 一式です。
+//
+// Examples: {"access_token":"example-access-token","expires_in":900,"refresh_expires_in":2592000,"refresh_token":"example-refresh-token","session_id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","token_type":"Bearer"}
+type SessionTokenResponse struct {
+	// AccessToken Aster API の認可に使用する、短時間有効な不透明 Token です。
+	//
+	// Examples: example-access-token
+	AccessToken AccessToken `json:"access_token"`
+
+	// ExpiresIn Access Token が失効するまでの秒数です。
+	ExpiresIn int `json:"expires_in"`
+
+	// RefreshExpiresIn Refresh Token が失効するまでの秒数です。
+	RefreshExpiresIn int `json:"refresh_expires_in"`
+
+	// RefreshToken Aster Session を更新するための、一度だけ使用できる不透明 Token です。
+	//
+	// Examples: example-refresh-token
+	RefreshToken RefreshToken `json:"refresh_token"`
+
+	// SessionId Client が Session を識別するための ID です。
+	SessionId UUID `json:"session_id"`
+
+	// TokenType Authorization Header で使用する Token Type です。
+	TokenType SessionTokenResponseTokenType `json:"token_type"`
+}
+
+// SessionTokenResponseTokenType Authorization Header で使用する Token Type です。
+type SessionTokenResponseTokenType string
 
 // Timestamp UTC の ISO 8601 Timestamp です。
 //
@@ -140,6 +286,36 @@ type Timestamp = time.Time
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 type UUID = openapi_types.UUID
 
+// UserSelf 認証済み User 自身にだけ返す Account 情報です。
+//
+// Examples: {"authentication_methods":["PASSWORD"],"avatar_url":null,"created_at":"2026-08-17T06:00:00Z","display_name":"Alice","email":"alice@example.com","email_verified":false,"id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"}
+type UserSelf struct {
+	// AuthenticationMethods Account に Link されている認証方法です。
+	AuthenticationMethods []AuthenticationMethod `json:"authentication_methods"`
+
+	// AvatarUrl Avatar Image の URL です。未設定の場合は null です。
+	AvatarUrl *string `json:"avatar_url"`
+
+	// CreatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	CreatedAt   Timestamp `json:"created_at"`
+	DisplayName string    `json:"display_name"`
+
+	// Email Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
+	//
+	// Examples: alice@example.com
+	Email Email `json:"email"`
+
+	// EmailVerified Email Address の所有確認が完了している場合は true です。
+	EmailVerified bool `json:"email_verified"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id UUID `json:"id"`
+}
+
 // Cursor 次の取得位置を表す、Server が発行した不透明な Cursor です。
 //
 // Examples: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
@@ -148,5 +324,29 @@ type Cursor = PaginationCursor
 // Limit defines model for Limit.
 type Limit = int
 
+// EmailAlreadyRegistered API Error の共通形式です。
+type EmailAlreadyRegistered = Error
+
+// InvalidCredentials API Error の共通形式です。
+type InvalidCredentials = Error
+
+// InvalidRefreshToken API Error の共通形式です。
+type InvalidRefreshToken = Error
+
 // RateLimited Rate Limit を超えた Request に返す Error です。
 type RateLimited = RateLimitError
+
+// Unauthorized API Error の共通形式です。
+type Unauthorized = Error
+
+// DeleteCurrentSessionJSONRequestBody defines body for DeleteCurrentSession for application/json ContentType.
+type DeleteCurrentSessionJSONRequestBody = LogoutRequest
+
+// CreatePasswordSessionJSONRequestBody defines body for CreatePasswordSession for application/json ContentType.
+type CreatePasswordSessionJSONRequestBody = LoginPasswordRequest
+
+// RegisterWithPasswordJSONRequestBody defines body for RegisterWithPassword for application/json ContentType.
+type RegisterWithPasswordJSONRequestBody = RegisterPasswordRequest
+
+// RefreshSessionJSONRequestBody defines body for RefreshSession for application/json ContentType.
+type RefreshSessionJSONRequestBody = RefreshSessionRequest

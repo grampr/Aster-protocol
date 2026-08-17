@@ -53,7 +53,11 @@ TypeScript の Runtime Constant は生成物であり、直接編集しません
 Intent の値には1 Bit だけを立てた整数を割り当てます。
 既存の値は Client と Bot の設定に保存されるため、別の意味へ再割り当てしません。
 
-Token、Password、Message 本文などの秘密情報や利用者データを Example に含めません。
+実在する Token、Password、Message 本文などの秘密情報や利用者データを Example に含めません。
+認証情報の Example が必要な場合は、`example-access-token` や `<password>` のように秘密ではない Placeholder を使用します。
+
+認証方法を追加するときも、Aster Session の Request と Response を Provider 固有の Token 形式へ結合しません。
+外部 Identity は Provider と Provider Subject の組で識別し、Email Address だけで既存 Account へ自動 Link しません。
 
 ## Commit と Pull Request
 

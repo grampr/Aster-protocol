@@ -1,0 +1,39 @@
+title: SessionTokenResponse
+description: 認証方法に依存しない Aster Session の Token 一式です。
+type: object
+additionalProperties: false
+required:
+  - access_token
+  - refresh_token
+  - token_type
+  - expires_in
+  - refresh_expires_in
+  - session_id
+properties:
+  access_token:
+    $ref: ./AccessToken.yaml
+  refresh_token:
+    $ref: ./RefreshToken.yaml
+  token_type:
+    type: string
+    const: Bearer
+    description: Authorization Header で使用する Token Type です。
+  expires_in:
+    type: integer
+    minimum: 1
+    description: Access Token が失効するまでの秒数です。
+  refresh_expires_in:
+    type: integer
+    minimum: 1
+    description: Refresh Token が失効するまでの秒数です。
+  session_id:
+    allOf:
+      - $ref: ../common/UUID.yaml
+    description: Client が Session を識別するための ID です。
+examples:
+  - access_token: example-access-token
+    refresh_token: example-refresh-token
+    token_type: Bearer
+    expires_in: 900
+    refresh_expires_in: 2592000
+    session_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0

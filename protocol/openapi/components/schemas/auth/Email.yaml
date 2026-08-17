@@ -1,0 +1,7 @@
+title: Email
+description: Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
+type: string
+format: email
+maxLength: 320
+examples:
+  - alice@example.com

@@ -1,0 +1,7 @@
+title: RefreshToken
+description: Aster Session を更新するための、一度だけ使用できる不透明 Token です。
+type: string
+minLength: 1
+maxLength: 4096
+examples:
+  - example-refresh-token

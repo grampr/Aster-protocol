@@ -4,6 +4,111 @@
  */
 
 export interface paths {
+    "/auth/password/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Password を使用して User Account と Session を作成する
+         * @description Email Address が登録済みの場合は新しい Account を作成しません。
+         *     作成した Account の Email 所有確認は、別途定義する Verification Flow で行います。
+         */
+        post: operations["registerWithPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/password/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email Address と Password で Session を作成する
+         * @description Account の存在を推測できないよう、Email Address と Password のどちらが一致しない場合も
+         *     同じ `INVALID_CREDENTIALS` Error を返します。
+         */
+        post: operations["createPasswordSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/token/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Token を使用して Session を更新する
+         * @description 成功時は新しい Access Token と Refresh Token を発行し、使用済みの Refresh Token を無効化します。
+         *     使用済み Token の再利用を検知した場合は、同じ Session の Token Family を無効化できます。
+         */
+        post: operations["refreshSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 現在の Aster Session を破棄する
+         * @description Bearer Access Token が示す Session と、Request の Refresh Token が同じ Session に属する場合に破棄します。
+         *     破棄後は、その Session から派生した Access Token と Refresh Token を再利用できません。
+         */
+        post: operations["deleteCurrentSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 認証済み User 自身の Account 情報を取得する
+         * @description Bearer Access Token が示す User の公開 Profile と認証状態を返します。
+         *     外部 Provider の Subject や Token は返しません。
+         */
+        get: operations["getCurrentUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -29,6 +134,26 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AccessToken
+         * @description Aster API の認可に使用する、短時間有効な不透明 Token です。
+         * @example example-access-token
+         */
+        AccessToken: string;
+        /**
+         * AuthenticationMethod
+         * @description User Account に Link された認証方法です。
+         * @example PASSWORD
+         * @enum {string}
+         */
+        AuthenticationMethod: "PASSWORD" | "GOOGLE";
+        /**
+         * Email
+         * Format: email
+         * @description Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
+         * @example alice@example.com
+         */
+        Email: string;
         /**
          * Error
          * @description API Error の共通形式です。
@@ -68,6 +193,28 @@ export interface components {
             time: components["schemas"]["Timestamp"];
         };
         /**
+         * LoginPasswordRequest
+         * @description Email Address と Password で Aster Session を作成する Request です。
+         * @example {
+         *       "email": "alice@example.com",
+         *       "password": "<password-with-15-or-more-characters>"
+         *     }
+         */
+        LoginPasswordRequest: {
+            email: components["schemas"]["Email"];
+            password: components["schemas"]["Password"];
+        };
+        /**
+         * LogoutRequest
+         * @description 破棄する Aster Session の Refresh Token を指定する Request です。
+         * @example {
+         *       "refresh_token": "example-refresh-token"
+         *     }
+         */
+        LogoutRequest: {
+            refresh_token: components["schemas"]["RefreshToken"];
+        };
+        /**
          * PageInfo
          * @description Cursor Pagination の継続情報です。
          * @example {
@@ -87,6 +234,13 @@ export interface components {
          * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
          */
         PaginationCursor: string;
+        /**
+         * Password
+         * @description User が設定する Password です。空白を含む Unicode 文字列を許可します。
+         *     Client は文字種の組み合わせを強制せず、Server は漏えい Password を拒否できます。
+         * @example <password-with-15-or-more-characters>
+         */
+        Password: string;
         /**
          * RateLimitDetails
          * @description Rate Limit Error に固有の再試行情報です。
@@ -118,6 +272,64 @@ export interface components {
          */
         RequestId: string;
         /**
+         * RefreshSessionRequest
+         * @description Refresh Token を Rotation して Aster Session を更新する Request です。
+         * @example {
+         *       "refresh_token": "example-refresh-token"
+         *     }
+         */
+        RefreshSessionRequest: {
+            refresh_token: components["schemas"]["RefreshToken"];
+        };
+        /**
+         * RefreshToken
+         * @description Aster Session を更新するための、一度だけ使用できる不透明 Token です。
+         * @example example-refresh-token
+         */
+        RefreshToken: string;
+        /**
+         * RegisterPasswordRequest
+         * @description Password を使用して User Account を作成する Request です。
+         * @example {
+         *       "email": "alice@example.com",
+         *       "password": "<password-with-15-or-more-characters>",
+         *       "display_name": "Alice"
+         *     }
+         */
+        RegisterPasswordRequest: {
+            email: components["schemas"]["Email"];
+            password: components["schemas"]["Password"];
+            /** @description 他の User に表示する名前です。 */
+            display_name: string;
+        };
+        /**
+         * SessionTokenResponse
+         * @description 認証方法に依存しない Aster Session の Token 一式です。
+         * @example {
+         *       "access_token": "example-access-token",
+         *       "refresh_token": "example-refresh-token",
+         *       "token_type": "Bearer",
+         *       "expires_in": 900,
+         *       "refresh_expires_in": 2592000,
+         *       "session_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
+         *     }
+         */
+        SessionTokenResponse: {
+            access_token: components["schemas"]["AccessToken"];
+            refresh_token: components["schemas"]["RefreshToken"];
+            /**
+             * @description Authorization Header で使用する Token Type です。
+             * @constant
+             */
+            token_type: "Bearer";
+            /** @description Access Token が失効するまでの秒数です。 */
+            expires_in: number;
+            /** @description Refresh Token が失効するまでの秒数です。 */
+            refresh_expires_in: number;
+            /** @description Client が Session を識別するための ID です。 */
+            session_id: components["schemas"]["UUID"];
+        };
+        /**
          * Timestamp
          * Format: date-time
          * @description UTC の ISO 8601 Timestamp です。
@@ -131,8 +343,52 @@ export interface components {
          * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
          */
         UUID: string;
+        /**
+         * UserSelf
+         * @description 認証済み User 自身にだけ返す Account 情報です。
+         * @example {
+         *       "id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0",
+         *       "email": "alice@example.com",
+         *       "email_verified": false,
+         *       "display_name": "Alice",
+         *       "avatar_url": null,
+         *       "authentication_methods": [
+         *         "PASSWORD"
+         *       ],
+         *       "created_at": "2026-08-17T06:00:00Z"
+         *     }
+         */
+        UserSelf: {
+            id: components["schemas"]["UUID"];
+            email: components["schemas"]["Email"];
+            /** @description Email Address の所有確認が完了している場合は true です。 */
+            email_verified: boolean;
+            display_name: string;
+            /** @description Avatar Image の URL です。未設定の場合は null です。 */
+            avatar_url: string | null;
+            /** @description Account に Link されている認証方法です。 */
+            authentication_methods: components["schemas"]["AuthenticationMethod"][];
+            created_at: components["schemas"]["Timestamp"];
+        };
     };
     responses: {
+        /** @description 指定された Email Address は登録済みです。 */
+        EmailAlreadyRegistered: {
+            headers: {
+                "X-Request-ID": components["headers"]["RequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "code": "EMAIL_ALREADY_REGISTERED",
+                 *       "message": "Email is already registered",
+                 *       "request_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
         /** @description Request を完了できませんでした。 */
         Error: {
             headers: {
@@ -144,6 +400,40 @@ export interface components {
                  * @example {
                  *       "code": "INTERNAL_ERROR",
                  *       "message": "Internal server error",
+                 *       "request_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Email Address または Password が一致しないため Session を作成しませんでした。 */
+        InvalidCredentials: {
+            headers: {
+                "X-Request-ID": components["headers"]["RequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "code": "INVALID_CREDENTIALS",
+                 *       "message": "Email or password is incorrect",
+                 *       "request_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Refresh Token が無効または失効済みのため Session を更新しませんでした。 */
+        InvalidRefreshToken: {
+            headers: {
+                "X-Request-ID": components["headers"]["RequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "code": "INVALID_REFRESH_TOKEN",
+                 *       "message": "Refresh token is invalid or expired",
                  *       "request_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
                  *     }
                  */
@@ -173,6 +463,28 @@ export interface components {
                  *     }
                  */
                 "application/json": components["schemas"]["RateLimitError"];
+            };
+        };
+        /** @description 有効な Aster Access Token がないため Request を認可しませんでした。 */
+        Unauthorized: {
+            headers: {
+                /**
+                 * @description Bearer 認証が必要であることを示します。
+                 * @example Bearer
+                 */
+                "WWW-Authenticate"?: string;
+                "X-Request-ID": components["headers"]["RequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "code": "UNAUTHORIZED",
+                 *       "message": "Authentication is required",
+                 *       "request_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
             };
         };
     };
@@ -226,6 +538,206 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    registerWithPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "email": "alice@example.com",
+                 *       "password": "<password-with-15-or-more-characters>",
+                 *       "display_name": "Alice"
+                 *     }
+                 */
+                "application/json": components["schemas"]["RegisterPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description User Account と Aster Session を作成しました。 */
+            201: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "access_token": "example-access-token",
+                     *       "refresh_token": "example-refresh-token",
+                     *       "token_type": "Bearer",
+                     *       "expires_in": 900,
+                     *       "refresh_expires_in": 2592000,
+                     *       "session_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["SessionTokenResponse"];
+                };
+            };
+            409: components["responses"]["EmailAlreadyRegistered"];
+            429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createPasswordSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "email": "alice@example.com",
+                 *       "password": "<password-with-15-or-more-characters>"
+                 *     }
+                 */
+                "application/json": components["schemas"]["LoginPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Aster Session を作成しました。 */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "access_token": "example-access-token",
+                     *       "refresh_token": "example-refresh-token",
+                     *       "token_type": "Bearer",
+                     *       "expires_in": 900,
+                     *       "refresh_expires_in": 2592000,
+                     *       "session_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["SessionTokenResponse"];
+                };
+            };
+            401: components["responses"]["InvalidCredentials"];
+            429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
+    refreshSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "refresh_token": "example-refresh-token"
+                 *     }
+                 */
+                "application/json": components["schemas"]["RefreshSessionRequest"];
+            };
+        };
+        responses: {
+            /** @description Aster Session を更新しました。 */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "access_token": "example-next-access-token",
+                     *       "refresh_token": "example-next-refresh-token",
+                     *       "token_type": "Bearer",
+                     *       "expires_in": 900,
+                     *       "refresh_expires_in": 2592000,
+                     *       "session_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["SessionTokenResponse"];
+                };
+            };
+            401: components["responses"]["InvalidRefreshToken"];
+            429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteCurrentSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "refresh_token": "example-refresh-token"
+                 *     }
+                 */
+                "application/json": components["schemas"]["LogoutRequest"];
+            };
+        };
+        responses: {
+            /** @description Aster Session を破棄しました。Response Body はありません。 */
+            204: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
+    getCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 認証済み User の Account 情報です。 */
+            200: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0",
+                     *       "email": "alice@example.com",
+                     *       "email_verified": false,
+                     *       "display_name": "Alice",
+                     *       "avatar_url": null,
+                     *       "authentication_methods": [
+                     *         "PASSWORD"
+                     *       ],
+                     *       "created_at": "2026-08-17T06:00:00Z"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["UserSelf"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
     getHealth: {
         parameters: {
             query?: never;
