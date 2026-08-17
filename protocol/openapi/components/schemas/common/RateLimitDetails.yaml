@@ -1,0 +1,13 @@
+title: RateLimitDetails
+description: Rate Limit Error に固有の再試行情報です。
+type: object
+additionalProperties: false
+required:
+  - retry_after_ms
+properties:
+  retry_after_ms:
+    type: integer
+    minimum: 0
+    description: Request を再試行できるまでのミリ秒数です。
+    examples:
+      - 1250

@@ -1,0 +1,10 @@
+name: limit
+in: query
+required: false
+description: 1回の Response で取得する最大件数です。
+schema:
+  type: integer
+  minimum: 1
+  maximum: 100
+  default: 50
+example: 50

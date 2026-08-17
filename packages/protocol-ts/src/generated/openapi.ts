@@ -36,12 +36,12 @@ export interface components {
         Error: {
             /**
              * @description Client が分岐に利用する機械可読な Error Code です。
-             * @example RATE_LIMITED
+             * @example INTERNAL_ERROR
              */
             code: string;
             /**
              * @description 開発者が原因を把握するための説明です。
-             * @example Too many requests
+             * @example Internal server error
              */
             message: string;
             request_id: components["schemas"]["RequestId"];
@@ -66,6 +66,49 @@ export interface components {
              */
             version: string;
             time: components["schemas"]["Timestamp"];
+        };
+        /**
+         * PageInfo
+         * @description Cursor Pagination の継続情報です。
+         * @example {
+         *       "has_more": true,
+         *       "next_cursor": "eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"
+         *     }
+         */
+        PageInfo: {
+            /** @description 現在の Page より後に取得可能な項目がある場合は true です。 */
+            has_more: boolean;
+            /** @description 次の Page を取得するときに渡す Cursor です。次がない場合は null です。 */
+            next_cursor: components["schemas"]["PaginationCursor"] | null;
+        };
+        /**
+         * PaginationCursor
+         * @description 次の取得位置を表す、Server が発行した不透明な Cursor です。
+         * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+         */
+        PaginationCursor: string;
+        /**
+         * RateLimitDetails
+         * @description Rate Limit Error に固有の再試行情報です。
+         */
+        RateLimitDetails: {
+            /**
+             * @description Request を再試行できるまでのミリ秒数です。
+             * @example 1250
+             */
+            retry_after_ms: number;
+        };
+        /**
+         * RateLimitError
+         * @description Rate Limit を超えた Request に返す Error です。
+         */
+        RateLimitError: components["schemas"]["Error"] & {
+            /**
+             * @description Rate Limit Error を表す固定 Code です。
+             * @constant
+             */
+            code?: "RATE_LIMITED";
+            details: components["schemas"]["RateLimitDetails"];
         };
         /**
          * RequestId
@@ -99,6 +142,28 @@ export interface components {
             content: {
                 /**
                  * @example {
+                 *       "code": "INTERNAL_ERROR",
+                 *       "message": "Internal server error",
+                 *       "request_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Rate Limit を超えたため Request を処理しませんでした。 */
+        RateLimited: {
+            headers: {
+                "Retry-After": components["headers"]["RetryAfter"];
+                "X-RateLimit-Limit": components["headers"]["RateLimitLimit"];
+                "X-RateLimit-Remaining": components["headers"]["RateLimitRemaining"];
+                "X-RateLimit-Reset": components["headers"]["RateLimitReset"];
+                "X-RateLimit-Bucket": components["headers"]["RateLimitBucket"];
+                "X-Request-ID": components["headers"]["RequestId"];
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
                  *       "code": "RATE_LIMITED",
                  *       "message": "Too many requests",
                  *       "request_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0",
@@ -107,18 +172,55 @@ export interface components {
                  *       }
                  *     }
                  */
-                "application/json": components["schemas"]["Error"];
+                "application/json": components["schemas"]["RateLimitError"];
             };
         };
     };
-    parameters: never;
+    parameters: {
+        /**
+         * @description 前の Response が返した次ページ用 Cursor です。
+         *     Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+         * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+         */
+        Cursor: components["schemas"]["PaginationCursor"];
+        /**
+         * @description 1回の Response で取得する最大件数です。
+         * @example 50
+         */
+        Limit: number;
+    };
     requestBodies: never;
     headers: {
+        /**
+         * @description 同じ Rate Limit を共有する Operation 群の不透明な識別子です。
+         * @example channel-message-write
+         */
+        RateLimitBucket: string;
+        /**
+         * @description 現在の Bucket で許可される Request 数です。
+         * @example 5
+         */
+        RateLimitLimit: number;
+        /**
+         * @description 現在の Window で残っている Request 数です。
+         * @example 0
+         */
+        RateLimitRemaining: number;
+        /**
+         * @description 現在の Window が終了する Unix Timestamp（秒）です。
+         * @example 1786946402
+         */
+        RateLimitReset: number;
         /**
          * @description Request を追跡するために Server が割り当てた識別子です。
          * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
          */
         RequestId: components["schemas"]["RequestId"];
+        /**
+         * @description Request を再試行できるまでの秒数です。
+         * @example 2
+         */
+        RetryAfter: number;
     };
     pathItems: never;
 }
@@ -136,6 +238,10 @@ export interface operations {
             /** @description HTTP Server は Request を処理できます。 */
             200: {
                 headers: {
+                    "X-RateLimit-Limit": components["headers"]["RateLimitLimit"];
+                    "X-RateLimit-Remaining": components["headers"]["RateLimitRemaining"];
+                    "X-RateLimit-Reset": components["headers"]["RateLimitReset"];
+                    "X-RateLimit-Bucket": components["headers"]["RateLimitBucket"];
                     "X-Request-ID": components["headers"]["RequestId"];
                     [name: string]: unknown;
                 };
@@ -150,7 +256,7 @@ export interface operations {
                     "application/json": components["schemas"]["HealthResponse"];
                 };
             };
-            429: components["responses"]["Error"];
+            429: components["responses"]["RateLimited"];
             default: components["responses"]["Error"];
         };
     };

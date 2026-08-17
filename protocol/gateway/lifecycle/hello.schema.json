@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "required": ["op", "d"],
   "properties": {
-    "op": { "const": 10, "description": "HELLO Opcode です。" },
+    "op": { "$ref": "../common/opcode.schema.json#/$defs/HELLO" },
     "d": {
       "type": "object",
       "additionalProperties": false,

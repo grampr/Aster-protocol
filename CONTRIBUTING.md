@@ -47,6 +47,12 @@ pnpm check
 Gateway Message は方向と Lifecycle を説明に含めます。
 Opcode と Event 名は Schema の `const` で固定し、生成された判別共用体から利用します。
 
+Opcode と Intent を追加するときは `protocol/gateway/common` の `$defs` を変更します。
+TypeScript の Runtime Constant は生成物であり、直接編集しません。
+
+Intent の値には1 Bit だけを立てた整数を割り当てます。
+既存の値は Client と Bot の設定に保存されるため、別の意味へ再割り当てしません。
+
 Token、Password、Message 本文などの秘密情報や利用者データを Example に含めません。
 
 ## Commit と Pull Request

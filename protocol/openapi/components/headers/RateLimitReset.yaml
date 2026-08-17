@@ -1,0 +1,7 @@
+description: 現在の Window が終了する Unix Timestamp（秒）です。
+required: true
+schema:
+  type: integer
+  format: int64
+  minimum: 0
+example: 1786946402

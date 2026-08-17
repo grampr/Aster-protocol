@@ -11,6 +11,14 @@ get:
     "200":
       description: HTTP Server は Request を処理できます。
       headers:
+        X-RateLimit-Limit:
+          $ref: ../../components/headers/RateLimitLimit.yaml
+        X-RateLimit-Remaining:
+          $ref: ../../components/headers/RateLimitRemaining.yaml
+        X-RateLimit-Reset:
+          $ref: ../../components/headers/RateLimitReset.yaml
+        X-RateLimit-Bucket:
+          $ref: ../../components/headers/RateLimitBucket.yaml
         X-Request-ID:
           $ref: ../../components/headers/RequestId.yaml
       content:
@@ -22,6 +30,6 @@ get:
             version: 0.1.0
             time: 2026-08-17T06:00:00Z
     "429":
-      $ref: ../../components/responses/Error.yaml
+      $ref: ../../components/responses/RateLimited.yaml
     default:
       $ref: ../../components/responses/Error.yaml
