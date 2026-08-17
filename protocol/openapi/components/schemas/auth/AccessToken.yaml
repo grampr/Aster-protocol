@@ -1,0 +1,7 @@
+title: AccessToken
+description: Aster API の認可に使用する、短時間有効な不透明 Token です。
+type: string
+minLength: 1
+maxLength: 4096
+examples:
+  - example-access-token

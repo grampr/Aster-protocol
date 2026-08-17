@@ -15,14 +15,31 @@ servers:
     description: 接続先インスタンスの Version 1 API
 
 tags:
+  - name: Authentication
+    description: Aster Session の作成、更新、破棄を行う Operation
+  - name: Users
+    description: 認証済み User 自身を扱う Operation
   - name: System
     description: Instance の稼働状態を確認する Operation
 
 paths:
+  /auth/password/register:
+    $ref: ./paths/auth/password-register.yaml
+  /auth/password/login:
+    $ref: ./paths/auth/password-login.yaml
+  /auth/token/refresh:
+    $ref: ./paths/auth/token-refresh.yaml
+  /auth/logout:
+    $ref: ./paths/auth/logout.yaml
+  /users/@me:
+    $ref: ./paths/users/me.yaml
   /health:
     $ref: ./paths/system/health.yaml
 
 components:
+  securitySchemes:
+    BearerAuth:
+      $ref: ./components/securitySchemes/BearerAuth.yaml
   headers:
     RateLimitBucket:
       $ref: ./components/headers/RateLimitBucket.yaml
@@ -42,26 +59,56 @@ components:
     Limit:
       $ref: ./components/parameters/Limit.yaml
   responses:
+    EmailAlreadyRegistered:
+      $ref: ./components/responses/EmailAlreadyRegistered.yaml
     Error:
       $ref: ./components/responses/Error.yaml
+    InvalidCredentials:
+      $ref: ./components/responses/InvalidCredentials.yaml
+    InvalidRefreshToken:
+      $ref: ./components/responses/InvalidRefreshToken.yaml
     RateLimited:
       $ref: ./components/responses/RateLimited.yaml
+    Unauthorized:
+      $ref: ./components/responses/Unauthorized.yaml
   schemas:
+    AccessToken:
+      $ref: ./components/schemas/auth/AccessToken.yaml
+    AuthenticationMethod:
+      $ref: ./components/schemas/auth/AuthenticationMethod.yaml
+    Email:
+      $ref: ./components/schemas/auth/Email.yaml
     Error:
       $ref: ./components/schemas/common/Error.yaml
     HealthResponse:
       $ref: ./components/schemas/system/HealthResponse.yaml
+    LoginPasswordRequest:
+      $ref: ./components/schemas/auth/LoginPasswordRequest.yaml
+    LogoutRequest:
+      $ref: ./components/schemas/auth/LogoutRequest.yaml
     PageInfo:
       $ref: ./components/schemas/common/PageInfo.yaml
     PaginationCursor:
       $ref: ./components/schemas/common/PaginationCursor.yaml
+    Password:
+      $ref: ./components/schemas/auth/Password.yaml
     RateLimitDetails:
       $ref: ./components/schemas/common/RateLimitDetails.yaml
     RateLimitError:
       $ref: ./components/schemas/common/RateLimitError.yaml
     RequestId:
       $ref: ./components/schemas/common/RequestId.yaml
+    RefreshSessionRequest:
+      $ref: ./components/schemas/auth/RefreshSessionRequest.yaml
+    RefreshToken:
+      $ref: ./components/schemas/auth/RefreshToken.yaml
+    RegisterPasswordRequest:
+      $ref: ./components/schemas/auth/RegisterPasswordRequest.yaml
+    SessionTokenResponse:
+      $ref: ./components/schemas/auth/SessionTokenResponse.yaml
     Timestamp:
       $ref: ./components/schemas/common/Timestamp.yaml
     UUID:
       $ref: ./components/schemas/common/UUID.yaml
+    UserSelf:
+      $ref: ./components/schemas/users/UserSelf.yaml

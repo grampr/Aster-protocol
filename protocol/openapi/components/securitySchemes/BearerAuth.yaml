@@ -1,0 +1,5 @@
+type: http
+scheme: bearer
+description: |
+  Aster Server が発行する不透明な Access Token です。
+  Google など外部 Provider の Token は指定しません。

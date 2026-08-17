@@ -1,0 +1,11 @@
+title: AuthenticationMethod
+description: User Account に Link された認証方法です。
+type: string
+enum:
+  - PASSWORD
+  - GOOGLE
+x-enum-varnames:
+  - Password
+  - Google
+examples:
+  - PASSWORD

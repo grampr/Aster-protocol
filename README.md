@@ -28,13 +28,16 @@ REST API は OpenAPI、WebSocket Gateway は JSON Schema を正とし、TypeScri
 protocol/openapi/
 ├── openapi.yaml
 ├── paths/
+│   ├── auth/
+│   ├── users/
 │   └── system/
-│       └── health.yaml
 └── components/
     ├── headers/
     ├── responses/
     └── schemas/
+        ├── auth/
         ├── common/
+        ├── users/
         └── system/
 ```
 
@@ -51,6 +54,28 @@ Request と Response には、利用者が値の意味を判断できる例を�
 
 `generated/openapi.yaml` は、外部ツールと Release で使う Bundle です。
 編集後は `pnpm generate` で更新します。
+
+## 認証と Session
+
+Password 認証と将来の外部認証は、どちらも Aster Server が発行する同じ `SessionTokenResponse` に合流します。
+Client が API に渡すのは Aster Access Token であり、Google の ID Token、Access Token、Refresh Token ではありません。
+
+初期契約は次の Operation を定義します。
+
+- `POST /auth/password/register`：Password Account と Session を作成する
+- `POST /auth/password/login`：Password で Session を作成する
+- `POST /auth/token/refresh`：Refresh Token を Rotation する
+- `POST /auth/logout`：現在の Session を破棄する
+- `GET /users/@me`：自分の Account と Link 済み認証方法を取得する
+
+Refresh Token は使用のたびに交換し、使用済み Token を無効にします。
+Desktop Client は Access Token を Memory、Refresh Token を OS の Secure Storage に保存する想定です。
+
+Google Login は OpenID Connect の Authorization Code Flow と PKCE `S256` を使います。
+Server は `state`、`nonce`、Issuer、Audience、署名を検証し、Google 側の Token を Client へ公開せず、短時間かつ一度だけ使える Aster Exchange Code に変換します。
+外部 Identity は Email Address だけでなく、Provider と Provider Subject の組で識別します。
+
+この境界の判断理由と将来追加する Flow は [ADR-0001](docs/decisions/0001-provider-neutral-authentication.md) に記録しています。
 
 ## Cursor Pagination
 

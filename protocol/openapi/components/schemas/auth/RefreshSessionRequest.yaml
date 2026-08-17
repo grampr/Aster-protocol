@@ -1,0 +1,11 @@
+title: RefreshSessionRequest
+description: Refresh Token を Rotation して Aster Session を更新する Request です。
+type: object
+additionalProperties: false
+required:
+  - refresh_token
+properties:
+  refresh_token:
+    $ref: ./RefreshToken.yaml
+examples:
+  - refresh_token: example-refresh-token

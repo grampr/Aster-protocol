@@ -1,0 +1,11 @@
+title: LogoutRequest
+description: 破棄する Aster Session の Refresh Token を指定する Request です。
+type: object
+additionalProperties: false
+required:
+  - refresh_token
+properties:
+  refresh_token:
+    $ref: ./RefreshToken.yaml
+examples:
+  - refresh_token: example-refresh-token

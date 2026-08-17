@@ -13,9 +13,206 @@ servers:
   - url: /api/v1
     description: 接続先インスタンスの Version 1 API
 tags:
+  - name: Authentication
+    description: Aster Session の作成、更新、破棄を行う Operation
+  - name: Users
+    description: 認証済み User 自身を扱う Operation
   - name: System
     description: Instance の稼働状態を確認する Operation
 paths:
+  /auth/password/register:
+    post:
+      operationId: registerWithPassword
+      tags:
+        - Authentication
+      summary: Password を使用して User Account と Session を作成する
+      description: |
+        Email Address が登録済みの場合は新しい Account を作成しません。
+        作成した Account の Email 所有確認は、別途定義する Verification Flow で行います。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPasswordRequest'
+            example:
+              email: alice@example.com
+              password: <password-with-15-or-more-characters>
+              display_name: Alice
+      responses:
+        '201':
+          description: User Account と Aster Session を作成しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionTokenResponse'
+              example:
+                access_token: example-access-token
+                refresh_token: example-refresh-token
+                token_type: Bearer
+                expires_in: 900
+                refresh_expires_in: 2592000
+                session_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+        '409':
+          $ref: '#/components/responses/EmailAlreadyRegistered'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /auth/password/login:
+    post:
+      operationId: createPasswordSession
+      tags:
+        - Authentication
+      summary: Email Address と Password で Session を作成する
+      description: |
+        Account の存在を推測できないよう、Email Address と Password のどちらが一致しない場合も
+        同じ `INVALID_CREDENTIALS` Error を返します。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginPasswordRequest'
+            example:
+              email: alice@example.com
+              password: <password-with-15-or-more-characters>
+      responses:
+        '200':
+          description: Aster Session を作成しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionTokenResponse'
+              example:
+                access_token: example-access-token
+                refresh_token: example-refresh-token
+                token_type: Bearer
+                expires_in: 900
+                refresh_expires_in: 2592000
+                session_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /auth/token/refresh:
+    post:
+      operationId: refreshSession
+      tags:
+        - Authentication
+      summary: Refresh Token を使用して Session を更新する
+      description: |
+        成功時は新しい Access Token と Refresh Token を発行し、使用済みの Refresh Token を無効化します。
+        使用済み Token の再利用を検知した場合は、同じ Session の Token Family を無効化できます。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshSessionRequest'
+            example:
+              refresh_token: example-refresh-token
+      responses:
+        '200':
+          description: Aster Session を更新しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionTokenResponse'
+              example:
+                access_token: example-next-access-token
+                refresh_token: example-next-refresh-token
+                token_type: Bearer
+                expires_in: 900
+                refresh_expires_in: 2592000
+                session_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+        '401':
+          $ref: '#/components/responses/InvalidRefreshToken'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /auth/logout:
+    post:
+      operationId: deleteCurrentSession
+      tags:
+        - Authentication
+      summary: 現在の Aster Session を破棄する
+      description: |
+        Bearer Access Token が示す Session と、Request の Refresh Token が同じ Session に属する場合に破棄します。
+        破棄後は、その Session から派生した Access Token と Refresh Token を再利用できません。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+            example:
+              refresh_token: example-refresh-token
+      responses:
+        '204':
+          description: Aster Session を破棄しました。Response Body はありません。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /users/@me:
+    get:
+      operationId: getCurrentUser
+      tags:
+        - Users
+      summary: 認証済み User 自身の Account 情報を取得する
+      description: |
+        Bearer Access Token が示す User の公開 Profile と認証状態を返します。
+        外部 Provider の Subject や Token は返しません。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 認証済み User の Account 情報です。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSelf'
+              example:
+                id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                email: alice@example.com
+                email_verified: false
+                display_name: Alice
+                avatar_url: null
+                authentication_methods:
+                  - PASSWORD
+                created_at: '2026-08-17T06:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
   /health:
     get:
       operationId: getHealth
@@ -53,6 +250,13 @@ paths:
         default:
           $ref: '#/components/responses/Error'
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        Aster Server が発行する不透明な Access Token です。
+        Google など外部 Provider の Token は指定しません。
   headers:
     RateLimitBucket:
       description: 同じ Rate Limit を共有する Operation 群の不透明な識別子です。
@@ -119,6 +323,19 @@ components:
         default: 50
       example: 50
   responses:
+    EmailAlreadyRegistered:
+      description: 指定された Email Address は登録済みです。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: EMAIL_ALREADY_REGISTERED
+            message: Email is already registered
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
     Error:
       description: Request を完了できませんでした。
       headers:
@@ -131,6 +348,32 @@ components:
           example:
             code: INTERNAL_ERROR
             message: Internal server error
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    InvalidCredentials:
+      description: Email Address または Password が一致しないため Session を作成しませんでした。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: INVALID_CREDENTIALS
+            message: Email or password is incorrect
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    InvalidRefreshToken:
+      description: Refresh Token が無効または失効済みのため Session を更新しませんでした。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: INVALID_REFRESH_TOKEN
+            message: Refresh token is invalid or expired
             request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
     RateLimited:
       description: Rate Limit を超えたため Request を処理しませんでした。
@@ -157,7 +400,53 @@ components:
             request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
             details:
               retry_after_ms: 1250
+    Unauthorized:
+      description: 有効な Aster Access Token がないため Request を認可しませんでした。
+      headers:
+        WWW-Authenticate:
+          description: Bearer 認証が必要であることを示します。
+          schema:
+            type: string
+          example: Bearer
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: UNAUTHORIZED
+            message: Authentication is required
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
   schemas:
+    AccessToken:
+      title: AccessToken
+      description: Aster API の認可に使用する、短時間有効な不透明 Token です。
+      type: string
+      minLength: 1
+      maxLength: 4096
+      examples:
+        - example-access-token
+    AuthenticationMethod:
+      title: AuthenticationMethod
+      description: User Account に Link された認証方法です。
+      type: string
+      enum:
+        - PASSWORD
+        - GOOGLE
+      x-enum-varnames:
+        - Password
+        - Google
+      examples:
+        - PASSWORD
+    Email:
+      title: Email
+      description: Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
+      type: string
+      format: email
+      maxLength: 320
+      examples:
+        - alice@example.com
     Error:
       title: Error
       description: API Error の共通形式です。
@@ -208,6 +497,34 @@ components:
             - 0.1.0
         time:
           $ref: '#/components/schemas/Timestamp'
+    LoginPasswordRequest:
+      title: LoginPasswordRequest
+      description: Email Address と Password で Aster Session を作成する Request です。
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          $ref: '#/components/schemas/Password'
+      examples:
+        - email: alice@example.com
+          password: <password-with-15-or-more-characters>
+    LogoutRequest:
+      title: LogoutRequest
+      description: 破棄する Aster Session の Refresh Token を指定する Request です。
+      type: object
+      additionalProperties: false
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          $ref: '#/components/schemas/RefreshToken'
+      examples:
+        - refresh_token: example-refresh-token
     PageInfo:
       title: PageInfo
       description: Cursor Pagination の継続情報です。
@@ -236,6 +553,16 @@ components:
       maxLength: 512
       examples:
         - eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+    Password:
+      title: Password
+      description: |
+        User が設定する Password です。空白を含む Unicode 文字列を許可します。
+        Client は文字種の組み合わせを強制せず、Server は漏えい Password を拒否できます。
+      type: string
+      minLength: 15
+      maxLength: 128
+      examples:
+        - <password-with-15-or-more-characters>
     RateLimitDetails:
       title: RateLimitDetails
       description: Rate Limit Error に固有の再試行情報です。
@@ -274,6 +601,89 @@ components:
       format: uuid
       examples:
         - 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    RefreshSessionRequest:
+      title: RefreshSessionRequest
+      description: Refresh Token を Rotation して Aster Session を更新する Request です。
+      type: object
+      additionalProperties: false
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          $ref: '#/components/schemas/RefreshToken'
+      examples:
+        - refresh_token: example-refresh-token
+    RefreshToken:
+      title: RefreshToken
+      description: Aster Session を更新するための、一度だけ使用できる不透明 Token です。
+      type: string
+      minLength: 1
+      maxLength: 4096
+      examples:
+        - example-refresh-token
+    RegisterPasswordRequest:
+      title: RegisterPasswordRequest
+      description: Password を使用して User Account を作成する Request です。
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+        - display_name
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          $ref: '#/components/schemas/Password'
+        display_name:
+          type: string
+          description: 他の User に表示する名前です。
+          minLength: 1
+          maxLength: 64
+      examples:
+        - email: alice@example.com
+          password: <password-with-15-or-more-characters>
+          display_name: Alice
+    SessionTokenResponse:
+      title: SessionTokenResponse
+      description: 認証方法に依存しない Aster Session の Token 一式です。
+      type: object
+      additionalProperties: false
+      required:
+        - access_token
+        - refresh_token
+        - token_type
+        - expires_in
+        - refresh_expires_in
+        - session_id
+      properties:
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        refresh_token:
+          $ref: '#/components/schemas/RefreshToken'
+        token_type:
+          type: string
+          const: Bearer
+          description: Authorization Header で使用する Token Type です。
+        expires_in:
+          type: integer
+          minimum: 1
+          description: Access Token が失効するまでの秒数です。
+        refresh_expires_in:
+          type: integer
+          minimum: 1
+          description: Refresh Token が失効するまでの秒数です。
+        session_id:
+          allOf:
+            - $ref: '#/components/schemas/UUID'
+          description: Client が Session を識別するための ID です。
+      examples:
+        - access_token: example-access-token
+          refresh_token: example-refresh-token
+          token_type: Bearer
+          expires_in: 900
+          refresh_expires_in: 2592000
+          session_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
     Timestamp:
       title: Timestamp
       description: UTC の ISO 8601 Timestamp です。
@@ -288,3 +698,52 @@ components:
       format: uuid
       examples:
         - 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    UserSelf:
+      title: UserSelf
+      description: 認証済み User 自身にだけ返す Account 情報です。
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - email
+        - email_verified
+        - display_name
+        - avatar_url
+        - authentication_methods
+        - created_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        email:
+          $ref: '#/components/schemas/Email'
+        email_verified:
+          type: boolean
+          description: Email Address の所有確認が完了している場合は true です。
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        avatar_url:
+          description: Avatar Image の URL です。未設定の場合は null です。
+          oneOf:
+            - type: string
+              format: uri
+            - type: 'null'
+        authentication_methods:
+          type: array
+          description: Account に Link されている認証方法です。
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/AuthenticationMethod'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+      examples:
+        - id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+          email: alice@example.com
+          email_verified: false
+          display_name: Alice
+          avatar_url: null
+          authentication_methods:
+            - PASSWORD
+          created_at: '2026-08-17T06:00:00Z'
