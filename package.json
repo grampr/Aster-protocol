@@ -1,0 +1,31 @@
+{
+  "name": "aster-protocol-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "bundle:openapi": "redocly bundle aster@v1 --output generated/openapi.yaml --component-renaming-conflicts-severity=error",
+    "generate:openapi:ts": "openapi-typescript",
+    "generate:gateway:ts": "json2ts --cwd protocol/gateway --input protocol/gateway/gateway.schema.json --output packages/protocol-ts/src/generated/gateway.ts",
+    "generate:go": "cd packages/protocol-go && go generate ./...",
+    "generate": "pnpm bundle:openapi && pnpm generate:openapi:ts && pnpm generate:gateway:ts && pnpm generate:go",
+    "lint:openapi": "redocly lint aster@v1",
+    "validate:gateway": "node scripts/validate-gateway.mjs",
+    "typecheck": "pnpm --recursive typecheck",
+    "test:go": "cd packages/protocol-go && go test ./...",
+    "check": "pnpm lint:openapi && pnpm validate:gateway && pnpm generate && pnpm typecheck && pnpm test:go"
+  },
+  "devDependencies": {
+    "@redocly/cli": "2.46.1",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "json-schema-to-typescript": "15.0.4",
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3"
+  }
+}

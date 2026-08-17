@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/lifecycle/hello.schema.json",
+  "title": "HelloMessage",
+  "description": "Server が接続直後に Heartbeat 間隔を通知します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "d"],
+  "properties": {
+    "op": { "const": 10, "description": "HELLO Opcode です。" },
+    "d": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heartbeat_interval_ms"],
+      "properties": {
+        "heartbeat_interval_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "description": "Client が Heartbeat を送信する間隔です。"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+title: Error
+description: API Error の共通形式です。
+type: object
+additionalProperties: false
+required:
+  - code
+  - message
+  - request_id
+properties:
+  code:
+    type: string
+    description: Client が分岐に利用する機械可読な Error Code です。
+    pattern: ^[A-Z][A-Z0-9_]*$
+    examples:
+      - RATE_LIMITED
+  message:
+    type: string
+    description: 開発者が原因を把握するための説明です。
+    minLength: 1
+    examples:
+      - Too many requests
+  request_id:
+    $ref: ./RequestId.yaml
+  details:
+    type: object
+    description: Error Code ごとに定義される追加情報です。
+    additionalProperties: true

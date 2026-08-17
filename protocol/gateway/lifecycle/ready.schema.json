@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/lifecycle/ready.schema.json",
+  "title": "ReadyMessage",
+  "description": "Server が新しい Gateway Session の開始を通知します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "t", "s", "d"],
+  "properties": {
+    "op": { "const": 0, "description": "DISPATCH Opcode です。" },
+    "t": { "const": "READY", "description": "Event 名です。" },
+    "s": { "type": "integer", "minimum": 0, "description": "Event Sequence です。" },
+    "d": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["session_id", "resume_gateway_url"],
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Resume に使用する Session Identifier です。"
+        },
+        "resume_gateway_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "切断後に Resume する Gateway URL です。"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@grampr/aster-protocol",
+  "version": "0.1.0",
+  "description": "Generated TypeScript types for the Aster REST API and Gateway",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

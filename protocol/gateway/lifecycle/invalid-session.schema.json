@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/lifecycle/invalid-session.schema.json",
+  "title": "InvalidSessionMessage",
+  "description": "Server が Session を再開できるか通知します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "d"],
+  "properties": {
+    "op": { "const": 9, "description": "INVALID_SESSION Opcode です。" },
+    "d": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resumable"],
+      "properties": {
+        "resumable": {
+          "type": "boolean",
+          "description": "同じ Session Identifier で再試行できる場合は true です。"
+        }
+      }
+    }
+  }
+}

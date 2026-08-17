@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/lifecycle/resumed.schema.json",
+  "title": "ResumedMessage",
+  "description": "Server が Gateway Session と Event 配信の再開を通知します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "t", "s", "d"],
+  "properties": {
+    "op": { "const": 0, "description": "DISPATCH Opcode です。" },
+    "t": { "const": "RESUMED", "description": "Event 名です。" },
+    "s": { "type": "integer", "minimum": 0, "description": "Event Sequence です。" },
+    "d": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Payload は空の Object です。"
+    }
+  }
+}

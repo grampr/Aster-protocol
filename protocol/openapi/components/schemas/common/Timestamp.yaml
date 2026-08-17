@@ -1,0 +1,6 @@
+title: Timestamp
+description: UTC の ISO 8601 Timestamp です。
+type: string
+format: date-time
+examples:
+  - 2026-08-17T06:00:00Z

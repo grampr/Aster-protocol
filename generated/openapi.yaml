@@ -1,0 +1,142 @@
+openapi: 3.1.1
+info:
+  title: Aster REST API
+  version: 0.1.0
+  summary: Aster Client、Bot、Webhook が利用する REST API
+  description: |
+    Aster の永続状態を取得し、明示的な変更を要求するための API です。
+    リアルタイムな変更通知は WebSocket Gateway が担当します。
+  license:
+    name: Apache License 2.0
+    identifier: Apache-2.0
+servers:
+  - url: /api/v1
+    description: 接続先インスタンスの Version 1 API
+tags:
+  - name: System
+    description: Instance の稼働状態を確認する Operation
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      tags:
+        - System
+      summary: Instance の稼働状態を取得する
+      description: |
+        HTTP Server が Request を処理できる状態か確認します。
+        PostgreSQL などの依存サービスを含む Readiness Check は別の Operation で定義します。
+      security: []
+      responses:
+        '200':
+          description: HTTP Server は Request を処理できます。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                version: 0.1.0
+                time: '2026-08-17T06:00:00Z'
+        '429':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+components:
+  headers:
+    RequestId:
+      description: Request を追跡するために Server が割り当てた識別子です。
+      required: true
+      schema:
+        $ref: '#/components/schemas/RequestId'
+      example: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+  responses:
+    Error:
+      description: Request を完了できませんでした。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: RATE_LIMITED
+            message: Too many requests
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+            details:
+              retry_after_ms: 1250
+  schemas:
+    Error:
+      title: Error
+      description: API Error の共通形式です。
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+        - request_id
+      properties:
+        code:
+          type: string
+          description: Client が分岐に利用する機械可読な Error Code です。
+          pattern: ^[A-Z][A-Z0-9_]*$
+          examples:
+            - RATE_LIMITED
+        message:
+          type: string
+          description: 開発者が原因を把握するための説明です。
+          minLength: 1
+          examples:
+            - Too many requests
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        details:
+          type: object
+          description: Error Code ごとに定義される追加情報です。
+          additionalProperties: true
+    HealthResponse:
+      title: HealthResponse
+      description: HTTP Server の稼働状態です。
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - version
+        - time
+      properties:
+        status:
+          type: string
+          const: ok
+          description: HTTP Server が稼働している場合は `ok` です。
+        version:
+          type: string
+          description: 稼働中の Aster Server Version です。
+          minLength: 1
+          examples:
+            - 0.1.0
+        time:
+          $ref: '#/components/schemas/Timestamp'
+    RequestId:
+      title: RequestId
+      description: Request と Log を対応づける UUID です。
+      type: string
+      format: uuid
+      examples:
+        - 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    Timestamp:
+      title: Timestamp
+      description: UTC の ISO 8601 Timestamp です。
+      type: string
+      format: date-time
+      examples:
+        - '2026-08-17T06:00:00Z'
+    UUID:
+      title: UUID
+      description: UUIDv7 を使用する Resource Identifier です。
+      type: string
+      format: uuid
+      examples:
+        - 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0

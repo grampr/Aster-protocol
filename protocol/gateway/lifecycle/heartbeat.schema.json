@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/lifecycle/heartbeat.schema.json",
+  "title": "HeartbeatMessage",
+  "description": "Client が接続維持と最後に受信した Sequence を通知します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "d"],
+  "properties": {
+    "op": { "const": 1, "description": "HEARTBEAT Opcode です。" },
+    "d": {
+      "description": "最後に受信した Sequence です。Event 受信前は null です。",
+      "type": ["integer", "null"],
+      "minimum": 0
+    }
+  }
+}
