@@ -30,6 +30,14 @@ paths:
         '200':
           description: HTTP Server は Request を処理できます。
           headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/RateLimitLimit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/RateLimitRemaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/RateLimitReset'
+            X-RateLimit-Bucket:
+              $ref: '#/components/headers/RateLimitBucket'
             X-Request-ID:
               $ref: '#/components/headers/RequestId'
           content:
@@ -41,17 +49,75 @@ paths:
                 version: 0.1.0
                 time: '2026-08-17T06:00:00Z'
         '429':
-          $ref: '#/components/responses/Error'
+          $ref: '#/components/responses/RateLimited'
         default:
           $ref: '#/components/responses/Error'
 components:
   headers:
+    RateLimitBucket:
+      description: 同じ Rate Limit を共有する Operation 群の不透明な識別子です。
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      example: channel-message-write
+    RateLimitLimit:
+      description: 現在の Bucket で許可される Request 数です。
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      example: 5
+    RateLimitRemaining:
+      description: 現在の Window で残っている Request 数です。
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+      example: 0
+    RateLimitReset:
+      description: 現在の Window が終了する Unix Timestamp（秒）です。
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+      example: 1786946402
     RequestId:
       description: Request を追跡するために Server が割り当てた識別子です。
       required: true
       schema:
         $ref: '#/components/schemas/RequestId'
       example: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    RetryAfter:
+      description: Request を再試行できるまでの秒数です。
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+      example: 2
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      description: |
+        前の Response が返した次ページ用 Cursor です。
+        Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+      schema:
+        $ref: '#/components/schemas/PaginationCursor'
+      example: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: 1回の Response で取得する最大件数です。
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+      example: 50
   responses:
     Error:
       description: Request を完了できませんでした。
@@ -62,6 +128,29 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+          example:
+            code: INTERNAL_ERROR
+            message: Internal server error
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    RateLimited:
+      description: Rate Limit を超えたため Request を処理しませんでした。
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/RateLimitLimit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/RateLimitRemaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/RateLimitReset'
+        X-RateLimit-Bucket:
+          $ref: '#/components/headers/RateLimitBucket'
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RateLimitError'
           example:
             code: RATE_LIMITED
             message: Too many requests
@@ -84,13 +173,13 @@ components:
           description: Client が分岐に利用する機械可読な Error Code です。
           pattern: ^[A-Z][A-Z0-9_]*$
           examples:
-            - RATE_LIMITED
+            - INTERNAL_ERROR
         message:
           type: string
           description: 開発者が原因を把握するための説明です。
           minLength: 1
           examples:
-            - Too many requests
+            - Internal server error
         request_id:
           $ref: '#/components/schemas/RequestId'
         details:
@@ -119,6 +208,65 @@ components:
             - 0.1.0
         time:
           $ref: '#/components/schemas/Timestamp'
+    PageInfo:
+      title: PageInfo
+      description: Cursor Pagination の継続情報です。
+      type: object
+      additionalProperties: false
+      required:
+        - has_more
+        - next_cursor
+      properties:
+        has_more:
+          type: boolean
+          description: 現在の Page より後に取得可能な項目がある場合は true です。
+        next_cursor:
+          description: 次の Page を取得するときに渡す Cursor です。次がない場合は null です。
+          oneOf:
+            - $ref: '#/components/schemas/PaginationCursor'
+            - type: 'null'
+      examples:
+        - has_more: true
+          next_cursor: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+    PaginationCursor:
+      title: PaginationCursor
+      description: 次の取得位置を表す、Server が発行した不透明な Cursor です。
+      type: string
+      minLength: 1
+      maxLength: 512
+      examples:
+        - eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+    RateLimitDetails:
+      title: RateLimitDetails
+      description: Rate Limit Error に固有の再試行情報です。
+      type: object
+      additionalProperties: false
+      required:
+        - retry_after_ms
+      properties:
+        retry_after_ms:
+          type: integer
+          minimum: 0
+          description: Request を再試行できるまでのミリ秒数です。
+          examples:
+            - 1250
+    RateLimitError:
+      title: RateLimitError
+      description: Rate Limit を超えた Request に返す Error です。
+      allOf:
+        - $ref: '#/components/schemas/Error'
+        - type: object
+          required:
+            - details
+          properties:
+            code:
+              type: string
+              const: RATE_LIMITED
+              x-enum-varnames:
+                - RateLimited
+              description: Rate Limit Error を表す固定 Code です。
+            details:
+              $ref: '#/components/schemas/RateLimitDetails'
     RequestId:
       title: RequestId
       description: Request と Log を対応づける UUID です。

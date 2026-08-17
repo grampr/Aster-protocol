@@ -1,0 +1,6 @@
+description: Request を再試行できるまでの秒数です。
+required: true
+schema:
+  type: integer
+  minimum: 0
+example: 2

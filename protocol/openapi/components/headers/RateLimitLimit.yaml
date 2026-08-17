@@ -1,0 +1,6 @@
+description: 現在の Bucket で許可される Request 数です。
+required: true
+schema:
+  type: integer
+  minimum: 1
+example: 5

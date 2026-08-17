@@ -24,11 +24,26 @@ func (e HealthResponseStatus) Valid() bool {
 	}
 }
 
+// Defines values for RateLimitErrorCode.
+const (
+	RateLimitErrorCodeRateLimited RateLimitErrorCode = "RATE_LIMITED"
+)
+
+// Valid indicates whether the value is a known member of the RateLimitErrorCode enum.
+func (e RateLimitErrorCode) Valid() bool {
+	switch e {
+	case RateLimitErrorCodeRateLimited:
+		return true
+	default:
+		return false
+	}
+}
+
 // Error API Error の共通形式です。
 type Error struct {
 	// Code Client が分岐に利用する機械可読な Error Code です。
 	//
-	// Examples: RATE_LIMITED
+	// Examples: INTERNAL_ERROR
 	Code string `json:"code"`
 
 	// Details Error Code ごとに定義される追加情報です。
@@ -36,7 +51,7 @@ type Error struct {
 
 	// Message 開発者が原因を把握するための説明です。
 	//
-	// Examples: Too many requests
+	// Examples: Internal server error
 	Message string `json:"message"`
 
 	// RequestId Request と Log を対応づける UUID です。
@@ -64,6 +79,52 @@ type HealthResponse struct {
 // HealthResponseStatus HTTP Server が稼働している場合は `ok` です。
 type HealthResponseStatus string
 
+// PageInfo Cursor Pagination の継続情報です。
+//
+// Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
+type PageInfo struct {
+	// HasMore 現在の Page より後に取得可能な項目がある場合は true です。
+	HasMore bool `json:"has_more"`
+
+	// NextCursor 次の Page を取得するときに渡す Cursor です。次がない場合は null です。
+	NextCursor *PaginationCursor `json:"next_cursor"`
+}
+
+// PaginationCursor 次の取得位置を表す、Server が発行した不透明な Cursor です。
+//
+// Examples: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+type PaginationCursor = string
+
+// RateLimitDetails Rate Limit Error に固有の再試行情報です。
+type RateLimitDetails struct {
+	// RetryAfterMs Request を再試行できるまでのミリ秒数です。
+	//
+	// Examples: 1250
+	RetryAfterMs int `json:"retry_after_ms"`
+}
+
+// RateLimitError Rate Limit を超えた Request に返す Error です。
+type RateLimitError struct {
+	// Code Rate Limit Error を表す固定 Code です。
+	Code RateLimitErrorCode `json:"code"`
+
+	// Details Rate Limit Error に固有の再試行情報です。
+	Details RateLimitDetails `json:"details"`
+
+	// Message 開発者が原因を把握するための説明です。
+	//
+	// Examples: Internal server error
+	Message string `json:"message"`
+
+	// RequestId Request と Log を対応づける UUID です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	RequestId RequestId `json:"request_id"`
+}
+
+// RateLimitErrorCode Rate Limit Error を表す固定 Code です。
+type RateLimitErrorCode string
+
 // RequestId Request と Log を対応づける UUID です。
 //
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
@@ -78,3 +139,14 @@ type Timestamp = time.Time
 //
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 type UUID = openapi_types.UUID
+
+// Cursor 次の取得位置を表す、Server が発行した不透明な Cursor です。
+//
+// Examples: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+type Cursor = PaginationCursor
+
+// Limit defines model for Limit.
+type Limit = int
+
+// RateLimited Rate Limit を超えた Request に返す Error です。
+type RateLimited = RateLimitError

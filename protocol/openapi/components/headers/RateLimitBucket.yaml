@@ -1,0 +1,6 @@
+description: 同じ Rate Limit を共有する Operation 群の不透明な識別子です。
+required: true
+schema:
+  type: string
+  minLength: 1
+example: channel-message-write

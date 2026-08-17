@@ -1,0 +1,9 @@
+name: cursor
+in: query
+required: false
+description: |
+  前の Response が返した次ページ用 Cursor です。
+  Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+schema:
+  $ref: ../schemas/common/PaginationCursor.yaml
+example: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9

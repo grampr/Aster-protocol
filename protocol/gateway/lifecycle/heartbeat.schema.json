@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "required": ["op", "d"],
   "properties": {
-    "op": { "const": 1, "description": "HEARTBEAT Opcode です。" },
+    "op": { "$ref": "../common/opcode.schema.json#/$defs/HEARTBEAT" },
     "d": {
       "description": "最後に受信した Sequence です。Event 受信前は null です。",
       "type": ["integer", "null"],

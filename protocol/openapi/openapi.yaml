@@ -24,16 +24,41 @@ paths:
 
 components:
   headers:
+    RateLimitBucket:
+      $ref: ./components/headers/RateLimitBucket.yaml
+    RateLimitLimit:
+      $ref: ./components/headers/RateLimitLimit.yaml
+    RateLimitRemaining:
+      $ref: ./components/headers/RateLimitRemaining.yaml
+    RateLimitReset:
+      $ref: ./components/headers/RateLimitReset.yaml
     RequestId:
       $ref: ./components/headers/RequestId.yaml
+    RetryAfter:
+      $ref: ./components/headers/RetryAfter.yaml
+  parameters:
+    Cursor:
+      $ref: ./components/parameters/Cursor.yaml
+    Limit:
+      $ref: ./components/parameters/Limit.yaml
   responses:
     Error:
       $ref: ./components/responses/Error.yaml
+    RateLimited:
+      $ref: ./components/responses/RateLimited.yaml
   schemas:
     Error:
       $ref: ./components/schemas/common/Error.yaml
     HealthResponse:
       $ref: ./components/schemas/system/HealthResponse.yaml
+    PageInfo:
+      $ref: ./components/schemas/common/PageInfo.yaml
+    PaginationCursor:
+      $ref: ./components/schemas/common/PaginationCursor.yaml
+    RateLimitDetails:
+      $ref: ./components/schemas/common/RateLimitDetails.yaml
+    RateLimitError:
+      $ref: ./components/schemas/common/RateLimitError.yaml
     RequestId:
       $ref: ./components/schemas/common/RequestId.yaml
     Timestamp:

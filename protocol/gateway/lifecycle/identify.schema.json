@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "required": ["op", "d"],
   "properties": {
-    "op": { "const": 2, "description": "IDENTIFY Opcode です。" },
+    "op": { "$ref": "../common/opcode.schema.json#/$defs/IDENTIFY" },
     "d": {
       "type": "object",
       "additionalProperties": false,
@@ -18,11 +18,7 @@
           "minLength": 1,
           "description": "Session または Bot の認証 Token です。"
         },
-        "intents": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "購読する Event を表す Bitfield です。"
-        }
+        "intents": { "$ref": "../common/intents.schema.json" }
       }
     }
   }

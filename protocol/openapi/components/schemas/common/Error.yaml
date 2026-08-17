@@ -12,13 +12,13 @@ properties:
     description: Client が分岐に利用する機械可読な Error Code です。
     pattern: ^[A-Z][A-Z0-9_]*$
     examples:
-      - RATE_LIMITED
+      - INTERNAL_ERROR
   message:
     type: string
     description: 開発者が原因を把握するための説明です。
     minLength: 1
     examples:
-      - Too many requests
+      - Internal server error
   request_id:
     $ref: ./RequestId.yaml
   details:

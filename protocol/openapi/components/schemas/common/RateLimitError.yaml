@@ -1,0 +1,16 @@
+title: RateLimitError
+description: Rate Limit を超えた Request に返す Error です。
+allOf:
+  - $ref: ./Error.yaml
+  - type: object
+    required:
+      - details
+    properties:
+      code:
+        type: string
+        const: RATE_LIMITED
+        x-enum-varnames:
+          - RateLimited
+        description: Rate Limit Error を表す固定 Code です。
+      details:
+        $ref: ./RateLimitDetails.yaml

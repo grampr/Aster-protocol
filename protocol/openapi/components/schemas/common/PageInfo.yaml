@@ -1,0 +1,19 @@
+title: PageInfo
+description: Cursor Pagination の継続情報です。
+type: object
+additionalProperties: false
+required:
+  - has_more
+  - next_cursor
+properties:
+  has_more:
+    type: boolean
+    description: 現在の Page より後に取得可能な項目がある場合は true です。
+  next_cursor:
+    description: 次の Page を取得するときに渡す Cursor です。次がない場合は null です。
+    oneOf:
+      - $ref: ./PaginationCursor.yaml
+      - type: "null"
+examples:
+  - has_more: true
+    next_cursor: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9

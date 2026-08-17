@@ -32,6 +32,48 @@ const schemas = await Promise.all(
   schemaFiles.map(async (path) => JSON.parse(await readFile(path, "utf8"))),
 );
 
+function findSchema(title) {
+  const schema = schemas.find((candidate) => candidate.title === title);
+  if (!schema) {
+    throw new Error(`Gateway schema was not found: ${title}`);
+  }
+
+  return schema;
+}
+
+function readIntegerDefinitions(schema) {
+  if (!schema.$defs || typeof schema.$defs !== "object") {
+    throw new Error(`${schema.title} does not define $defs`);
+  }
+
+  return Object.entries(schema.$defs).map(([name, definition]) => {
+    if (!Number.isInteger(definition.const)) {
+      throw new Error(`${schema.title}.${name} must define an integer const`);
+    }
+
+    return [name, definition.const];
+  });
+}
+
+function assertUniqueValues(entries, schemaName) {
+  const values = entries.map(([, value]) => value);
+  if (new Set(values).size !== values.length) {
+    throw new Error(`${schemaName} contains duplicate values`);
+  }
+}
+
+const opcodeDefinitions = readIntegerDefinitions(findSchema("GatewayOpcode"));
+assertUniqueValues(opcodeDefinitions, "GatewayOpcode");
+
+const intentDefinitions = readIntegerDefinitions(findSchema("GatewayIntents"));
+assertUniqueValues(intentDefinitions, "GatewayIntents");
+
+for (const [name, value] of intentDefinitions) {
+  if (value <= 0 || (value & (value - 1)) !== 0) {
+    throw new Error(`GatewayIntents.${name} must contain exactly one bit`);
+  }
+}
+
 for (const schema of schemas) {
   ajv.addSchema(schema);
 }
@@ -47,7 +89,7 @@ const validFixtures = [
   { op: 10, d: { heartbeat_interval_ms: 45_000 } },
   { op: 1, d: null },
   { op: 11, d: null },
-  { op: 2, d: { token: "example-token", intents: 0 } },
+  { op: 2, d: { token: "example-token", intents: 5 } },
   {
     op: 0,
     t: "READY",
@@ -72,4 +114,14 @@ if (validate(invalidFixture)) {
   throw new Error("Invalid Gateway fixture was accepted");
 }
 
-console.log(`Validated ${schemaFiles.length} Gateway schemas and fixtures.`);
+const invalidIntentFixture = {
+  op: 2,
+  d: { token: "example-token", intents: -1 },
+};
+if (validate(invalidIntentFixture)) {
+  throw new Error("Negative Gateway intents were accepted");
+}
+
+console.log(
+  `Validated ${schemaFiles.length} Gateway schemas, ${opcodeDefinitions.length} opcodes, ${intentDefinitions.length} intents, and fixtures.`,
+);

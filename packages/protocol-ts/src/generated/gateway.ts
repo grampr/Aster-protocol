@@ -17,13 +17,17 @@ export type AsterGatewayMessage =
   | ResumeMessage
   | ResumedMessage
   | InvalidSessionMessage;
+/**
+ * 購読する Gateway Event 群を表す32-bit Bitfield です。未割り当て Bit は Server が意味を定義するまで使用しません。
+ */
+export type GatewayIntents = number;
 
 /**
  * Server が接続直後に Heartbeat 間隔を通知します。
  */
 export interface HelloMessage {
   /**
-   * HELLO Opcode です。
+   * Server が Heartbeat 間隔を通知します。
    */
   op: 10;
   d: {
@@ -38,7 +42,7 @@ export interface HelloMessage {
  */
 export interface IdentifyMessage {
   /**
-   * IDENTIFY Opcode です。
+   * Client が新しい Session を開始します。
    */
   op: 2;
   d: {
@@ -46,10 +50,7 @@ export interface IdentifyMessage {
      * Session または Bot の認証 Token です。
      */
     token: string;
-    /**
-     * 購読する Event を表す Bitfield です。
-     */
-    intents: number;
+    intents: GatewayIntents;
   };
 }
 /**
@@ -57,7 +58,7 @@ export interface IdentifyMessage {
  */
 export interface ReadyMessage {
   /**
-   * DISPATCH Opcode です。
+   * Server が Event を配信します。
    */
   op: 0;
   /**
@@ -84,7 +85,7 @@ export interface ReadyMessage {
  */
 export interface HeartbeatMessage {
   /**
-   * HEARTBEAT Opcode です。
+   * Client が接続を維持します。
    */
   op: 1;
   /**
@@ -97,7 +98,7 @@ export interface HeartbeatMessage {
  */
 export interface HeartbeatAckMessage {
   /**
-   * HEARTBEAT_ACK Opcode です。
+   * Server が Heartbeat の受信を通知します。
    */
   op: 11;
   /**
@@ -110,7 +111,7 @@ export interface HeartbeatAckMessage {
  */
 export interface ResumeMessage {
   /**
-   * RESUME Opcode です。
+   * Client が既存 Session を再開します。
    */
   op: 6;
   d: {
@@ -133,7 +134,7 @@ export interface ResumeMessage {
  */
 export interface ResumedMessage {
   /**
-   * DISPATCH Opcode です。
+   * Server が Event を配信します。
    */
   op: 0;
   /**
@@ -154,7 +155,7 @@ export interface ResumedMessage {
  */
 export interface InvalidSessionMessage {
   /**
-   * INVALID_SESSION Opcode です。
+   * Server が Session の無効状態を通知します。
    */
   op: 9;
   d: {

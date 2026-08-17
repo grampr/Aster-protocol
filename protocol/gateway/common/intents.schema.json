@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/common/intents.schema.json",
+  "title": "GatewayIntents",
+  "description": "購読する Gateway Event 群を表す32-bit Bitfield です。未割り当て Bit は Server が意味を定義するまで使用しません。",
+  "type": "integer",
+  "minimum": 0,
+  "maximum": 2147483647,
+  "examples": [0, 5, 511],
+  "$defs": {
+    "GUILDS": { "const": 1, "description": "Guild の作成、更新、削除を購読します。" },
+    "GUILD_MEMBERS": { "const": 2, "description": "Guild Member の参加、退出、更新を購読します。" },
+    "GUILD_MESSAGES": { "const": 4, "description": "Guild の Message Event を購読します。" },
+    "DIRECT_MESSAGES": { "const": 8, "description": "Direct Message Event を購読します。" },
+    "MESSAGE_CONTENT": { "const": 16, "description": "許可された Message Content を受信します。" },
+    "GUILD_VOICE_STATES": { "const": 32, "description": "Guild の Voice State 更新を購読します。" },
+    "GUILD_PRESENCES": { "const": 64, "description": "Guild Member の Presence 更新を購読します。" },
+    "REACTIONS": { "const": 128, "description": "Message Reaction Event を購読します。" },
+    "APPLICATION_INTERACTIONS": { "const": 256, "description": "Application Interaction を購読します。" }
+  }
+}

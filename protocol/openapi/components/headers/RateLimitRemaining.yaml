@@ -1,0 +1,6 @@
+description: 現在の Window で残っている Request 数です。
+required: true
+schema:
+  type: integer
+  minimum: 0
+example: 0

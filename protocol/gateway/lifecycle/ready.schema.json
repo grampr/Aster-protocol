@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "required": ["op", "t", "s", "d"],
   "properties": {
-    "op": { "const": 0, "description": "DISPATCH Opcode です。" },
+    "op": { "$ref": "../common/opcode.schema.json#/$defs/DISPATCH" },
     "t": { "const": "READY", "description": "Event 名です。" },
     "s": { "type": "integer", "minimum": 0, "description": "Event Sequence です。" },
     "d": {

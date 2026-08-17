@@ -1,0 +1,7 @@
+title: PaginationCursor
+description: 次の取得位置を表す、Server が発行した不透明な Cursor です。
+type: string
+minLength: 1
+maxLength: 512
+examples:
+  - eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
