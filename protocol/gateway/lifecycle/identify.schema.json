@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/lifecycle/identify.schema.json",
+  "title": "IdentifyMessage",
+  "description": "Client または Bot が新しい Gateway Session を開始します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "d"],
+  "properties": {
+    "op": { "const": 2, "description": "IDENTIFY Opcode です。" },
+    "d": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["token", "intents"],
+      "properties": {
+        "token": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Session または Bot の認証 Token です。"
+        },
+        "intents": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "購読する Event を表す Bitfield です。"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/lifecycle/heartbeat-ack.schema.json",
+  "title": "HeartbeatAckMessage",
+  "description": "Server が直前の Heartbeat を受信したことを通知します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "d"],
+  "properties": {
+    "op": { "const": 11, "description": "HEARTBEAT_ACK Opcode です。" },
+    "d": { "type": "null", "description": "Payload はありません。" }
+  }
+}

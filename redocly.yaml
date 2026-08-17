@@ -1,0 +1,18 @@
+apis:
+  aster@v1:
+    root: ./protocol/openapi/openapi.yaml
+    x-openapi-ts:
+      output: ./packages/protocol-ts/src/generated/openapi.ts
+
+extends:
+  - recommended
+
+rules:
+  info-license: error
+  no-ambiguous-paths: error
+  no-unresolved-refs: error
+  operation-description: warn
+  operation-operationId: error
+  operation-operationId-unique: error
+  operation-summary: error
+  spec-strict-refs: error

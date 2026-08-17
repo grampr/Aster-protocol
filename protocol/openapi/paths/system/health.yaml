@@ -1,0 +1,27 @@
+get:
+  operationId: getHealth
+  tags:
+    - System
+  summary: Instance の稼働状態を取得する
+  description: |
+    HTTP Server が Request を処理できる状態か確認します。
+    PostgreSQL などの依存サービスを含む Readiness Check は別の Operation で定義します。
+  security: []
+  responses:
+    "200":
+      description: HTTP Server は Request を処理できます。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/system/HealthResponse.yaml
+          example:
+            status: ok
+            version: 0.1.0
+            time: 2026-08-17T06:00:00Z
+    "429":
+      $ref: ../../components/responses/Error.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

@@ -1,0 +1,5 @@
+description: Request を追跡するために Server が割り当てた識別子です。
+required: true
+schema:
+  $ref: ../schemas/common/RequestId.yaml
+example: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0

@@ -1,0 +1,42 @@
+openapi: 3.1.1
+info:
+  title: Aster REST API
+  version: 0.1.0
+  summary: Aster Client、Bot、Webhook が利用する REST API
+  description: |
+    Aster の永続状態を取得し、明示的な変更を要求するための API です。
+    リアルタイムな変更通知は WebSocket Gateway が担当します。
+  license:
+    name: Apache License 2.0
+    identifier: Apache-2.0
+
+servers:
+  - url: /api/v1
+    description: 接続先インスタンスの Version 1 API
+
+tags:
+  - name: System
+    description: Instance の稼働状態を確認する Operation
+
+paths:
+  /health:
+    $ref: ./paths/system/health.yaml
+
+components:
+  headers:
+    RequestId:
+      $ref: ./components/headers/RequestId.yaml
+  responses:
+    Error:
+      $ref: ./components/responses/Error.yaml
+  schemas:
+    Error:
+      $ref: ./components/schemas/common/Error.yaml
+    HealthResponse:
+      $ref: ./components/schemas/system/HealthResponse.yaml
+    RequestId:
+      $ref: ./components/schemas/common/RequestId.yaml
+    Timestamp:
+      $ref: ./components/schemas/common/Timestamp.yaml
+    UUID:
+      $ref: ./components/schemas/common/UUID.yaml

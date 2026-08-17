@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/lifecycle/resume.schema.json",
+  "title": "ResumeMessage",
+  "description": "Client が切断前の Gateway Session と Event 配信を再開します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "d"],
+  "properties": {
+    "op": { "const": 6, "description": "RESUME Opcode です。" },
+    "d": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["token", "session_id", "sequence"],
+      "properties": {
+        "token": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Session または Bot の認証 Token です。"
+        },
+        "session_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "READY で受信した Session Identifier です。"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "最後に処理した Event Sequence です。"
+        }
+      }
+    }
+  }
+}

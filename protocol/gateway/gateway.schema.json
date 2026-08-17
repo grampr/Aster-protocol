@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/gateway.schema.json",
+  "title": "AsterGatewayMessage",
+  "description": "Aster Gateway で送受信する接続 Lifecycle Message の集合です。",
+  "oneOf": [
+    { "$ref": "./lifecycle/hello.schema.json" },
+    { "$ref": "./lifecycle/identify.schema.json" },
+    { "$ref": "./lifecycle/ready.schema.json" },
+    { "$ref": "./lifecycle/heartbeat.schema.json" },
+    { "$ref": "./lifecycle/heartbeat-ack.schema.json" },
+    { "$ref": "./lifecycle/resume.schema.json" },
+    { "$ref": "./lifecycle/resumed.schema.json" },
+    { "$ref": "./lifecycle/invalid-session.schema.json" }
+  ]
+}

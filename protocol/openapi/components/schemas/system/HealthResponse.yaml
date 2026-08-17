@@ -1,0 +1,21 @@
+title: HealthResponse
+description: HTTP Server の稼働状態です。
+type: object
+additionalProperties: false
+required:
+  - status
+  - version
+  - time
+properties:
+  status:
+    type: string
+    const: ok
+    description: HTTP Server が稼働している場合は `ok` です。
+  version:
+    type: string
+    description: 稼働中の Aster Server Version です。
+    minLength: 1
+    examples:
+      - 0.1.0
+  time:
+    $ref: ../common/Timestamp.yaml
