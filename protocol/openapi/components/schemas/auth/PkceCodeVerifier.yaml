@@ -1,0 +1,8 @@
+title: PkceCodeVerifier
+description: RFC 7636のUnreserved Characterだけで構成するPKCE Code Verifierです。
+type: string
+minLength: 43
+maxLength: 128
+pattern: ^[A-Za-z0-9._~-]+$
+examples:
+  - dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk

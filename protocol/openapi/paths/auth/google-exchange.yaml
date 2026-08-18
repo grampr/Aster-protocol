@@ -1,0 +1,47 @@
+post:
+  operationId: exchangeGoogleAuthorization
+  tags:
+    - Authentication
+  summary: Google認証結果をAster Sessionへ交換する
+  description: |
+    Callback Deep Linkで受け取ったAster Exchange Codeと、Login開始時に生成したPKCE Verifierを交換します。
+    Exchange Codeは一度だけ使用でき、成功・失敗を問わず再利用できません。
+    GoogleのTokenはServer側に留まり、ResponseはProvider非依存のAster Session Tokenだけを返します。
+
+    Google Identityが未Linkで、同じ確認済みEmail Addressを持つ既存Accountがある場合は自動Linkせず、
+    `ACCOUNT_LINK_REQUIRED`を返します。
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/GoogleExchangeRequest.yaml
+        example:
+          exchange_code: example-one-time-aster-exchange-code
+          code_verifier: dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+  responses:
+    "200":
+      description: Google Identityを確認し、Aster Sessionを作成しました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/SessionTokenResponse.yaml
+          example:
+            access_token: example-access-token
+            refresh_token: example-refresh-token
+            token_type: Bearer
+            expires_in: 900
+            refresh_expires_in: 2592000
+            session_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    "400":
+      $ref: ../../components/responses/InvalidAuthorizationGrant.yaml
+    "409":
+      $ref: ../../components/responses/AccountLinkRequired.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

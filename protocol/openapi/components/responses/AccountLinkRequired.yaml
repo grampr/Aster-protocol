@@ -1,0 +1,12 @@
+description: 確認済みEmail Addressが既存Accountで使用されているため、自動Linkや新規Account作成を行いませんでした。
+headers:
+  X-Request-ID:
+    $ref: ../headers/RequestId.yaml
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/common/Error.yaml
+    example:
+      code: ACCOUNT_LINK_REQUIRED
+      message: Sign in to the existing account before linking Google
+      request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0

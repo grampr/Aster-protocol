@@ -1,0 +1,6 @@
+title: PkceCodeChallenge
+description: PKCE S256でCode Verifierから生成した、PaddingなしのBase64url値です。
+type: string
+pattern: ^[A-Za-z0-9_-]{43}$
+examples:
+  - E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM

@@ -1,0 +1,8 @@
+title: OAuthClientState
+description: Desktop ClientがLogin開始とDeep Link Callbackを照合するために生成する不透明な値です。
+type: string
+minLength: 43
+maxLength: 128
+pattern: ^[A-Za-z0-9._~-]+$
+examples:
+  - yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A

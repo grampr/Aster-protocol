@@ -75,6 +75,15 @@ Google Login は OpenID Connect の Authorization Code Flow と PKCE `S256` を�
 Server は `state`、`nonce`、Issuer、Audience、署名を検証し、Google 側の Token を Client へ公開せず、短時間かつ一度だけ使える Aster Exchange Code に変換します。
 外部 Identity は Email Address だけでなく、Provider と Provider Subject の組で識別します。
 
+Desktop Login は次の3段階です。
+
+1. `POST /auth/google/authorize` でPKCE ChallengeとClient Stateを登録し、Google Authorization URLを取得する。
+2. `GET /auth/google/callback` でServerがGoogleの応答を検証し、`aster://auth/callback`へAster Exchange Codeを返す。
+3. `POST /auth/google/exchange` でExchange CodeとPKCE VerifierをAster Session Tokenへ交換する。
+
+Desktop Redirect URIは`aster://auth/callback`に固定します。
+CallbackのDeep LinkにはGoogleのTokenを含めません。
+
 この境界の判断理由と将来追加する Flow は [ADR-0001](docs/decisions/0001-provider-neutral-authentication.md) に記録しています。
 
 ## Cursor Pagination

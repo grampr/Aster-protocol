@@ -20,3 +20,4 @@ Aster Protocol の利用者に影響する変更を記録します。
 - Password による Account 登録、Login、Session 更新、Logout の OpenAPI Schema
 - Bearer 認証と認証済み User 自身を取得する OpenAPI Schema
 - Password と将来の Google OIDC が共有する Provider 非依存の Aster Session 契約
+- Google OpenID Connect、PKCE S256、Desktop Deep Link、Aster Exchange Code の OpenAPI Schema

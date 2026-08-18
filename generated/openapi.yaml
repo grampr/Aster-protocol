@@ -105,6 +105,172 @@ paths:
           $ref: '#/components/responses/RateLimited'
         default:
           $ref: '#/components/responses/Error'
+  /auth/google/authorize:
+    post:
+      operationId: beginGoogleAuthorization
+      tags:
+        - Authentication
+      summary: Google Loginを開始する
+      description: |
+        Desktop Clientが生成したPKCE S256 ChallengeとClient Stateを短時間のLogin試行へ保存し、
+        System Browserで開くGoogle Authorization URLを返します。
+        ServerはGoogle向けのOAuth StateとOpenID Connect Nonceを別に生成し、Clientへ秘密情報を返しません。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleAuthorizationRequest'
+            example:
+              redirect_uri: aster://auth/callback
+              code_challenge: E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+              code_challenge_method: S256
+              client_state: yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
+      responses:
+        '200':
+          description: Google Authorization URLを作成しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoogleAuthorizationResponse'
+              example:
+                authorization_url: https://accounts.google.com/o/oauth2/v2/auth?client_id=example&response_type=code
+                expires_in: 300
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /auth/google/callback:
+    get:
+      operationId: completeGoogleAuthorization
+      tags:
+        - Authentication
+      summary: GoogleからのAuthorization Callbackを処理する
+      description: |
+        Googleが呼び出すServer側Callbackです。ServerはOAuth State、OpenID Connect Nonce、Issuer、
+        Audience、署名を検証します。成功時は短時間かつ一度だけ使用できるAster Exchange Codeと、
+        Login開始時のClient Stateだけを`aster://auth/callback`へ302 Redirectします。
+        GoogleのAuthorization Code、ID Token、Access Token、Refresh TokenはDeep Linkへ含めません。
+
+        Googleが認証を拒否した場合は`error=access_denied`、Provider処理に失敗した場合は
+        `error=provider_error`とClient Stateを許可済みDeep Linkへ返します。
+        OAuth Stateを検証できないRequestはRedirectせず、400 Errorを返します。
+      security: []
+      parameters:
+        - name: code
+          in: query
+          required: false
+          description: Googleが発行したAuthorization Codeです。Server内部でのみ交換します。
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 4096
+        - name: state
+          in: query
+          required: true
+          description: ServerがGoogle Authorization Requestに設定したOAuth Stateです。
+          schema:
+            type: string
+            minLength: 32
+            maxLength: 512
+        - name: error
+          in: query
+          required: false
+          description: GoogleがAuthorizationを完了できなかった理由です。
+          schema:
+            type: string
+            maxLength: 256
+        - name: error_description
+          in: query
+          required: false
+          description: Googleが返す補足情報です。Deep Linkへそのまま転送しません。
+          schema:
+            type: string
+            maxLength: 1024
+      responses:
+        '302':
+          description: 許可済みAster Desktop Deep Linkへ認証結果をRedirectします。
+          headers:
+            Location:
+              required: true
+              description: Exchange Codeまたは安全なError CodeとClient Stateを含むAster Deep Linkです。
+              schema:
+                type: string
+                pattern: ^aster://auth/callback\?
+              examples:
+                success:
+                  value: aster://auth/callback?code=example-one-time-aster-exchange-code&state=yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
+                denied:
+                  value: aster://auth/callback?error=access_denied&state=yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '400':
+          description: OAuth Stateが無効、失効済み、またはCallback Parameterの組み合わせが不正です。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: INVALID_OAUTH_CALLBACK
+                message: OAuth callback is invalid or expired
+                request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+        default:
+          $ref: '#/components/responses/Error'
+  /auth/google/exchange:
+    post:
+      operationId: exchangeGoogleAuthorization
+      tags:
+        - Authentication
+      summary: Google認証結果をAster Sessionへ交換する
+      description: |
+        Callback Deep Linkで受け取ったAster Exchange Codeと、Login開始時に生成したPKCE Verifierを交換します。
+        Exchange Codeは一度だけ使用でき、成功・失敗を問わず再利用できません。
+        GoogleのTokenはServer側に留まり、ResponseはProvider非依存のAster Session Tokenだけを返します。
+
+        Google Identityが未Linkで、同じ確認済みEmail Addressを持つ既存Accountがある場合は自動Linkせず、
+        `ACCOUNT_LINK_REQUIRED`を返します。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleExchangeRequest'
+            example:
+              exchange_code: example-one-time-aster-exchange-code
+              code_verifier: dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+      responses:
+        '200':
+          description: Google Identityを確認し、Aster Sessionを作成しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionTokenResponse'
+              example:
+                access_token: example-access-token
+                refresh_token: example-refresh-token
+                token_type: Bearer
+                expires_in: 900
+                refresh_expires_in: 2592000
+                session_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+        '400':
+          $ref: '#/components/responses/InvalidAuthorizationGrant'
+        '409':
+          $ref: '#/components/responses/AccountLinkRequired'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
   /auth/token/refresh:
     post:
       operationId: refreshSession
@@ -336,6 +502,19 @@ components:
             code: EMAIL_ALREADY_REGISTERED
             message: Email is already registered
             request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    AccountLinkRequired:
+      description: 確認済みEmail Addressが既存Accountで使用されているため、自動Linkや新規Account作成を行いませんでした。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: ACCOUNT_LINK_REQUIRED
+            message: Sign in to the existing account before linking Google
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
     Error:
       description: Request を完了できませんでした。
       headers:
@@ -361,6 +540,19 @@ components:
           example:
             code: INVALID_CREDENTIALS
             message: Email or password is incorrect
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    InvalidAuthorizationGrant:
+      description: Exchange Codeが無効、失効済み、使用済み、またはPKCE検証に失敗したためSessionを作成しませんでした。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: INVALID_AUTHORIZATION_GRANT
+            message: Authorization grant is invalid or expired
             request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
     InvalidRefreshToken:
       description: Refresh Token が無効または失効済みのため Session を更新しませんでした。
@@ -447,6 +639,14 @@ components:
       maxLength: 320
       examples:
         - alice@example.com
+    AsterExchangeCode:
+      title: AsterExchangeCode
+      description: Google認証後にAster Serverが発行する、短時間かつ一度だけ使用できる不透明なCodeです。
+      type: string
+      minLength: 32
+      maxLength: 512
+      examples:
+        - example-one-time-aster-exchange-code
     Error:
       title: Error
       description: API Error の共通形式です。
@@ -497,6 +697,72 @@ components:
             - 0.1.0
         time:
           $ref: '#/components/schemas/Timestamp'
+    GoogleAuthorizationRequest:
+      title: GoogleAuthorizationRequest
+      description: Google Loginを開始するDesktop ClientのPKCE情報です。
+      type: object
+      additionalProperties: false
+      required:
+        - redirect_uri
+        - code_challenge
+        - code_challenge_method
+        - client_state
+      properties:
+        redirect_uri:
+          type: string
+          format: uri
+          const: aster://auth/callback
+          description: 許可されたAster DesktopのDeep Linkです。任意のRedirect URIは受け付けません。
+        code_challenge:
+          $ref: '#/components/schemas/PkceCodeChallenge'
+        code_challenge_method:
+          type: string
+          const: S256
+          description: Aster Desktopが使用できるPKCE変換方式です。
+        client_state:
+          $ref: '#/components/schemas/OAuthClientState'
+      examples:
+        - redirect_uri: aster://auth/callback
+          code_challenge: E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+          code_challenge_method: S256
+          client_state: yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
+    GoogleAuthorizationResponse:
+      title: GoogleAuthorizationResponse
+      description: System Browserで開くGoogle Authorization URLです。
+      type: object
+      additionalProperties: false
+      required:
+        - authorization_url
+        - expires_in
+      properties:
+        authorization_url:
+          type: string
+          format: uri
+          description: ServerがOAuth StateとOpenID Connect Nonceを組み込んだGoogle Authorization URLです。
+        expires_in:
+          type: integer
+          minimum: 1
+          maximum: 600
+          description: Login試行が失効するまでの秒数です。
+      examples:
+        - authorization_url: https://accounts.google.com/o/oauth2/v2/auth?client_id=example&response_type=code
+          expires_in: 300
+    GoogleExchangeRequest:
+      title: GoogleExchangeRequest
+      description: 一度限りのAster Exchange CodeをProvider非依存のAster Sessionへ交換します。
+      type: object
+      additionalProperties: false
+      required:
+        - exchange_code
+        - code_verifier
+      properties:
+        exchange_code:
+          $ref: '#/components/schemas/AsterExchangeCode'
+        code_verifier:
+          $ref: '#/components/schemas/PkceCodeVerifier'
+      examples:
+        - exchange_code: example-one-time-aster-exchange-code
+          code_verifier: dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
     LoginPasswordRequest:
       title: LoginPasswordRequest
       description: Email Address と Password で Aster Session を作成する Request です。
@@ -563,6 +829,31 @@ components:
       maxLength: 128
       examples:
         - <password-with-15-or-more-characters>
+    PkceCodeChallenge:
+      title: PkceCodeChallenge
+      description: PKCE S256でCode Verifierから生成した、PaddingなしのBase64url値です。
+      type: string
+      pattern: ^[A-Za-z0-9_-]{43}$
+      examples:
+        - E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+    PkceCodeVerifier:
+      title: PkceCodeVerifier
+      description: RFC 7636のUnreserved Characterだけで構成するPKCE Code Verifierです。
+      type: string
+      minLength: 43
+      maxLength: 128
+      pattern: ^[A-Za-z0-9._~-]+$
+      examples:
+        - dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+    OAuthClientState:
+      title: OAuthClientState
+      description: Desktop ClientがLogin開始とDeep Link Callbackを照合するために生成する不透明な値です。
+      type: string
+      minLength: 43
+      maxLength: 128
+      pattern: ^[A-Za-z0-9._~-]+$
+      examples:
+        - yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
     RateLimitDetails:
       title: RateLimitDetails
       description: Rate Limit Error に固有の再試行情報です。
