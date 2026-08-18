@@ -1,0 +1,12 @@
+description: Exchange Codeが無効、失効済み、使用済み、またはPKCE検証に失敗したためSessionを作成しませんでした。
+headers:
+  X-Request-ID:
+    $ref: ../headers/RequestId.yaml
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/common/Error.yaml
+    example:
+      code: INVALID_AUTHORIZATION_GRANT
+      message: Authorization grant is invalid or expired
+      request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0

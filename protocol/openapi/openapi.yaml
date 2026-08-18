@@ -27,6 +27,12 @@ paths:
     $ref: ./paths/auth/password-register.yaml
   /auth/password/login:
     $ref: ./paths/auth/password-login.yaml
+  /auth/google/authorize:
+    $ref: ./paths/auth/google-authorization.yaml
+  /auth/google/callback:
+    $ref: ./paths/auth/google-callback.yaml
+  /auth/google/exchange:
+    $ref: ./paths/auth/google-exchange.yaml
   /auth/token/refresh:
     $ref: ./paths/auth/token-refresh.yaml
   /auth/logout:
@@ -61,10 +67,14 @@ components:
   responses:
     EmailAlreadyRegistered:
       $ref: ./components/responses/EmailAlreadyRegistered.yaml
+    AccountLinkRequired:
+      $ref: ./components/responses/AccountLinkRequired.yaml
     Error:
       $ref: ./components/responses/Error.yaml
     InvalidCredentials:
       $ref: ./components/responses/InvalidCredentials.yaml
+    InvalidAuthorizationGrant:
+      $ref: ./components/responses/InvalidAuthorizationGrant.yaml
     InvalidRefreshToken:
       $ref: ./components/responses/InvalidRefreshToken.yaml
     RateLimited:
@@ -78,10 +88,18 @@ components:
       $ref: ./components/schemas/auth/AuthenticationMethod.yaml
     Email:
       $ref: ./components/schemas/auth/Email.yaml
+    AsterExchangeCode:
+      $ref: ./components/schemas/auth/AsterExchangeCode.yaml
     Error:
       $ref: ./components/schemas/common/Error.yaml
     HealthResponse:
       $ref: ./components/schemas/system/HealthResponse.yaml
+    GoogleAuthorizationRequest:
+      $ref: ./components/schemas/auth/GoogleAuthorizationRequest.yaml
+    GoogleAuthorizationResponse:
+      $ref: ./components/schemas/auth/GoogleAuthorizationResponse.yaml
+    GoogleExchangeRequest:
+      $ref: ./components/schemas/auth/GoogleExchangeRequest.yaml
     LoginPasswordRequest:
       $ref: ./components/schemas/auth/LoginPasswordRequest.yaml
     LogoutRequest:
@@ -92,6 +110,12 @@ components:
       $ref: ./components/schemas/common/PaginationCursor.yaml
     Password:
       $ref: ./components/schemas/auth/Password.yaml
+    PkceCodeChallenge:
+      $ref: ./components/schemas/auth/PkceCodeChallenge.yaml
+    PkceCodeVerifier:
+      $ref: ./components/schemas/auth/PkceCodeVerifier.yaml
+    OAuthClientState:
+      $ref: ./components/schemas/auth/OAuthClientState.yaml
     RateLimitDetails:
       $ref: ./components/schemas/common/RateLimitDetails.yaml
     RateLimitError:

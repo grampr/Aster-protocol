@@ -1,0 +1,78 @@
+get:
+  operationId: completeGoogleAuthorization
+  tags:
+    - Authentication
+  summary: GoogleからのAuthorization Callbackを処理する
+  description: |
+    Googleが呼び出すServer側Callbackです。ServerはOAuth State、OpenID Connect Nonce、Issuer、
+    Audience、署名を検証します。成功時は短時間かつ一度だけ使用できるAster Exchange Codeと、
+    Login開始時のClient Stateだけを`aster://auth/callback`へ302 Redirectします。
+    GoogleのAuthorization Code、ID Token、Access Token、Refresh TokenはDeep Linkへ含めません。
+
+    Googleが認証を拒否した場合は`error=access_denied`、Provider処理に失敗した場合は
+    `error=provider_error`とClient Stateを許可済みDeep Linkへ返します。
+    OAuth Stateを検証できないRequestはRedirectせず、400 Errorを返します。
+  security: []
+  parameters:
+    - name: code
+      in: query
+      required: false
+      description: Googleが発行したAuthorization Codeです。Server内部でのみ交換します。
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 4096
+    - name: state
+      in: query
+      required: true
+      description: ServerがGoogle Authorization Requestに設定したOAuth Stateです。
+      schema:
+        type: string
+        minLength: 32
+        maxLength: 512
+    - name: error
+      in: query
+      required: false
+      description: GoogleがAuthorizationを完了できなかった理由です。
+      schema:
+        type: string
+        maxLength: 256
+    - name: error_description
+      in: query
+      required: false
+      description: Googleが返す補足情報です。Deep Linkへそのまま転送しません。
+      schema:
+        type: string
+        maxLength: 1024
+  responses:
+    "302":
+      description: 許可済みAster Desktop Deep Linkへ認証結果をRedirectします。
+      headers:
+        Location:
+          required: true
+          description: Exchange Codeまたは安全なError CodeとClient Stateを含むAster Deep Linkです。
+          schema:
+            type: string
+            pattern: ^aster://auth/callback\?
+          examples:
+            success:
+              value: aster://auth/callback?code=example-one-time-aster-exchange-code&state=yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
+            denied:
+              value: aster://auth/callback?error=access_denied&state=yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+    "400":
+      description: OAuth Stateが無効、失効済み、またはCallback Parameterの組み合わせが不正です。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/Error.yaml
+          example:
+            code: INVALID_OAUTH_CALLBACK
+            message: OAuth callback is invalid or expired
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    default:
+      $ref: ../../components/responses/Error.yaml

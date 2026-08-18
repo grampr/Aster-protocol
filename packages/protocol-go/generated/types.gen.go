@@ -27,6 +27,36 @@ func (e AuthenticationMethod) Valid() bool {
 	}
 }
 
+// Defines values for GoogleAuthorizationRequestCodeChallengeMethod.
+const (
+	S256 GoogleAuthorizationRequestCodeChallengeMethod = "S256"
+)
+
+// Valid indicates whether the value is a known member of the GoogleAuthorizationRequestCodeChallengeMethod enum.
+func (e GoogleAuthorizationRequestCodeChallengeMethod) Valid() bool {
+	switch e {
+	case S256:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GoogleAuthorizationRequestRedirectUri.
+const (
+	Asterauthcallback GoogleAuthorizationRequestRedirectUri = "aster://auth/callback"
+)
+
+// Valid indicates whether the value is a known member of the GoogleAuthorizationRequestRedirectUri enum.
+func (e GoogleAuthorizationRequestRedirectUri) Valid() bool {
+	switch e {
+	case Asterauthcallback:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for HealthResponseStatus.
 const (
 	Ok HealthResponseStatus = "ok"
@@ -77,6 +107,11 @@ func (e SessionTokenResponseTokenType) Valid() bool {
 // Examples: example-access-token
 type AccessToken = string
 
+// AsterExchangeCode Google認証後にAster Serverが発行する、短時間かつ一度だけ使用できる不透明なCodeです。
+//
+// Examples: example-one-time-aster-exchange-code
+type AsterExchangeCode = string
+
 // AuthenticationMethod User Account に Link された認証方法です。
 //
 // Examples: PASSWORD
@@ -106,6 +141,59 @@ type Error struct {
 	//
 	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 	RequestId RequestId `json:"request_id"`
+}
+
+// GoogleAuthorizationRequest Google Loginを開始するDesktop ClientのPKCE情報です。
+//
+// Examples: {"client_state":"yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A","code_challenge":"E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM","code_challenge_method":"S256","redirect_uri":"aster://auth/callback"}
+type GoogleAuthorizationRequest struct {
+	// ClientState Desktop ClientがLogin開始とDeep Link Callbackを照合するために生成する不透明な値です。
+	//
+	// Examples: yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
+	ClientState OAuthClientState `json:"client_state"`
+
+	// CodeChallenge PKCE S256でCode Verifierから生成した、PaddingなしのBase64url値です。
+	//
+	// Examples: E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+	CodeChallenge PkceCodeChallenge `json:"code_challenge"`
+
+	// CodeChallengeMethod Aster Desktopが使用できるPKCE変換方式です。
+	CodeChallengeMethod GoogleAuthorizationRequestCodeChallengeMethod `json:"code_challenge_method"`
+
+	// RedirectUri 許可されたAster DesktopのDeep Linkです。任意のRedirect URIは受け付けません。
+	RedirectUri GoogleAuthorizationRequestRedirectUri `json:"redirect_uri"`
+}
+
+// GoogleAuthorizationRequestCodeChallengeMethod Aster Desktopが使用できるPKCE変換方式です。
+type GoogleAuthorizationRequestCodeChallengeMethod string
+
+// GoogleAuthorizationRequestRedirectUri 許可されたAster DesktopのDeep Linkです。任意のRedirect URIは受け付けません。
+type GoogleAuthorizationRequestRedirectUri string
+
+// GoogleAuthorizationResponse System Browserで開くGoogle Authorization URLです。
+//
+// Examples: {"authorization_url":"https://accounts.google.com/o/oauth2/v2/auth?client_id=example\u0026response_type=code","expires_in":300}
+type GoogleAuthorizationResponse struct {
+	// AuthorizationUrl ServerがOAuth StateとOpenID Connect Nonceを組み込んだGoogle Authorization URLです。
+	AuthorizationUrl string `json:"authorization_url"`
+
+	// ExpiresIn Login試行が失効するまでの秒数です。
+	ExpiresIn int `json:"expires_in"`
+}
+
+// GoogleExchangeRequest 一度限りのAster Exchange CodeをProvider非依存のAster Sessionへ交換します。
+//
+// Examples: {"code_verifier":"dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk","exchange_code":"example-one-time-aster-exchange-code"}
+type GoogleExchangeRequest struct {
+	// CodeVerifier RFC 7636のUnreserved Characterだけで構成するPKCE Code Verifierです。
+	//
+	// Examples: dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+	CodeVerifier PkceCodeVerifier `json:"code_verifier"`
+
+	// ExchangeCode Google認証後にAster Serverが発行する、短時間かつ一度だけ使用できる不透明なCodeです。
+	//
+	// Examples: example-one-time-aster-exchange-code
+	ExchangeCode AsterExchangeCode `json:"exchange_code"`
 }
 
 // HealthResponse HTTP Server の稼働状態です。
@@ -154,6 +242,11 @@ type LogoutRequest struct {
 	RefreshToken RefreshToken `json:"refresh_token"`
 }
 
+// OAuthClientState Desktop ClientがLogin開始とDeep Link Callbackを照合するために生成する不透明な値です。
+//
+// Examples: yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
+type OAuthClientState = string
+
 // PageInfo Cursor Pagination の継続情報です。
 //
 // Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
@@ -175,6 +268,16 @@ type PaginationCursor = string
 //
 // Examples: <password-with-15-or-more-characters>
 type Password = string
+
+// PkceCodeChallenge PKCE S256でCode Verifierから生成した、PaddingなしのBase64url値です。
+//
+// Examples: E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+type PkceCodeChallenge = string
+
+// PkceCodeVerifier RFC 7636のUnreserved Characterだけで構成するPKCE Code Verifierです。
+//
+// Examples: dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+type PkceCodeVerifier = string
 
 // RateLimitDetails Rate Limit Error に固有の再試行情報です。
 type RateLimitDetails struct {
@@ -324,8 +427,14 @@ type Cursor = PaginationCursor
 // Limit defines model for Limit.
 type Limit = int
 
+// AccountLinkRequired API Error の共通形式です。
+type AccountLinkRequired = Error
+
 // EmailAlreadyRegistered API Error の共通形式です。
 type EmailAlreadyRegistered = Error
+
+// InvalidAuthorizationGrant API Error の共通形式です。
+type InvalidAuthorizationGrant = Error
 
 // InvalidCredentials API Error の共通形式です。
 type InvalidCredentials = Error
@@ -338,6 +447,27 @@ type RateLimited = RateLimitError
 
 // Unauthorized API Error の共通形式です。
 type Unauthorized = Error
+
+// CompleteGoogleAuthorizationParams defines parameters for CompleteGoogleAuthorization.
+type CompleteGoogleAuthorizationParams struct {
+	// Code Googleが発行したAuthorization Codeです。Server内部でのみ交換します。
+	Code *string `form:"code,omitempty" json:"code,omitempty"`
+
+	// State ServerがGoogle Authorization Requestに設定したOAuth Stateです。
+	State string `form:"state" json:"state"`
+
+	// Error GoogleがAuthorizationを完了できなかった理由です。
+	Error *string `form:"error,omitempty" json:"error,omitempty"`
+
+	// ErrorDescription Googleが返す補足情報です。Deep Linkへそのまま転送しません。
+	ErrorDescription *string `form:"error_description,omitempty" json:"error_description,omitempty"`
+}
+
+// BeginGoogleAuthorizationJSONRequestBody defines body for BeginGoogleAuthorization for application/json ContentType.
+type BeginGoogleAuthorizationJSONRequestBody = GoogleAuthorizationRequest
+
+// ExchangeGoogleAuthorizationJSONRequestBody defines body for ExchangeGoogleAuthorization for application/json ContentType.
+type ExchangeGoogleAuthorizationJSONRequestBody = GoogleExchangeRequest
 
 // DeleteCurrentSessionJSONRequestBody defines body for DeleteCurrentSession for application/json ContentType.
 type DeleteCurrentSessionJSONRequestBody = LogoutRequest

@@ -1,0 +1,28 @@
+title: GoogleAuthorizationRequest
+description: Google Loginを開始するDesktop ClientのPKCE情報です。
+type: object
+additionalProperties: false
+required:
+  - redirect_uri
+  - code_challenge
+  - code_challenge_method
+  - client_state
+properties:
+  redirect_uri:
+    type: string
+    format: uri
+    const: aster://auth/callback
+    description: 許可されたAster DesktopのDeep Linkです。任意のRedirect URIは受け付けません。
+  code_challenge:
+    $ref: ./PkceCodeChallenge.yaml
+  code_challenge_method:
+    type: string
+    const: S256
+    description: Aster Desktopが使用できるPKCE変換方式です。
+  client_state:
+    $ref: ./OAuthClientState.yaml
+examples:
+  - redirect_uri: aster://auth/callback
+    code_challenge: E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+    code_challenge_method: S256
+    client_state: yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A

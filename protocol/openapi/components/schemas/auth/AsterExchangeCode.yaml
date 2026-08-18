@@ -1,0 +1,7 @@
+title: AsterExchangeCode
+description: Google認証後にAster Serverが発行する、短時間かつ一度だけ使用できる不透明なCodeです。
+type: string
+minLength: 32
+maxLength: 512
+examples:
+  - example-one-time-aster-exchange-code

@@ -1,0 +1,15 @@
+title: GoogleExchangeRequest
+description: 一度限りのAster Exchange CodeをProvider非依存のAster Sessionへ交換します。
+type: object
+additionalProperties: false
+required:
+  - exchange_code
+  - code_verifier
+properties:
+  exchange_code:
+    $ref: ./AsterExchangeCode.yaml
+  code_verifier:
+    $ref: ./PkceCodeVerifier.yaml
+examples:
+  - exchange_code: example-one-time-aster-exchange-code
+    code_verifier: dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk

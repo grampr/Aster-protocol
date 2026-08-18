@@ -1,0 +1,38 @@
+post:
+  operationId: beginGoogleAuthorization
+  tags:
+    - Authentication
+  summary: Google Loginを開始する
+  description: |
+    Desktop Clientが生成したPKCE S256 ChallengeとClient Stateを短時間のLogin試行へ保存し、
+    System Browserで開くGoogle Authorization URLを返します。
+    ServerはGoogle向けのOAuth StateとOpenID Connect Nonceを別に生成し、Clientへ秘密情報を返しません。
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/GoogleAuthorizationRequest.yaml
+        example:
+          redirect_uri: aster://auth/callback
+          code_challenge: E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+          code_challenge_method: S256
+          client_state: yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
+  responses:
+    "200":
+      description: Google Authorization URLを作成しました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/auth/GoogleAuthorizationResponse.yaml
+          example:
+            authorization_url: https://accounts.google.com/o/oauth2/v2/auth?client_id=example&response_type=code
+            expires_in: 300
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
