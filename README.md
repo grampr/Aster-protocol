@@ -131,7 +131,7 @@ Header と Body で単位が異なるため、Field 名と説明に単位を含�
 ## Gateway Schema
 
 Gateway は JSON Schema Draft 2020-12 を使用します。
-接続制御を `protocol/gateway/lifecycle`、共有データを `protocol/gateway/common` に配置します。
+接続制御を `protocol/gateway/lifecycle`、Dispatch Eventを`protocol/gateway/events`、Event Payloadとして共有するResourceを`protocol/gateway/resources`、Opcodeなどの共通値を`protocol/gateway/common`に配置します。
 
 Gateway Message は `op` で処理種別を判定します。
 Dispatch Event は `t` に Event 名、`s` に Sequence、`d` に Payload を持ちます。
@@ -147,8 +147,21 @@ Dispatch Event は `t` に Event 名、`s` に Sequence、`d` に Payload を持
 - `RESUMED`
 - `INVALID_SESSION`
 
-Opcode と Intent の割り当ては `protocol/gateway/common` の JSON Schema を正とします。
-TypeScript で利用する Runtime Constant も同じ Schema から生成します。
+Text Channelの同期には次のDispatch Eventを使用します。
+
+- `MESSAGE_CREATE`：作成されたMessage全体を配信する
+- `MESSAGE_UPDATE`：更新後のMessage全体を配信する
+- `MESSAGE_DELETE`：削除されたMessageの`id`と`channel_id`を配信する
+
+Message Eventは`GUILD_MESSAGES` Intentを購読した接続へ配信します。
+`MESSAGE_CONTENT` Intentが許可されない接続でもEvent自体は配信しますが、Messageの`content`は`null`にします。
+投稿者自身の接続も配信対象に含め、ClientはMessage IDを使ってREST ResponseとGateway Eventを重複排除します。
+
+すべてのDispatch EventはGateway Session内で単調増加する`s`を持ちます。
+Clientは最後に適用したSequenceをHeartbeatとResumeへ渡し、再配信されたEventをSequenceとResource IDで安全に処理します。
+
+Opcode、Event名、Intentの割り当ては`protocol/gateway/common`のJSON Schemaを正とします。
+TypeScriptで利用するRuntime Constantも同じSchemaから生成します。
 
 | Opcode | 値 |
 | --- | ---: |

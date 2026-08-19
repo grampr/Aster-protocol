@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/events/messages/message-create.schema.json",
+  "title": "MessageCreateEvent",
+  "description": "Serverが購読中のClientまたはBotへ、新しいMessageを配信します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "t", "s", "d"],
+  "properties": {
+    "op": { "$ref": "../../common/opcode.schema.json#/$defs/DISPATCH" },
+    "t": { "$ref": "../../common/event-name.schema.json#/$defs/MESSAGE_CREATE" },
+    "s": { "type": "integer", "minimum": 0, "description": "Gateway Session内で単調増加するEvent Sequenceです。" },
+    "d": { "$ref": "../../resources/message.schema.json" }
+  }
+}

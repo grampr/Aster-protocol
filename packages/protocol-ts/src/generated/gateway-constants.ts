@@ -26,3 +26,13 @@ export const GatewayIntent = Object.freeze({
 } as const);
 
 export type GatewayIntentValue = (typeof GatewayIntent)[keyof typeof GatewayIntent];
+
+export const GatewayEvent = Object.freeze({
+  READY: "READY",
+  RESUMED: "RESUMED",
+  MESSAGE_CREATE: "MESSAGE_CREATE",
+  MESSAGE_UPDATE: "MESSAGE_UPDATE",
+  MESSAGE_DELETE: "MESSAGE_DELETE",
+} as const);
+
+export type GatewayEventValue = (typeof GatewayEvent)[keyof typeof GatewayEvent];

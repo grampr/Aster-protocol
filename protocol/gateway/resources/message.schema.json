@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/resources/message.schema.json",
+  "title": "GatewayMessageResource",
+  "description": "MESSAGE_CREATEとMESSAGE_UPDATEで配信するText ChannelのMessageです。MESSAGE_CONTENT Intentが許可されない接続ではcontentをnullにします。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "channel_id", "author", "content", "created_at", "edited_at"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "description": "Message IDです。" },
+    "channel_id": { "type": "string", "format": "uuid", "description": "Messageが属するText Channel IDです。" },
+    "author": { "$ref": "./user-summary.schema.json" },
+    "content": {
+      "description": "UTF-8のMessage本文です。MESSAGE_CONTENT Intentが許可されない場合はnullです。",
+      "oneOf": [
+        { "type": "string", "minLength": 1, "maxLength": 4000 },
+        { "type": "null" }
+      ]
+    },
+    "created_at": { "type": "string", "format": "date-time", "description": "Messageを作成した時刻です。" },
+    "edited_at": {
+      "description": "最後に本文を編集した時刻です。未編集の場合はnullです。",
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    }
+  }
+}

@@ -22,3 +22,5 @@ Aster Protocol の利用者に影響する変更を記録します。
 - Password と将来の Google OIDC が共有する Provider 非依存の Aster Session 契約
 - Google OpenID Connect、PKCE S256、Desktop Deep Link、Aster Exchange Code の OpenAPI Schema
 - Guild、Text/Voice Channel、Messageの取得・作成・更新・削除を行うOpenAPI Schema
+- Message作成・更新・削除を配信するGateway Event Schema
+- TypeScript用Gateway Event名Runtime Constant
