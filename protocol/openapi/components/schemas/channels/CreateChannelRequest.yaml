@@ -1,0 +1,21 @@
+title: CreateChannelRequest
+description: Guild内に新しいChannelを作成するときの設定です。
+type: object
+additionalProperties: false
+required:
+  - type
+  - name
+properties:
+  type:
+    $ref: ./ChannelType.yaml
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+  topic:
+    type: string
+    maxLength: 1024
+examples:
+  - type: TEXT
+    name: イベント企画
+    topic: 次回イベントの日程と内容を相談します

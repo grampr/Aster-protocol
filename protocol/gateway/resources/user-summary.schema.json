@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/resources/user-summary.schema.json",
+  "title": "GatewayUserSummary",
+  "description": "Gateway EventでMessage Authorを表示するための公開User情報です。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "display_name", "avatar_url"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "description": "User IDです。" },
+    "display_name": { "type": "string", "minLength": 1, "maxLength": 64, "description": "表示名です。" },
+    "avatar_url": {
+      "description": "Avatar ImageのURLです。未設定の場合はnullです。",
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "type": "null" }
+      ]
+    }
+  }
+}

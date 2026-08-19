@@ -27,6 +27,24 @@ func (e AuthenticationMethod) Valid() bool {
 	}
 }
 
+// Defines values for ChannelType.
+const (
+	TEXT  ChannelType = "TEXT"
+	VOICE ChannelType = "VOICE"
+)
+
+// Valid indicates whether the value is a known member of the ChannelType enum.
+func (e ChannelType) Valid() bool {
+	switch e {
+	case TEXT:
+		return true
+	case VOICE:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for GoogleAuthorizationRequestCodeChallengeMethod.
 const (
 	S256 GoogleAuthorizationRequestCodeChallengeMethod = "S256"
@@ -117,6 +135,81 @@ type AsterExchangeCode = string
 // Examples: PASSWORD
 type AuthenticationMethod string
 
+// Channel Guild内のText ChannelまたはVoice Channelです。
+//
+// Examples: {"created_at":"2026-08-17T06:05:00Z","guild_id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","name":"イベント企画","position":2,"topic":"次回イベントの日程と内容を相談します","type":"TEXT"}
+type Channel struct {
+	// CreatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	CreatedAt Timestamp `json:"created_at"`
+
+	// GuildId Channelが属するGuild IDです。
+	GuildId UUID `json:"guild_id"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id   UUID   `json:"id"`
+	Name string `json:"name"`
+
+	// Position 同じGuild内での表示順です。小さい値を先に表示します。
+	Position int `json:"position"`
+
+	// Topic Text Channelの説明です。未設定またはVoice Channelの場合はnullです。
+	Topic *string `json:"topic"`
+
+	// Type Channelで扱うCommunicationの種類です。
+	//
+	// Examples: TEXT
+	Type ChannelType `json:"type"`
+}
+
+// ChannelList Guild内のChannelをpositionの昇順で返すPageです。
+//
+// Examples: {"items":[{"created_at":"2026-08-17T06:05:00Z","guild_id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","name":"イベント企画","position":2,"topic":"次回イベントの日程と内容を相談します","type":"TEXT"}],"page":{"has_more":false,"next_cursor":null}}
+type ChannelList struct {
+	Items []Channel `json:"items"`
+
+	// Page Cursor Pagination の継続情報です。
+	//
+	// Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
+	Page PageInfo `json:"page"`
+}
+
+// ChannelType Channelで扱うCommunicationの種類です。
+//
+// Examples: TEXT
+type ChannelType string
+
+// CreateChannelRequest Guild内に新しいChannelを作成するときの設定です。
+//
+// Examples: {"name":"イベント企画","topic":"次回イベントの日程と内容を相談します","type":"TEXT"}
+type CreateChannelRequest struct {
+	Name  string  `json:"name"`
+	Topic *string `json:"topic,omitempty"`
+
+	// Type Channelで扱うCommunicationの種類です。
+	//
+	// Examples: TEXT
+	Type ChannelType `json:"type"`
+}
+
+// CreateGuildRequest 新しいGuildを作成するときの設定です。
+//
+// Examples: {"description":"創作とイベント企画のためのコミュニティ","name":"星屑コミュニティ"}
+type CreateGuildRequest struct {
+	Description *string `json:"description,omitempty"`
+	Name        string  `json:"name"`
+}
+
+// CreateMessageRequest Text Channelへ投稿するMessage本文です。
+//
+// Examples: {"content":"10月24日で進める方向でよいでしょうか？"}
+type CreateMessageRequest struct {
+	Content string `json:"content"`
+}
+
 // Email Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
 //
 // Examples: alice@example.com
@@ -196,6 +289,43 @@ type GoogleExchangeRequest struct {
 	ExchangeCode AsterExchangeCode `json:"exchange_code"`
 }
 
+// Guild Userが参加し、ChannelをまとめるCommunityです。
+//
+// Examples: {"created_at":"2026-08-17T06:00:00Z","description":"創作とイベント企画のためのコミュニティ","icon_url":"https://cdn.example.com/guild-icons/aster.png","id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","name":"星屑コミュニティ","owner_id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"}
+type Guild struct {
+	// CreatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	CreatedAt Timestamp `json:"created_at"`
+
+	// Description Guildの概要です。未設定の場合はnullです。
+	Description *string `json:"description"`
+
+	// IconUrl Guild IconのURLです。未設定の場合はnullです。
+	IconUrl *string `json:"icon_url"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id   UUID   `json:"id"`
+	Name string `json:"name"`
+
+	// OwnerId Guildを所有するUser IDです。
+	OwnerId UUID `json:"owner_id"`
+}
+
+// GuildList 認証済みUserが参加しているGuildのPageです。
+//
+// Examples: {"items":[{"created_at":"2026-08-17T06:00:00Z","description":"創作とイベント企画のためのコミュニティ","icon_url":"https://cdn.example.com/guild-icons/aster.png","id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","name":"星屑コミュニティ","owner_id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"}],"page":{"has_more":false,"next_cursor":null}}
+type GuildList struct {
+	Items []Guild `json:"items"`
+
+	// Page Cursor Pagination の継続情報です。
+	//
+	// Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
+	Page PageInfo `json:"page"`
+}
+
 // HealthResponse HTTP Server の稼働状態です。
 type HealthResponse struct {
 	// Status HTTP Server が稼働している場合は `ok` です。
@@ -240,6 +370,47 @@ type LogoutRequest struct {
 	//
 	// Examples: example-refresh-token
 	RefreshToken RefreshToken `json:"refresh_token"`
+}
+
+// Message Text Channelに投稿されたMessageです。
+//
+// Examples: {"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2"}
+type Message struct {
+	// Author Messageなどで表示するUserの公開情報です。
+	//
+	// Examples: {"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"}
+	Author UserSummary `json:"author"`
+
+	// ChannelId Messageが属するText Channel IDです。
+	ChannelId UUID `json:"channel_id"`
+
+	// Content UTF-8のMessage本文です。
+	Content string `json:"content"`
+
+	// CreatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	CreatedAt Timestamp `json:"created_at"`
+
+	// EditedAt 最後に本文を編集した時刻です。未編集の場合はnullです。
+	EditedAt *Timestamp `json:"edited_at"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id UUID `json:"id"`
+}
+
+// MessageList Text ChannelのMessageを新しい順で返すPageです。
+//
+// Examples: {"items":[{"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2"}],"page":{"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9"}}
+type MessageList struct {
+	Items []Message `json:"items"`
+
+	// Page Cursor Pagination の継続情報です。
+	//
+	// Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
+	Page PageInfo `json:"page"`
 }
 
 // OAuthClientState Desktop ClientがLogin開始とDeep Link Callbackを照合するために生成する不透明な値です。
@@ -389,6 +560,33 @@ type Timestamp = time.Time
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 type UUID = openapi_types.UUID
 
+// UpdateChannelRequest Channelの変更するFieldだけを指定します。
+//
+// Examples: {"name":"秋のイベント企画","position":3}
+type UpdateChannelRequest struct {
+	Name     *string `json:"name,omitempty"`
+	Position *int    `json:"position,omitempty"`
+
+	// Topic nullを指定するとTopicを削除します。
+	Topic *string `json:"topic,omitempty"`
+}
+
+// UpdateGuildRequest Guildの変更するFieldだけを指定します。
+//
+// Examples: {"description":null,"name":"星屑クリエイターズ"}
+type UpdateGuildRequest struct {
+	// Description nullを指定すると概要を削除します。
+	Description *string `json:"description,omitempty"`
+	Name        *string `json:"name,omitempty"`
+}
+
+// UpdateMessageRequest 自分が投稿したMessageの本文を置き換えます。
+//
+// Examples: {"content":"10月24日（土）で進める方向でよいでしょうか？"}
+type UpdateMessageRequest struct {
+	Content string `json:"content"`
+}
+
 // UserSelf 認証済み User 自身にだけ返す Account 情報です。
 //
 // Examples: {"authentication_methods":["PASSWORD"],"avatar_url":null,"created_at":"2026-08-17T06:00:00Z","display_name":"Alice","email":"alice@example.com","email_verified":false,"id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0"}
@@ -419,19 +617,51 @@ type UserSelf struct {
 	Id UUID `json:"id"`
 }
 
+// UserSummary Messageなどで表示するUserの公開情報です。
+//
+// Examples: {"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"}
+type UserSummary struct {
+	// AvatarUrl Avatar ImageのURLです。未設定の場合はnullです。
+	AvatarUrl   *string `json:"avatar_url"`
+	DisplayName string  `json:"display_name"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id UUID `json:"id"`
+}
+
+// ChannelId UUIDv7 を使用する Resource Identifier です。
+//
+// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+type ChannelId = UUID
+
 // Cursor 次の取得位置を表す、Server が発行した不透明な Cursor です。
 //
 // Examples: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
 type Cursor = PaginationCursor
 
+// GuildId UUIDv7 を使用する Resource Identifier です。
+//
+// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+type GuildId = UUID
+
 // Limit defines model for Limit.
 type Limit = int
+
+// MessageId UUIDv7 を使用する Resource Identifier です。
+//
+// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+type MessageId = UUID
 
 // AccountLinkRequired API Error の共通形式です。
 type AccountLinkRequired = Error
 
 // EmailAlreadyRegistered API Error の共通形式です。
 type EmailAlreadyRegistered = Error
+
+// Forbidden API Error の共通形式です。
+type Forbidden = Error
 
 // InvalidAuthorizationGrant API Error の共通形式です。
 type InvalidAuthorizationGrant = Error
@@ -444,6 +674,9 @@ type InvalidRefreshToken = Error
 
 // RateLimited Rate Limit を超えた Request に返す Error です。
 type RateLimited = RateLimitError
+
+// ResourceNotFound API Error の共通形式です。
+type ResourceNotFound = Error
 
 // Unauthorized API Error の共通形式です。
 type Unauthorized = Error
@@ -463,6 +696,36 @@ type CompleteGoogleAuthorizationParams struct {
 	ErrorDescription *string `form:"error_description,omitempty" json:"error_description,omitempty"`
 }
 
+// ListChannelMessagesParams defines parameters for ListChannelMessages.
+type ListChannelMessagesParams struct {
+	// Cursor 前の Response が返した次ページ用 Cursor です。
+	// Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// Limit 1回の Response で取得する最大件数です。
+	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// ListCurrentUserGuildsParams defines parameters for ListCurrentUserGuilds.
+type ListCurrentUserGuildsParams struct {
+	// Cursor 前の Response が返した次ページ用 Cursor です。
+	// Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// Limit 1回の Response で取得する最大件数です。
+	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// ListGuildChannelsParams defines parameters for ListGuildChannels.
+type ListGuildChannelsParams struct {
+	// Cursor 前の Response が返した次ページ用 Cursor です。
+	// Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// Limit 1回の Response で取得する最大件数です。
+	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
 // BeginGoogleAuthorizationJSONRequestBody defines body for BeginGoogleAuthorization for application/json ContentType.
 type BeginGoogleAuthorizationJSONRequestBody = GoogleAuthorizationRequest
 
@@ -480,3 +743,21 @@ type RegisterWithPasswordJSONRequestBody = RegisterPasswordRequest
 
 // RefreshSessionJSONRequestBody defines body for RefreshSession for application/json ContentType.
 type RefreshSessionJSONRequestBody = RefreshSessionRequest
+
+// UpdateChannelJSONRequestBody defines body for UpdateChannel for application/json ContentType.
+type UpdateChannelJSONRequestBody = UpdateChannelRequest
+
+// CreateChannelMessageJSONRequestBody defines body for CreateChannelMessage for application/json ContentType.
+type CreateChannelMessageJSONRequestBody = CreateMessageRequest
+
+// UpdateChannelMessageJSONRequestBody defines body for UpdateChannelMessage for application/json ContentType.
+type UpdateChannelMessageJSONRequestBody = UpdateMessageRequest
+
+// CreateGuildJSONRequestBody defines body for CreateGuild for application/json ContentType.
+type CreateGuildJSONRequestBody = CreateGuildRequest
+
+// UpdateGuildJSONRequestBody defines body for UpdateGuild for application/json ContentType.
+type UpdateGuildJSONRequestBody = UpdateGuildRequest
+
+// CreateGuildChannelJSONRequestBody defines body for CreateGuildChannel for application/json ContentType.
+type CreateGuildChannelJSONRequestBody = CreateChannelRequest

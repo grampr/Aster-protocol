@@ -1,0 +1,7 @@
+name: message_id
+in: path
+required: true
+description: 操作対象の Message ID です。
+schema:
+  $ref: ../schemas/common/UUID.yaml
+example: 0198b8f2-4f80-7e67-b250-b4051415e3c2

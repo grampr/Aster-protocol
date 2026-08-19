@@ -31,6 +31,20 @@ function readIntegerDefinitions(schema, schemaName) {
   });
 }
 
+function readStringDefinitions(schema, schemaName) {
+  if (!schema.$defs || typeof schema.$defs !== "object") {
+    throw new Error(`${schemaName} does not define $defs`);
+  }
+
+  return Object.entries(schema.$defs).map(([name, definition]) => {
+    if (typeof definition.const !== "string" || definition.const.length === 0) {
+      throw new Error(`${schemaName}.${name} must define a non-empty string const`);
+    }
+
+    return [name, JSON.stringify(definition.const)];
+  });
+}
+
 function renderConstant(name, entries) {
   const properties = entries
     .map(([key, value]) => `  ${key}: ${value},`)
@@ -47,6 +61,7 @@ function renderConstant(name, entries) {
 
 const opcodeSchema = await readSchema("opcode.schema.json");
 const intentsSchema = await readSchema("intents.schema.json");
+const eventNameSchema = await readSchema("event-name.schema.json");
 
 const output = [
   "// This file was generated from the Gateway JSON Schemas.",
@@ -60,6 +75,11 @@ const output = [
   renderConstant(
     "GatewayIntent",
     readIntegerDefinitions(intentsSchema, "GatewayIntents"),
+  ),
+  "",
+  renderConstant(
+    "GatewayEvent",
+    readStringDefinitions(eventNameSchema, "GatewayEventName"),
   ),
   "",
 ].join("\n");

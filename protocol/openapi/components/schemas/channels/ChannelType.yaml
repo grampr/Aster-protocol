@@ -1,0 +1,8 @@
+title: ChannelType
+description: Channelで扱うCommunicationの種類です。
+type: string
+enum:
+  - TEXT
+  - VOICE
+examples:
+  - TEXT

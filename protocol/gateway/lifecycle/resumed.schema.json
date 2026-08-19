@@ -8,7 +8,7 @@
   "required": ["op", "t", "s", "d"],
   "properties": {
     "op": { "$ref": "../common/opcode.schema.json#/$defs/DISPATCH" },
-    "t": { "const": "RESUMED", "description": "Event 名です。" },
+    "t": { "$ref": "../common/event-name.schema.json#/$defs/RESUMED" },
     "s": { "type": "integer", "minimum": 0, "description": "Event Sequence です。" },
     "d": {
       "type": "object",

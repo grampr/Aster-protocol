@@ -1,0 +1,92 @@
+parameters:
+  - $ref: ../../components/parameters/ChannelId.yaml
+  - $ref: ../../components/parameters/MessageId.yaml
+
+get:
+  operationId: getChannelMessage
+  tags:
+    - Messages
+  summary: Text ChannelのMessageを取得する
+  description: Messageが指定したText Channelに属し、認証済みUserから参照できる場合だけ返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 指定したMessageです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/messages/Message.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+patch:
+  operationId: updateChannelMessage
+  tags:
+    - Messages
+  summary: 自分のMessage本文を変更する
+  description: Messageのauthorだけが本文を変更できます。変更時にedited_atをServer時刻へ更新します。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/messages/UpdateMessageRequest.yaml
+        example:
+          content: 10月24日（土）で進める方向でよいでしょうか？
+  responses:
+    "200":
+      description: 変更後のMessageです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/messages/Message.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+delete:
+  operationId: deleteChannelMessage
+  tags:
+    - Messages
+  summary: Messageを削除する
+  description: Messageのauthor、またはMessageを管理できる権限を持つUserだけが実行できます。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: Messageを削除しました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

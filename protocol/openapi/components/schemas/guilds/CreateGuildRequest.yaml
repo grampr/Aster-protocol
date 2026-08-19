@@ -1,0 +1,17 @@
+title: CreateGuildRequest
+description: 新しいGuildを作成するときの設定です。
+type: object
+additionalProperties: false
+required:
+  - name
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+  description:
+    type: string
+    maxLength: 1024
+examples:
+  - name: 星屑コミュニティ
+    description: 創作とイベント企画のためのコミュニティ

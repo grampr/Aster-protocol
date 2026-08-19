@@ -1,0 +1,65 @@
+get:
+  operationId: listCurrentUserGuilds
+  tags:
+    - Guilds
+  summary: 認証済みUserが参加しているGuildを取得する
+  description: |
+    ClientのGuild一覧を構成するため、認証済みUserから参照できるGuildだけを返します。
+    Cursorがない最初のRequestではServerが定める安定した順序の先頭から取得します。
+  security:
+    - BearerAuth: []
+  parameters:
+    - $ref: ../../components/parameters/Cursor.yaml
+    - $ref: ../../components/parameters/Limit.yaml
+  responses:
+    "200":
+      description: 参加しているGuildのPageです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/guilds/GuildList.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+post:
+  operationId: createGuild
+  tags:
+    - Guilds
+  summary: Guildを作成する
+  description: |
+    認証済みUserをOwnerとするGuildを作成します。
+    Default Channelなどの初期Resourceを自動作成するかはServer設定に従います。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/guilds/CreateGuildRequest.yaml
+        example:
+          name: 星屑コミュニティ
+          description: 創作とイベント企画のためのコミュニティ
+  responses:
+    "201":
+      description: Guildを作成しました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/guilds/Guild.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

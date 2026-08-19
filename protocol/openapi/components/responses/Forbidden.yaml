@@ -1,0 +1,12 @@
+description: 認証済み User にこの操作を行う権限がありません。
+headers:
+  X-Request-ID:
+    $ref: ../headers/RequestId.yaml
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/common/Error.yaml
+    example:
+      code: FORBIDDEN
+      message: You do not have permission to perform this operation
+      request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0

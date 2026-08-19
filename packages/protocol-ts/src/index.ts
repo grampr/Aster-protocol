@@ -4,14 +4,23 @@ export type {
   paths,
 } from "./generated/openapi.js";
 
-export type { AsterGatewayMessage } from "./generated/gateway.js";
+export type {
+  AsterGatewayMessage,
+  GatewayMessageResource,
+  GatewayUserSummary,
+  MessageCreateEvent,
+  MessageDeleteEvent,
+  MessageUpdateEvent,
+} from "./generated/gateway.js";
 
 export {
+  GatewayEvent,
   GatewayIntent,
   GatewayOpcode,
 } from "./generated/gateway-constants.js";
 
 export type {
+  GatewayEventValue,
   GatewayIntentValue,
   GatewayOpcodeValue,
 } from "./generated/gateway-constants.js";

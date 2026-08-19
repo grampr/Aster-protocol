@@ -55,6 +55,20 @@ function readIntegerDefinitions(schema) {
   });
 }
 
+function readStringDefinitions(schema) {
+  if (!schema.$defs || typeof schema.$defs !== "object") {
+    throw new Error(`${schema.title} does not define $defs`);
+  }
+
+  return Object.entries(schema.$defs).map(([name, definition]) => {
+    if (typeof definition.const !== "string" || definition.const.length === 0) {
+      throw new Error(`${schema.title}.${name} must define a non-empty string const`);
+    }
+
+    return [name, definition.const];
+  });
+}
+
 function assertUniqueValues(entries, schemaName) {
   const values = entries.map(([, value]) => value);
   if (new Set(values).size !== values.length) {
@@ -67,6 +81,9 @@ assertUniqueValues(opcodeDefinitions, "GatewayOpcode");
 
 const intentDefinitions = readIntegerDefinitions(findSchema("GatewayIntents"));
 assertUniqueValues(intentDefinitions, "GatewayIntents");
+
+const eventDefinitions = readStringDefinitions(findSchema("GatewayEventName"));
+assertUniqueValues(eventDefinitions, "GatewayEventName");
 
 for (const [name, value] of intentDefinitions) {
   if (value <= 0 || (value & (value - 1)) !== 0) {
@@ -99,6 +116,49 @@ const validFixtures = [
       resume_gateway_url: "wss://instance.example/gateway/v1",
     },
   },
+  {
+    op: 0,
+    t: "MESSAGE_CREATE",
+    s: 1,
+    d: {
+      id: "0198b8f2-4f80-7e67-b250-b4051415e3c2",
+      channel_id: "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
+      author: {
+        id: "0198b8ef-1c5d-7b34-892e-81d2e1e2b090",
+        display_name: "Alice",
+        avatar_url: "https://cdn.example.com/avatars/alice.png",
+      },
+      content: "10月24日で進める方向でよいでしょうか？",
+      created_at: "2026-08-17T06:12:00Z",
+      edited_at: null,
+    },
+  },
+  {
+    op: 0,
+    t: "MESSAGE_UPDATE",
+    s: 2,
+    d: {
+      id: "0198b8f2-4f80-7e67-b250-b4051415e3c2",
+      channel_id: "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
+      author: {
+        id: "0198b8ef-1c5d-7b34-892e-81d2e1e2b090",
+        display_name: "Alice",
+        avatar_url: null,
+      },
+      content: null,
+      created_at: "2026-08-17T06:12:00Z",
+      edited_at: "2026-08-17T06:15:00Z",
+    },
+  },
+  {
+    op: 0,
+    t: "MESSAGE_DELETE",
+    s: 3,
+    d: {
+      id: "0198b8f2-4f80-7e67-b250-b4051415e3c2",
+      channel_id: "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
+    },
+  },
 ];
 
 for (const fixture of validFixtures) {
@@ -122,6 +182,18 @@ if (validate(invalidIntentFixture)) {
   throw new Error("Negative Gateway intents were accepted");
 }
 
+const invalidDispatchFixture = {
+  op: 0,
+  t: "MESSAGE_DELETE",
+  d: {
+    id: "0198b8f2-4f80-7e67-b250-b4051415e3c2",
+    channel_id: "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
+  },
+};
+if (validate(invalidDispatchFixture)) {
+  throw new Error("Dispatch Event without a sequence was accepted");
+}
+
 console.log(
-  `Validated ${schemaFiles.length} Gateway schemas, ${opcodeDefinitions.length} opcodes, ${intentDefinitions.length} intents, and fixtures.`,
+  `Validated ${schemaFiles.length} Gateway schemas, ${opcodeDefinitions.length} opcodes, ${intentDefinitions.length} intents, ${eventDefinitions.length} events, and fixtures.`,
 );

@@ -6,7 +6,7 @@
  */
 
 /**
- * Aster Gateway で送受信する接続 Lifecycle Message の集合です。
+ * Aster Gatewayで送受信するLifecycle MessageとDispatch Eventの集合です。
  */
 export type AsterGatewayMessage =
   | HelloMessage
@@ -16,7 +16,10 @@ export type AsterGatewayMessage =
   | HeartbeatAckMessage
   | ResumeMessage
   | ResumedMessage
-  | InvalidSessionMessage;
+  | InvalidSessionMessage
+  | MessageCreateEvent
+  | MessageUpdateEvent
+  | MessageDeleteEvent;
 /**
  * 購読する Gateway Event 群を表す32-bit Bitfield です。未割り当て Bit は Server が意味を定義するまで使用しません。
  */
@@ -62,7 +65,7 @@ export interface ReadyMessage {
    */
   op: 0;
   /**
-   * Event 名です。
+   * 新しいGateway Sessionが開始したことを通知します。
    */
   t: "READY";
   /**
@@ -138,7 +141,7 @@ export interface ResumedMessage {
    */
   op: 0;
   /**
-   * Event 名です。
+   * 既存Gateway Sessionが再開したことを通知します。
    */
   t: "RESUMED";
   /**
@@ -163,5 +166,111 @@ export interface InvalidSessionMessage {
      * 同じ Session Identifier で再試行できる場合は true です。
      */
     resumable: boolean;
+  };
+}
+/**
+ * Serverが購読中のClientまたはBotへ、新しいMessageを配信します。
+ */
+export interface MessageCreateEvent {
+  /**
+   * Server が Event を配信します。
+   */
+  op: 0;
+  /**
+   * Text ChannelにMessageが作成されたことを通知します。
+   */
+  t: "MESSAGE_CREATE";
+  /**
+   * Gateway Session内で単調増加するEvent Sequenceです。
+   */
+  s: number;
+  d: GatewayMessageResource;
+}
+/**
+ * MESSAGE_CREATEとMESSAGE_UPDATEで配信するText ChannelのMessageです。MESSAGE_CONTENT Intentが許可されない接続ではcontentをnullにします。
+ */
+export interface GatewayMessageResource {
+  /**
+   * Message IDです。
+   */
+  id: string;
+  /**
+   * Messageが属するText Channel IDです。
+   */
+  channel_id: string;
+  author: GatewayUserSummary;
+  /**
+   * UTF-8のMessage本文です。MESSAGE_CONTENT Intentが許可されない場合はnullです。
+   */
+  content: string | null;
+  /**
+   * Messageを作成した時刻です。
+   */
+  created_at: string;
+  /**
+   * 最後に本文を編集した時刻です。未編集の場合はnullです。
+   */
+  edited_at: string | null;
+}
+/**
+ * Gateway EventでMessage Authorを表示するための公開User情報です。
+ */
+export interface GatewayUserSummary {
+  /**
+   * User IDです。
+   */
+  id: string;
+  /**
+   * 表示名です。
+   */
+  display_name: string;
+  /**
+   * Avatar ImageのURLです。未設定の場合はnullです。
+   */
+  avatar_url: string | null;
+}
+/**
+ * Serverが購読中のClientまたはBotへ、更新後のMessage全体を配信します。
+ */
+export interface MessageUpdateEvent {
+  /**
+   * Server が Event を配信します。
+   */
+  op: 0;
+  /**
+   * Text ChannelのMessageが更新されたことを通知します。
+   */
+  t: "MESSAGE_UPDATE";
+  /**
+   * Gateway Session内で単調増加するEvent Sequenceです。
+   */
+  s: number;
+  d: GatewayMessageResource;
+}
+/**
+ * Serverが購読中のClientまたはBotへ、削除されたMessageの識別情報を配信します。
+ */
+export interface MessageDeleteEvent {
+  /**
+   * Server が Event を配信します。
+   */
+  op: 0;
+  /**
+   * Text ChannelのMessageが削除されたことを通知します。
+   */
+  t: "MESSAGE_DELETE";
+  /**
+   * Gateway Session内で単調増加するEvent Sequenceです。
+   */
+  s: number;
+  d: {
+    /**
+     * 削除されたMessage IDです。
+     */
+    id: string;
+    /**
+     * Messageが属していたText Channel IDです。
+     */
+    channel_id: string;
   };
 }
