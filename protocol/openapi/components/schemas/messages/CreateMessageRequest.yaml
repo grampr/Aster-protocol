@@ -1,0 +1,13 @@
+title: CreateMessageRequest
+description: Text Channelへ投稿するMessage本文です。
+type: object
+additionalProperties: false
+required:
+  - content
+properties:
+  content:
+    type: string
+    minLength: 1
+    maxLength: 4000
+examples:
+  - content: 10月24日で進める方向でよいでしょうか？

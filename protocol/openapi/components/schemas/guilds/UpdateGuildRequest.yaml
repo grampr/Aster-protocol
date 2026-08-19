@@ -1,0 +1,19 @@
+title: UpdateGuildRequest
+description: Guildの変更するFieldだけを指定します。
+type: object
+additionalProperties: false
+minProperties: 1
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+  description:
+    description: nullを指定すると概要を削除します。
+    oneOf:
+      - type: string
+        maxLength: 1024
+      - type: "null"
+examples:
+  - name: 星屑クリエイターズ
+    description: null

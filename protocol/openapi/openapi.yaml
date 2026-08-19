@@ -19,6 +19,12 @@ tags:
     description: Aster Session の作成、更新、破棄を行う Operation
   - name: Users
     description: 認証済み User 自身を扱う Operation
+  - name: Guilds
+    description: User が参加する Guild とその設定を扱う Operation
+  - name: Channels
+    description: Guild 内の Text Channel と Voice Channel を扱う Operation
+  - name: Messages
+    description: Text Channel 内の Message を扱う Operation
   - name: System
     description: Instance の稼働状態を確認する Operation
 
@@ -39,6 +45,18 @@ paths:
     $ref: ./paths/auth/logout.yaml
   /users/@me:
     $ref: ./paths/users/me.yaml
+  /guilds:
+    $ref: ./paths/guilds/guilds.yaml
+  /guilds/{guild_id}:
+    $ref: ./paths/guilds/guild.yaml
+  /guilds/{guild_id}/channels:
+    $ref: ./paths/guilds/channels.yaml
+  /channels/{channel_id}:
+    $ref: ./paths/channels/channel.yaml
+  /channels/{channel_id}/messages:
+    $ref: ./paths/channels/messages.yaml
+  /channels/{channel_id}/messages/{message_id}:
+    $ref: ./paths/messages/message.yaml
   /health:
     $ref: ./paths/system/health.yaml
 
@@ -60,10 +78,16 @@ components:
     RetryAfter:
       $ref: ./components/headers/RetryAfter.yaml
   parameters:
+    ChannelId:
+      $ref: ./components/parameters/ChannelId.yaml
     Cursor:
       $ref: ./components/parameters/Cursor.yaml
+    GuildId:
+      $ref: ./components/parameters/GuildId.yaml
     Limit:
       $ref: ./components/parameters/Limit.yaml
+    MessageId:
+      $ref: ./components/parameters/MessageId.yaml
   responses:
     EmailAlreadyRegistered:
       $ref: ./components/responses/EmailAlreadyRegistered.yaml
@@ -71,6 +95,8 @@ components:
       $ref: ./components/responses/AccountLinkRequired.yaml
     Error:
       $ref: ./components/responses/Error.yaml
+    Forbidden:
+      $ref: ./components/responses/Forbidden.yaml
     InvalidCredentials:
       $ref: ./components/responses/InvalidCredentials.yaml
     InvalidAuthorizationGrant:
@@ -79,6 +105,8 @@ components:
       $ref: ./components/responses/InvalidRefreshToken.yaml
     RateLimited:
       $ref: ./components/responses/RateLimited.yaml
+    ResourceNotFound:
+      $ref: ./components/responses/ResourceNotFound.yaml
     Unauthorized:
       $ref: ./components/responses/Unauthorized.yaml
   schemas:
@@ -86,6 +114,18 @@ components:
       $ref: ./components/schemas/auth/AccessToken.yaml
     AuthenticationMethod:
       $ref: ./components/schemas/auth/AuthenticationMethod.yaml
+    Channel:
+      $ref: ./components/schemas/channels/Channel.yaml
+    ChannelList:
+      $ref: ./components/schemas/channels/ChannelList.yaml
+    ChannelType:
+      $ref: ./components/schemas/channels/ChannelType.yaml
+    CreateChannelRequest:
+      $ref: ./components/schemas/channels/CreateChannelRequest.yaml
+    CreateGuildRequest:
+      $ref: ./components/schemas/guilds/CreateGuildRequest.yaml
+    CreateMessageRequest:
+      $ref: ./components/schemas/messages/CreateMessageRequest.yaml
     Email:
       $ref: ./components/schemas/auth/Email.yaml
     AsterExchangeCode:
@@ -100,10 +140,18 @@ components:
       $ref: ./components/schemas/auth/GoogleAuthorizationResponse.yaml
     GoogleExchangeRequest:
       $ref: ./components/schemas/auth/GoogleExchangeRequest.yaml
+    Guild:
+      $ref: ./components/schemas/guilds/Guild.yaml
+    GuildList:
+      $ref: ./components/schemas/guilds/GuildList.yaml
     LoginPasswordRequest:
       $ref: ./components/schemas/auth/LoginPasswordRequest.yaml
     LogoutRequest:
       $ref: ./components/schemas/auth/LogoutRequest.yaml
+    Message:
+      $ref: ./components/schemas/messages/Message.yaml
+    MessageList:
+      $ref: ./components/schemas/messages/MessageList.yaml
     PageInfo:
       $ref: ./components/schemas/common/PageInfo.yaml
     PaginationCursor:
@@ -132,7 +180,15 @@ components:
       $ref: ./components/schemas/auth/SessionTokenResponse.yaml
     Timestamp:
       $ref: ./components/schemas/common/Timestamp.yaml
+    UpdateChannelRequest:
+      $ref: ./components/schemas/channels/UpdateChannelRequest.yaml
+    UpdateGuildRequest:
+      $ref: ./components/schemas/guilds/UpdateGuildRequest.yaml
+    UpdateMessageRequest:
+      $ref: ./components/schemas/messages/UpdateMessageRequest.yaml
     UUID:
       $ref: ./components/schemas/common/UUID.yaml
     UserSelf:
       $ref: ./components/schemas/users/UserSelf.yaml
+    UserSummary:
+      $ref: ./components/schemas/users/UserSummary.yaml

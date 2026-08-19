@@ -1,0 +1,26 @@
+title: ChannelList
+description: Guild内のChannelをpositionの昇順で返すPageです。
+type: object
+additionalProperties: false
+required:
+  - items
+  - page
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Channel.yaml
+  page:
+    $ref: ../common/PageInfo.yaml
+examples:
+  - items:
+      - id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+        guild_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+        type: TEXT
+        name: イベント企画
+        topic: 次回イベントの日程と内容を相談します
+        position: 2
+        created_at: 2026-08-17T06:05:00Z
+    page:
+      has_more: false
+      next_cursor: null

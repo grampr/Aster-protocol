@@ -1,0 +1,7 @@
+name: channel_id
+in: path
+required: true
+description: 操作対象の Channel ID です。
+schema:
+  $ref: ../schemas/common/UUID.yaml
+example: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1

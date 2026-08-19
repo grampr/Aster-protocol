@@ -1,0 +1,92 @@
+parameters:
+  - $ref: ../../components/parameters/GuildId.yaml
+
+get:
+  operationId: getGuild
+  tags:
+    - Guilds
+  summary: Guildを取得する
+  description: 認証済みUserが参照できるGuildの現在の設定を返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 指定したGuildです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/guilds/Guild.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+patch:
+  operationId: updateGuild
+  tags:
+    - Guilds
+  summary: Guildの設定を変更する
+  description: Guild設定を変更できる権限を持つUserだけが実行できます。指定していないFieldは変更しません。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/guilds/UpdateGuildRequest.yaml
+        example:
+          name: 星屑クリエイターズ
+          description: null
+  responses:
+    "200":
+      description: 変更後のGuildです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/guilds/Guild.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+delete:
+  operationId: deleteGuild
+  tags:
+    - Guilds
+  summary: Guildを削除する
+  description: Guildを削除できる権限を持つUserだけが実行できます。削除はGuild配下のResourceにも影響します。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: Guildを削除しました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

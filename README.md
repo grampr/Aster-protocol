@@ -29,6 +29,9 @@ protocol/openapi/
 ├── openapi.yaml
 ├── paths/
 │   ├── auth/
+│   ├── channels/
+│   ├── guilds/
+│   ├── messages/
 │   ├── users/
 │   └── system/
 └── components/
@@ -36,7 +39,10 @@ protocol/openapi/
     ├── responses/
     └── schemas/
         ├── auth/
+        ├── channels/
         ├── common/
+        ├── guilds/
+        ├── messages/
         ├── users/
         └── system/
 ```
@@ -85,6 +91,18 @@ Desktop Redirect URIは`aster://auth/callback`に固定します。
 CallbackのDeep LinkにはGoogleのTokenを含めません。
 
 この境界の判断理由と将来追加する Flow は [ADR-0001](docs/decisions/0001-provider-neutral-authentication.md) に記録しています。
+
+## Guild、Channel、Message
+
+初期のChat Resourceは、GuildをCommunityの境界、Channelを会話の置き場所、MessageをText Channel内の投稿として分離します。
+Channel Typeは`TEXT`と`VOICE`から始め、Category、DM、Threadは専用の表示規則と権限境界を定義してから追加します。
+
+REST APIは、Guild、Channel、Messageの現在の永続状態と明示的な変更を担当します。
+新規Messageや更新・削除のリアルタイム通知は、後続のGateway Event契約で定義します。
+
+Message一覧は新しい順で返し、`next_cursor`で過去へ遡ります。
+Message本文は1〜4000文字とし、初期契約では添付ファイルだけのMessageを扱いません。
+添付ファイルResourceを定義するときに、本文が空のMessageを許可する条件も同時に追加します。
 
 ## Cursor Pagination
 

@@ -1,0 +1,13 @@
+title: UpdateMessageRequest
+description: 自分が投稿したMessageの本文を置き換えます。
+type: object
+additionalProperties: false
+required:
+  - content
+properties:
+  content:
+    type: string
+    minLength: 1
+    maxLength: 4000
+examples:
+  - content: 10月24日（土）で進める方向でよいでしょうか？

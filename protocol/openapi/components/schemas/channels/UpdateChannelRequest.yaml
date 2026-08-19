@@ -1,0 +1,22 @@
+title: UpdateChannelRequest
+description: Channelの変更するFieldだけを指定します。
+type: object
+additionalProperties: false
+minProperties: 1
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+  topic:
+    description: nullを指定するとTopicを削除します。
+    oneOf:
+      - type: string
+        maxLength: 1024
+      - type: "null"
+  position:
+    type: integer
+    minimum: 0
+examples:
+  - name: 秋のイベント企画
+    position: 3

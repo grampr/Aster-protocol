@@ -1,0 +1,92 @@
+parameters:
+  - $ref: ../../components/parameters/ChannelId.yaml
+
+get:
+  operationId: getChannel
+  tags:
+    - Channels
+  summary: Channelを取得する
+  description: 認証済みUserが参照できるChannelの現在の設定を返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 指定したChannelです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/channels/Channel.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+patch:
+  operationId: updateChannel
+  tags:
+    - Channels
+  summary: Channelの設定を変更する
+  description: Channelを管理できる権限を持つUserだけが実行できます。Channel Typeは作成後に変更できません。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/channels/UpdateChannelRequest.yaml
+        example:
+          name: 秋のイベント企画
+          position: 3
+  responses:
+    "200":
+      description: 変更後のChannelです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/channels/Channel.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+delete:
+  operationId: deleteChannel
+  tags:
+    - Channels
+  summary: Channelを削除する
+  description: Channelを管理できる権限を持つUserだけが実行できます。Text Channelの削除は配下のMessageにも影響します。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: Channelを削除しました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

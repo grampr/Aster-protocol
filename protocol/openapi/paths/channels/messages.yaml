@@ -1,0 +1,72 @@
+parameters:
+  - $ref: ../../components/parameters/ChannelId.yaml
+
+get:
+  operationId: listChannelMessages
+  tags:
+    - Messages
+  summary: Text ChannelのMessageを取得する
+  description: |
+    認証済みUserが参照できるMessageをcreated_atとidの新しい順で返します。
+    next_cursorは現在のPageより古いMessageを取得するために使用します。
+    Voice Channelを指定した場合はResourceが見つからないものとして扱います。
+  security:
+    - BearerAuth: []
+  parameters:
+    - $ref: ../../components/parameters/Cursor.yaml
+    - $ref: ../../components/parameters/Limit.yaml
+  responses:
+    "200":
+      description: Text Channel内のMessageのPageです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/messages/MessageList.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+post:
+  operationId: createChannelMessage
+  tags:
+    - Messages
+  summary: Text ChannelにMessageを投稿する
+  description: Messageを送信できる権限を持つUserをauthorとして、新しいMessageを作成します。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/messages/CreateMessageRequest.yaml
+        example:
+          content: 10月24日で進める方向でよいでしょうか？
+  responses:
+    "201":
+      description: Messageを作成しました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/messages/Message.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

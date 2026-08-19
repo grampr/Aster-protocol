@@ -1,0 +1,43 @@
+title: Guild
+description: Userが参加し、ChannelをまとめるCommunityです。
+type: object
+additionalProperties: false
+required:
+  - id
+  - name
+  - description
+  - icon_url
+  - owner_id
+  - created_at
+properties:
+  id:
+    $ref: ../common/UUID.yaml
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+  description:
+    description: Guildの概要です。未設定の場合はnullです。
+    oneOf:
+      - type: string
+        maxLength: 1024
+      - type: "null"
+  icon_url:
+    description: Guild IconのURLです。未設定の場合はnullです。
+    oneOf:
+      - type: string
+        format: uri
+      - type: "null"
+  owner_id:
+    allOf:
+      - $ref: ../common/UUID.yaml
+    description: Guildを所有するUser IDです。
+  created_at:
+    $ref: ../common/Timestamp.yaml
+examples:
+  - id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    name: 星屑コミュニティ
+    description: 創作とイベント企画のためのコミュニティ
+    icon_url: https://cdn.example.com/guild-icons/aster.png
+    owner_id: 0198b8ef-1c5d-7b34-892e-81d2e1e2b090
+    created_at: 2026-08-17T06:00:00Z

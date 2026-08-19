@@ -17,6 +17,12 @@ tags:
     description: Aster Session の作成、更新、破棄を行う Operation
   - name: Users
     description: 認証済み User 自身を扱う Operation
+  - name: Guilds
+    description: User が参加する Guild とその設定を扱う Operation
+  - name: Channels
+    description: Guild 内の Text Channel と Voice Channel を扱う Operation
+  - name: Messages
+    description: Text Channel 内の Message を扱う Operation
   - name: System
     description: Instance の稼働状態を確認する Operation
 paths:
@@ -379,6 +385,482 @@ paths:
           $ref: '#/components/responses/RateLimited'
         default:
           $ref: '#/components/responses/Error'
+  /guilds:
+    get:
+      operationId: listCurrentUserGuilds
+      tags:
+        - Guilds
+      summary: 認証済みUserが参加しているGuildを取得する
+      description: |
+        ClientのGuild一覧を構成するため、認証済みUserから参照できるGuildだけを返します。
+        Cursorがない最初のRequestではServerが定める安定した順序の先頭から取得します。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: 参加しているGuildのPageです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuildList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createGuild
+      tags:
+        - Guilds
+      summary: Guildを作成する
+      description: |
+        認証済みUserをOwnerとするGuildを作成します。
+        Default Channelなどの初期Resourceを自動作成するかはServer設定に従います。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGuildRequest'
+            example:
+              name: 星屑コミュニティ
+              description: 創作とイベント企画のためのコミュニティ
+      responses:
+        '201':
+          description: Guildを作成しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guild'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+    get:
+      operationId: getGuild
+      tags:
+        - Guilds
+      summary: Guildを取得する
+      description: 認証済みUserが参照できるGuildの現在の設定を返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 指定したGuildです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guild'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: updateGuild
+      tags:
+        - Guilds
+      summary: Guildの設定を変更する
+      description: Guild設定を変更できる権限を持つUserだけが実行できます。指定していないFieldは変更しません。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGuildRequest'
+            example:
+              name: 星屑クリエイターズ
+              description: null
+      responses:
+        '200':
+          description: 変更後のGuildです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guild'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: deleteGuild
+      tags:
+        - Guilds
+      summary: Guildを削除する
+      description: Guildを削除できる権限を持つUserだけが実行できます。削除はGuild配下のResourceにも影響します。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Guildを削除しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/channels:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+    get:
+      operationId: listGuildChannels
+      tags:
+        - Channels
+      summary: GuildのChannelを取得する
+      description: 認証済みUserが参照できるChannelをpositionの昇順で返します。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Guild内のChannelのPageです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createGuildChannel
+      tags:
+        - Channels
+      summary: GuildにChannelを作成する
+      description: Channelを管理できる権限を持つUserだけが実行できます。positionはServerが末尾になるよう割り当てます。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChannelRequest'
+            example:
+              type: TEXT
+              name: イベント企画
+              topic: 次回イベントの日程と内容を相談します
+      responses:
+        '201':
+          description: Channelを作成しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /channels/{channel_id}:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    get:
+      operationId: getChannel
+      tags:
+        - Channels
+      summary: Channelを取得する
+      description: 認証済みUserが参照できるChannelの現在の設定を返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 指定したChannelです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: updateChannel
+      tags:
+        - Channels
+      summary: Channelの設定を変更する
+      description: Channelを管理できる権限を持つUserだけが実行できます。Channel Typeは作成後に変更できません。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChannelRequest'
+            example:
+              name: 秋のイベント企画
+              position: 3
+      responses:
+        '200':
+          description: 変更後のChannelです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: deleteChannel
+      tags:
+        - Channels
+      summary: Channelを削除する
+      description: Channelを管理できる権限を持つUserだけが実行できます。Text Channelの削除は配下のMessageにも影響します。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Channelを削除しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /channels/{channel_id}/messages:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    get:
+      operationId: listChannelMessages
+      tags:
+        - Messages
+      summary: Text ChannelのMessageを取得する
+      description: |
+        認証済みUserが参照できるMessageをcreated_atとidの新しい順で返します。
+        next_cursorは現在のPageより古いMessageを取得するために使用します。
+        Voice Channelを指定した場合はResourceが見つからないものとして扱います。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Text Channel内のMessageのPageです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createChannelMessage
+      tags:
+        - Messages
+      summary: Text ChannelにMessageを投稿する
+      description: Messageを送信できる権限を持つUserをauthorとして、新しいMessageを作成します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageRequest'
+            example:
+              content: 10月24日で進める方向でよいでしょうか？
+      responses:
+        '201':
+          description: Messageを作成しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /channels/{channel_id}/messages/{message_id}:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+      - $ref: '#/components/parameters/MessageId'
+    get:
+      operationId: getChannelMessage
+      tags:
+        - Messages
+      summary: Text ChannelのMessageを取得する
+      description: Messageが指定したText Channelに属し、認証済みUserから参照できる場合だけ返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 指定したMessageです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: updateChannelMessage
+      tags:
+        - Messages
+      summary: 自分のMessage本文を変更する
+      description: Messageのauthorだけが本文を変更できます。変更時にedited_atをServer時刻へ更新します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMessageRequest'
+            example:
+              content: 10月24日（土）で進める方向でよいでしょうか？
+      responses:
+        '200':
+          description: 変更後のMessageです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: deleteChannelMessage
+      tags:
+        - Messages
+      summary: Messageを削除する
+      description: Messageのauthor、またはMessageを管理できる権限を持つUserだけが実行できます。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Messageを削除しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
   /health:
     get:
       operationId: getHealth
@@ -467,6 +949,14 @@ components:
         minimum: 0
       example: 2
   parameters:
+    ChannelId:
+      name: channel_id
+      in: path
+      required: true
+      description: 操作対象の Channel ID です。
+      schema:
+        $ref: '#/components/schemas/UUID'
+      example: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
     Cursor:
       name: cursor
       in: query
@@ -477,6 +967,14 @@ components:
       schema:
         $ref: '#/components/schemas/PaginationCursor'
       example: eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+    GuildId:
+      name: guild_id
+      in: path
+      required: true
+      description: 操作対象の Guild ID です。
+      schema:
+        $ref: '#/components/schemas/UUID'
+      example: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
     Limit:
       name: limit
       in: query
@@ -488,6 +986,14 @@ components:
         maximum: 100
         default: 50
       example: 50
+    MessageId:
+      name: message_id
+      in: path
+      required: true
+      description: 操作対象の Message ID です。
+      schema:
+        $ref: '#/components/schemas/UUID'
+      example: 0198b8f2-4f80-7e67-b250-b4051415e3c2
   responses:
     EmailAlreadyRegistered:
       description: 指定された Email Address は登録済みです。
@@ -527,6 +1033,19 @@ components:
           example:
             code: INTERNAL_ERROR
             message: Internal server error
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    Forbidden:
+      description: 認証済み User にこの操作を行う権限がありません。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: FORBIDDEN
+            message: You do not have permission to perform this operation
             request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
     InvalidCredentials:
       description: Email Address または Password が一致しないため Session を作成しませんでした。
@@ -592,6 +1111,19 @@ components:
             request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
             details:
               retry_after_ms: 1250
+    ResourceNotFound:
+      description: 指定した Resource が存在しないか、認証済み User から参照できません。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: NOT_FOUND
+            message: Resource not found
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
     Unauthorized:
       description: 有効な Aster Access Token がないため Request を認可しませんでした。
       headers:
@@ -631,6 +1163,142 @@ components:
         - Google
       examples:
         - PASSWORD
+    Channel:
+      title: Channel
+      description: Guild内のText ChannelまたはVoice Channelです。
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - guild_id
+        - type
+        - name
+        - topic
+        - position
+        - created_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        guild_id:
+          allOf:
+            - $ref: '#/components/schemas/UUID'
+          description: Channelが属するGuild IDです。
+        type:
+          $ref: '#/components/schemas/ChannelType'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        topic:
+          description: Text Channelの説明です。未設定またはVoice Channelの場合はnullです。
+          oneOf:
+            - type: string
+              maxLength: 1024
+            - type: 'null'
+        position:
+          type: integer
+          minimum: 0
+          description: 同じGuild内での表示順です。小さい値を先に表示します。
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+      examples:
+        - id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+          guild_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+          type: TEXT
+          name: イベント企画
+          topic: 次回イベントの日程と内容を相談します
+          position: 2
+          created_at: '2026-08-17T06:05:00Z'
+    ChannelList:
+      title: ChannelList
+      description: Guild内のChannelをpositionの昇順で返すPageです。
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - page
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Channel'
+        page:
+          $ref: '#/components/schemas/PageInfo'
+      examples:
+        - items:
+            - id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+              guild_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+              type: TEXT
+              name: イベント企画
+              topic: 次回イベントの日程と内容を相談します
+              position: 2
+              created_at: '2026-08-17T06:05:00Z'
+          page:
+            has_more: false
+            next_cursor: null
+    ChannelType:
+      title: ChannelType
+      description: Channelで扱うCommunicationの種類です。
+      type: string
+      enum:
+        - TEXT
+        - VOICE
+      examples:
+        - TEXT
+    CreateChannelRequest:
+      title: CreateChannelRequest
+      description: Guild内に新しいChannelを作成するときの設定です。
+      type: object
+      additionalProperties: false
+      required:
+        - type
+        - name
+      properties:
+        type:
+          $ref: '#/components/schemas/ChannelType'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        topic:
+          type: string
+          maxLength: 1024
+      examples:
+        - type: TEXT
+          name: イベント企画
+          topic: 次回イベントの日程と内容を相談します
+    CreateGuildRequest:
+      title: CreateGuildRequest
+      description: 新しいGuildを作成するときの設定です。
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1024
+      examples:
+        - name: 星屑コミュニティ
+          description: 創作とイベント企画のためのコミュニティ
+    CreateMessageRequest:
+      title: CreateMessageRequest
+      description: Text Channelへ投稿するMessage本文です。
+      type: object
+      additionalProperties: false
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 4000
+      examples:
+        - content: 10月24日で進める方向でよいでしょうか？
     Email:
       title: Email
       description: Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
@@ -763,6 +1431,76 @@ components:
       examples:
         - exchange_code: example-one-time-aster-exchange-code
           code_verifier: dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+    Guild:
+      title: Guild
+      description: Userが参加し、ChannelをまとめるCommunityです。
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - description
+        - icon_url
+        - owner_id
+        - created_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          description: Guildの概要です。未設定の場合はnullです。
+          oneOf:
+            - type: string
+              maxLength: 1024
+            - type: 'null'
+        icon_url:
+          description: Guild IconのURLです。未設定の場合はnullです。
+          oneOf:
+            - type: string
+              format: uri
+            - type: 'null'
+        owner_id:
+          allOf:
+            - $ref: '#/components/schemas/UUID'
+          description: Guildを所有するUser IDです。
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+      examples:
+        - id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+          name: 星屑コミュニティ
+          description: 創作とイベント企画のためのコミュニティ
+          icon_url: https://cdn.example.com/guild-icons/aster.png
+          owner_id: 0198b8ef-1c5d-7b34-892e-81d2e1e2b090
+          created_at: '2026-08-17T06:00:00Z'
+    GuildList:
+      title: GuildList
+      description: 認証済みUserが参加しているGuildのPageです。
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - page
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Guild'
+        page:
+          $ref: '#/components/schemas/PageInfo'
+      examples:
+        - items:
+            - id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+              name: 星屑コミュニティ
+              description: 創作とイベント企画のためのコミュニティ
+              icon_url: https://cdn.example.com/guild-icons/aster.png
+              owner_id: 0198b8ef-1c5d-7b34-892e-81d2e1e2b090
+              created_at: '2026-08-17T06:00:00Z'
+          page:
+            has_more: false
+            next_cursor: null
     LoginPasswordRequest:
       title: LoginPasswordRequest
       description: Email Address と Password で Aster Session を作成する Request です。
@@ -791,6 +1529,78 @@ components:
           $ref: '#/components/schemas/RefreshToken'
       examples:
         - refresh_token: example-refresh-token
+    Message:
+      title: Message
+      description: Text Channelに投稿されたMessageです。
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - channel_id
+        - author
+        - content
+        - created_at
+        - edited_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        channel_id:
+          allOf:
+            - $ref: '#/components/schemas/UUID'
+          description: Messageが属するText Channel IDです。
+        author:
+          $ref: '#/components/schemas/UserSummary'
+        content:
+          type: string
+          minLength: 1
+          maxLength: 4000
+          description: UTF-8のMessage本文です。
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        edited_at:
+          description: 最後に本文を編集した時刻です。未編集の場合はnullです。
+          oneOf:
+            - $ref: '#/components/schemas/Timestamp'
+            - type: 'null'
+      examples:
+        - id: 0198b8f2-4f80-7e67-b250-b4051415e3c2
+          channel_id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+          author:
+            id: 0198b8ef-1c5d-7b34-892e-81d2e1e2b090
+            display_name: Alice
+            avatar_url: https://cdn.example.com/avatars/alice.png
+          content: 10月24日で進める方向でよいでしょうか？
+          created_at: '2026-08-17T06:12:00Z'
+          edited_at: null
+    MessageList:
+      title: MessageList
+      description: Text ChannelのMessageを新しい順で返すPageです。
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - page
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        page:
+          $ref: '#/components/schemas/PageInfo'
+      examples:
+        - items:
+            - id: 0198b8f2-4f80-7e67-b250-b4051415e3c2
+              channel_id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+              author:
+                id: 0198b8ef-1c5d-7b34-892e-81d2e1e2b090
+                display_name: Alice
+                avatar_url: https://cdn.example.com/avatars/alice.png
+              content: 10月24日で進める方向でよいでしょうか？
+              created_at: '2026-08-17T06:12:00Z'
+              edited_at: null
+          page:
+            has_more: true
+            next_cursor: eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9
     PageInfo:
       title: PageInfo
       description: Cursor Pagination の継続情報です。
@@ -982,6 +1792,63 @@ components:
       format: date-time
       examples:
         - '2026-08-17T06:00:00Z'
+    UpdateChannelRequest:
+      title: UpdateChannelRequest
+      description: Channelの変更するFieldだけを指定します。
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        topic:
+          description: nullを指定するとTopicを削除します。
+          oneOf:
+            - type: string
+              maxLength: 1024
+            - type: 'null'
+        position:
+          type: integer
+          minimum: 0
+      examples:
+        - name: 秋のイベント企画
+          position: 3
+    UpdateGuildRequest:
+      title: UpdateGuildRequest
+      description: Guildの変更するFieldだけを指定します。
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          description: nullを指定すると概要を削除します。
+          oneOf:
+            - type: string
+              maxLength: 1024
+            - type: 'null'
+      examples:
+        - name: 星屑クリエイターズ
+          description: null
+    UpdateMessageRequest:
+      title: UpdateMessageRequest
+      description: 自分が投稿したMessageの本文を置き換えます。
+      type: object
+      additionalProperties: false
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 4000
+      examples:
+        - content: 10月24日（土）で進める方向でよいでしょうか？
     UUID:
       title: UUID
       description: UUIDv7 を使用する Resource Identifier です。
@@ -1038,3 +1905,29 @@ components:
           authentication_methods:
             - PASSWORD
           created_at: '2026-08-17T06:00:00Z'
+    UserSummary:
+      title: UserSummary
+      description: Messageなどで表示するUserの公開情報です。
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - display_name
+        - avatar_url
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        avatar_url:
+          description: Avatar ImageのURLです。未設定の場合はnullです。
+          oneOf:
+            - type: string
+              format: uri
+            - type: 'null'
+      examples:
+        - id: 0198b8ef-1c5d-7b34-892e-81d2e1e2b090
+          display_name: Alice
+          avatar_url: https://cdn.example.com/avatars/alice.png

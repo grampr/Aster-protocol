@@ -1,0 +1,25 @@
+title: UserSummary
+description: Messageなどで表示するUserの公開情報です。
+type: object
+additionalProperties: false
+required:
+  - id
+  - display_name
+  - avatar_url
+properties:
+  id:
+    $ref: ../common/UUID.yaml
+  display_name:
+    type: string
+    minLength: 1
+    maxLength: 64
+  avatar_url:
+    description: Avatar ImageのURLです。未設定の場合はnullです。
+    oneOf:
+      - type: string
+        format: uri
+      - type: "null"
+examples:
+  - id: 0198b8ef-1c5d-7b34-892e-81d2e1e2b090
+    display_name: Alice
+    avatar_url: https://cdn.example.com/avatars/alice.png

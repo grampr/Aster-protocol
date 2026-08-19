@@ -1,0 +1,71 @@
+parameters:
+  - $ref: ../../components/parameters/GuildId.yaml
+
+get:
+  operationId: listGuildChannels
+  tags:
+    - Channels
+  summary: GuildのChannelを取得する
+  description: 認証済みUserが参照できるChannelをpositionの昇順で返します。
+  security:
+    - BearerAuth: []
+  parameters:
+    - $ref: ../../components/parameters/Cursor.yaml
+    - $ref: ../../components/parameters/Limit.yaml
+  responses:
+    "200":
+      description: Guild内のChannelのPageです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/channels/ChannelList.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+post:
+  operationId: createGuildChannel
+  tags:
+    - Channels
+  summary: GuildにChannelを作成する
+  description: Channelを管理できる権限を持つUserだけが実行できます。positionはServerが末尾になるよう割り当てます。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/channels/CreateChannelRequest.yaml
+        example:
+          type: TEXT
+          name: イベント企画
+          topic: 次回イベントの日程と内容を相談します
+  responses:
+    "201":
+      description: Channelを作成しました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/channels/Channel.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
