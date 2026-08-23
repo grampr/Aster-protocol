@@ -9,6 +9,7 @@ required:
   - content
   - reply_to_message_id
   - reply_to
+  - reactions
   - created_at
   - edited_at
 properties:
@@ -39,6 +40,11 @@ properties:
     oneOf:
       - $ref: ./MessageReply.yaml
       - type: "null"
+  reactions:
+    type: array
+    description: 絵文字ごとのReaction集計です。Reactionがない場合は空配列です。
+    items:
+      $ref: ./MessageReaction.yaml
   created_at:
     $ref: ../common/Timestamp.yaml
   edited_at:
@@ -65,5 +71,9 @@ examples:
       content: 10月24日で進めませんか？
       created_at: 2026-08-17T06:10:00Z
       edited_at: null
+    reactions:
+      - emoji: 👍
+        count: 3
+        me: true
     created_at: 2026-08-17T06:12:00Z
     edited_at: null

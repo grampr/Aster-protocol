@@ -1,0 +1,66 @@
+parameters:
+  - $ref: ../../components/parameters/ChannelId.yaml
+  - $ref: ../../components/parameters/MessageId.yaml
+  - $ref: ../../components/parameters/ReactionEmoji.yaml
+
+put:
+  operationId: addMessageReaction
+  tags:
+    - Messages
+  summary: MessageにReactionを付ける
+  description: |
+    同じUserが同じ絵文字を複数回付けても1件として扱います。
+    Messageが指定したText Channelに属し、認証済みUserから参照できる場合だけ更新します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 追加後のReaction集計です。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/messages/MessageReaction.yaml
+    "400":
+      $ref: ../../components/responses/Error.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+delete:
+  operationId: removeMessageReaction
+  tags:
+    - Messages
+  summary: Messageから自分のReactionを外す
+  description: |
+    Reactionが付いていない場合も成功として扱い、現在の集計を返します。
+    Messageが指定したText Channelに属し、認証済みUserから参照できる場合だけ更新します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 解除後のReaction集計です。最後の1件を外した場合はcountが0になります。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/messages/MessageReaction.yaml
+    "400":
+      $ref: ../../components/responses/Error.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

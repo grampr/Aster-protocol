@@ -378,7 +378,7 @@ type LogoutRequest struct {
 
 // Message Text Channelに投稿されたMessageです。
 //
-// Examples: {"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reply_to":{"author":{"avatar_url":null,"display_name":"Bob","id":"0198b8ed-7ba1-7165-b028-9ecf14ed1e7b"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進めませんか？","created_at":"2026-08-17T06:10:00Z","edited_at":null,"id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"},"reply_to_message_id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"}
+// Examples: {"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reactions":[{"count":3,"emoji":"👍","me":true}],"reply_to":{"author":{"avatar_url":null,"display_name":"Bob","id":"0198b8ed-7ba1-7165-b028-9ecf14ed1e7b"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進めませんか？","created_at":"2026-08-17T06:10:00Z","edited_at":null,"id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"},"reply_to_message_id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"}
 type Message struct {
 	// Author Messageなどで表示するUserの公開情報です。
 	//
@@ -404,6 +404,9 @@ type Message struct {
 	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 	Id UUID `json:"id"`
 
+	// Reactions 絵文字ごとのReaction集計です。Reactionがない場合は空配列です。
+	Reactions []MessageReaction `json:"reactions"`
+
 	// ReplyTo 表示可能な返信元Messageです。通常のMessage、削除済み、または参照不能の場合はnullです。
 	// reply_to_message_idがnullでなく、このFieldがnullの場合、Clientは返信元を表示できない状態として扱います。
 	ReplyTo *MessageReply `json:"reply_to"`
@@ -415,7 +418,7 @@ type Message struct {
 
 // MessageList Text ChannelのMessageを新しい順で返すPageです。
 //
-// Examples: {"items":[{"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reply_to":null,"reply_to_message_id":null}],"page":{"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9"}}
+// Examples: {"items":[{"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reactions":[],"reply_to":null,"reply_to_message_id":null}],"page":{"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9"}}
 type MessageList struct {
 	Items []Message `json:"items"`
 
@@ -423,6 +426,18 @@ type MessageList struct {
 	//
 	// Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
 	Page PageInfo `json:"page"`
+}
+
+// MessageReaction Messageに付いた同じ絵文字のReaction集計です。Message内ではcountが1以上の項目だけを返します。
+type MessageReaction struct {
+	// Count Operation完了後にこの絵文字が付いている件数です。解除Responseでは0になる場合があります。
+	Count int `json:"count"`
+
+	// Emoji Message Reactionに使うUnicode絵文字列です。Variation SelectorやZWJを含むSequence全体を一つの値として扱います。
+	Emoji ReactionEmoji `json:"emoji"`
+
+	// Me 認証済みUser自身がこのReactionを付けている場合はtrueです。
+	Me bool `json:"me"`
 }
 
 // MessageReply 返信元Messageを表示するための軽量な参照です。
@@ -519,6 +534,9 @@ type RateLimitError struct {
 
 // RateLimitErrorCode Rate Limit Error を表す固定 Code です。
 type RateLimitErrorCode string
+
+// ReactionEmoji Message Reactionに使うUnicode絵文字列です。Variation SelectorやZWJを含むSequence全体を一つの値として扱います。
+type ReactionEmoji = string
 
 // RefreshSessionRequest Refresh Token を Rotation して Aster Session を更新する Request です。
 //

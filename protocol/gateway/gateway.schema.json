@@ -14,6 +14,8 @@
     { "$ref": "./lifecycle/invalid-session.schema.json" },
     { "$ref": "./events/messages/message-create.schema.json" },
     { "$ref": "./events/messages/message-update.schema.json" },
-    { "$ref": "./events/messages/message-delete.schema.json" }
+    { "$ref": "./events/messages/message-delete.schema.json" },
+    { "$ref": "./events/messages/message-reaction-add.schema.json" },
+    { "$ref": "./events/messages/message-reaction-remove.schema.json" }
   ]
 }

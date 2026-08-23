@@ -8,13 +8,17 @@
     { "$ref": "#/$defs/RESUMED" },
     { "$ref": "#/$defs/MESSAGE_CREATE" },
     { "$ref": "#/$defs/MESSAGE_UPDATE" },
-    { "$ref": "#/$defs/MESSAGE_DELETE" }
+    { "$ref": "#/$defs/MESSAGE_DELETE" },
+    { "$ref": "#/$defs/MESSAGE_REACTION_ADD" },
+    { "$ref": "#/$defs/MESSAGE_REACTION_REMOVE" }
   ],
   "$defs": {
     "READY": { "const": "READY", "description": "新しいGateway Sessionが開始したことを通知します。" },
     "RESUMED": { "const": "RESUMED", "description": "既存Gateway Sessionが再開したことを通知します。" },
     "MESSAGE_CREATE": { "const": "MESSAGE_CREATE", "description": "Text ChannelにMessageが作成されたことを通知します。" },
     "MESSAGE_UPDATE": { "const": "MESSAGE_UPDATE", "description": "Text ChannelのMessageが更新されたことを通知します。" },
-    "MESSAGE_DELETE": { "const": "MESSAGE_DELETE", "description": "Text ChannelのMessageが削除されたことを通知します。" }
+    "MESSAGE_DELETE": { "const": "MESSAGE_DELETE", "description": "Text ChannelのMessageが削除されたことを通知します。" },
+    "MESSAGE_REACTION_ADD": { "const": "MESSAGE_REACTION_ADD", "description": "MessageにReactionが追加されたことを通知します。" },
+    "MESSAGE_REACTION_REMOVE": { "const": "MESSAGE_REACTION_REMOVE", "description": "MessageからReactionが解除されたことを通知します。" }
   }
 }

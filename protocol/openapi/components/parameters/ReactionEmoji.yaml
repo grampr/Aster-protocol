@@ -1,0 +1,7 @@
+name: emoji
+in: path
+required: true
+description: URL EncodingしたUnicode絵文字です。初期VersionではCustom Emojiを受け付けません。
+schema:
+  $ref: ../schemas/messages/ReactionEmoji.yaml
+example: 👍
