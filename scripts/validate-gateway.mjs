@@ -174,6 +174,20 @@ const validFixtures = [
       channel_id: "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
     },
   },
+  {
+    op: 0,
+    t: "TYPING_START",
+    s: 4,
+    d: {
+      channel_id: "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
+      user: {
+        id: "0198b8ef-1c5d-7b34-892e-81d2e1e2b090",
+        display_name: "Alice",
+        avatar_url: null,
+      },
+      started_at: "2026-08-17T06:16:00Z",
+    },
+  },
 ];
 
 for (const fixture of validFixtures) {

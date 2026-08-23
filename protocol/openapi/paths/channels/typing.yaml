@@ -1,0 +1,27 @@
+parameters:
+  - $ref: ../../components/parameters/ChannelId.yaml
+
+post:
+  operationId: startChannelTyping
+  tags:
+    - Channels
+  summary: Text Channelで入力開始を通知する
+  description: |
+    認証済みUserがText Channelへ入力中であることを、Gatewayを通じて同じGuildの接続へ通知します。
+    Clientは入力が続く間だけ定期的に呼び出し、Messageを保存する用途には使用しません。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: 入力開始の通知を受け付けました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

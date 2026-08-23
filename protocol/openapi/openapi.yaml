@@ -55,6 +55,8 @@ paths:
     $ref: ./paths/channels/channel.yaml
   /channels/{channel_id}/messages:
     $ref: ./paths/channels/messages.yaml
+  /channels/{channel_id}/typing:
+    $ref: ./paths/channels/typing.yaml
   /channels/{channel_id}/messages/{message_id}:
     $ref: ./paths/messages/message.yaml
   /channels/{channel_id}/messages/{message_id}/reactions/{emoji}:
