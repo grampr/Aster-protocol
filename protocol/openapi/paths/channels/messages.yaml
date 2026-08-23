@@ -39,7 +39,9 @@ post:
   tags:
     - Messages
   summary: Text ChannelにMessageを投稿する
-  description: Messageを送信できる権限を持つUserをauthorとして、新しいMessageを作成します。
+  description: |
+    Messageを送信できる権限を持つUserをauthorとして、新しいMessageを作成します。
+    reply_to_message_idを指定すると、同じText Channel内の参照可能なMessageへの返信として作成します。
   security:
     - BearerAuth: []
   requestBody:
@@ -50,6 +52,7 @@ post:
           $ref: ../../components/schemas/messages/CreateMessageRequest.yaml
         example:
           content: 10月24日で進める方向でよいでしょうか？
+          reply_to_message_id: 0198b8f0-1b72-73a2-a2ef-75cf3cd276d8
   responses:
     "201":
       description: Messageを作成しました。

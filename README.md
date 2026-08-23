@@ -104,6 +104,10 @@ Message一覧は新しい順で返し、`next_cursor`で過去へ遡ります。
 Message本文は1〜4000文字とし、初期契約では添付ファイルだけのMessageを扱いません。
 添付ファイルResourceを定義するときに、本文が空のMessageを許可する条件も同時に追加します。
 
+返信は`CreateMessageRequest.reply_to_message_id`で同じText Channel内のMessageを指定します。
+Responseの`reply_to`は返信表示に必要な軽量参照で、再帰的な返信構造を持ちません。
+返信元が削除済みまたは参照不能になった場合も`reply_to_message_id`は保持し、`reply_to`を`null`にすることでClientが「返信元を表示できない」状態を区別できます。
+
 ## Cursor Pagination
 
 一覧 API は `cursor` と `limit` を共通 Query Parameter として使用します。
@@ -154,7 +158,7 @@ Text Channelの同期には次のDispatch Eventを使用します。
 - `MESSAGE_DELETE`：削除されたMessageの`id`と`channel_id`を配信する
 
 Message Eventは`GUILD_MESSAGES` Intentを購読した接続へ配信します。
-`MESSAGE_CONTENT` Intentが許可されない接続でもEvent自体は配信しますが、Messageの`content`は`null`にします。
+`MESSAGE_CONTENT` Intentが許可されない接続でもEvent自体は配信しますが、Messageと返信元参照の`content`は`null`にします。
 投稿者自身の接続も配信対象に含め、ClientはMessage IDを使ってREST ResponseとGateway Eventを重複排除します。
 
 すべてのDispatch EventはGateway Session内で単調増加する`s`を持ちます。

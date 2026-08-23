@@ -9,5 +9,12 @@ properties:
     type: string
     minLength: 1
     maxLength: 4000
+  reply_to_message_id:
+    allOf:
+      - $ref: ../common/UUID.yaml
+    description: |
+      同じText Channel内で返信するMessage IDです。
+      指定したMessageが存在しない、同じChannelに属さない、または参照できない場合は404を返します。
 examples:
   - content: 10月24日で進める方向でよいでしょうか？
+    reply_to_message_id: 0198b8f0-1b72-73a2-a2ef-75cf3cd276d8

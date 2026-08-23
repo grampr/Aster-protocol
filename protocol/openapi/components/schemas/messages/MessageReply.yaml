@@ -1,0 +1,34 @@
+title: MessageReply
+description: |
+  返信元Messageを表示するための軽量な参照です。
+  再帰的なMessage構造を避けるため、返信元自身のreply_toは含みません。
+type: object
+additionalProperties: false
+required:
+  - id
+  - channel_id
+  - author
+  - content
+  - created_at
+  - edited_at
+properties:
+  id:
+    $ref: ../common/UUID.yaml
+  channel_id:
+    allOf:
+      - $ref: ../common/UUID.yaml
+    description: 返信元Messageが属するText Channel IDです。
+  author:
+    $ref: ../users/UserSummary.yaml
+  content:
+    type: string
+    minLength: 1
+    maxLength: 4000
+    description: 返信元MessageのUTF-8本文です。
+  created_at:
+    $ref: ../common/Timestamp.yaml
+  edited_at:
+    description: 返信元Messageを最後に編集した時刻です。未編集の場合はnullです。
+    oneOf:
+      - $ref: ../common/Timestamp.yaml
+      - type: "null"

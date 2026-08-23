@@ -24,3 +24,4 @@ Aster Protocol の利用者に影響する変更を記録します。
 - Guild、Text/Voice Channel、Messageの取得・作成・更新・削除を行うOpenAPI Schema
 - Message作成・更新・削除を配信するGateway Event Schema
 - TypeScript用Gateway Event名Runtime Constant
+- 同じText Channel内のMessageへ返信するOpenAPIとGatewayの参照契約
