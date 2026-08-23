@@ -6,7 +6,7 @@
   "type": "integer",
   "minimum": 0,
   "maximum": 2147483647,
-  "examples": [0, 5, 511],
+  "examples": [0, 5, 1023],
   "$defs": {
     "GUILDS": { "const": 1, "description": "Guild の作成、更新、削除を購読します。" },
     "GUILD_MEMBERS": { "const": 2, "description": "Guild Member の参加、退出、更新を購読します。" },
@@ -16,6 +16,7 @@
     "GUILD_VOICE_STATES": { "const": 32, "description": "Guild の Voice State 更新を購読します。" },
     "GUILD_PRESENCES": { "const": 64, "description": "Guild Member の Presence 更新を購読します。" },
     "REACTIONS": { "const": 128, "description": "Message Reaction Event を購読します。" },
-    "APPLICATION_INTERACTIONS": { "const": 256, "description": "Application Interaction を購読します。" }
+    "APPLICATION_INTERACTIONS": { "const": 256, "description": "Application Interaction を購読します。" },
+    "TYPING": { "const": 512, "description": "Text Channelの入力中通知を購読します。" }
   }
 }

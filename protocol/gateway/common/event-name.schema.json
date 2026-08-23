@@ -10,7 +10,8 @@
     { "$ref": "#/$defs/MESSAGE_UPDATE" },
     { "$ref": "#/$defs/MESSAGE_DELETE" },
     { "$ref": "#/$defs/MESSAGE_REACTION_ADD" },
-    { "$ref": "#/$defs/MESSAGE_REACTION_REMOVE" }
+    { "$ref": "#/$defs/MESSAGE_REACTION_REMOVE" },
+    { "$ref": "#/$defs/TYPING_START" }
   ],
   "$defs": {
     "READY": { "const": "READY", "description": "新しいGateway Sessionが開始したことを通知します。" },
@@ -19,6 +20,7 @@
     "MESSAGE_UPDATE": { "const": "MESSAGE_UPDATE", "description": "Text ChannelのMessageが更新されたことを通知します。" },
     "MESSAGE_DELETE": { "const": "MESSAGE_DELETE", "description": "Text ChannelのMessageが削除されたことを通知します。" },
     "MESSAGE_REACTION_ADD": { "const": "MESSAGE_REACTION_ADD", "description": "MessageにReactionが追加されたことを通知します。" },
-    "MESSAGE_REACTION_REMOVE": { "const": "MESSAGE_REACTION_REMOVE", "description": "MessageからReactionが解除されたことを通知します。" }
+    "MESSAGE_REACTION_REMOVE": { "const": "MESSAGE_REACTION_REMOVE", "description": "MessageからReactionが解除されたことを通知します。" },
+    "TYPING_START": { "const": "TYPING_START", "description": "Text ChannelでUserが入力を開始または継続したことを通知します。" }
   }
 }

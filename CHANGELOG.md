@@ -26,3 +26,4 @@ Aster Protocol の利用者に影響する変更を記録します。
 - TypeScript用Gateway Event名Runtime Constant
 - 同じText Channel内のMessageへ返信するOpenAPIとGatewayの参照契約
 - Unicode絵文字によるMessage ReactionのOpenAPIとGateway Event契約
+- Text Channelの入力開始を通知するOpenAPIとGateway Event契約

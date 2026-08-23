@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/events/channels/typing-start.schema.json",
+  "title": "TypingStartEvent",
+  "description": "ServerがTYPING Intentを購読中のClientまたはBotへ、Text Channelの入力開始または継続を配信します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "t", "s", "d"],
+  "properties": {
+    "op": { "$ref": "../../common/opcode.schema.json#/$defs/DISPATCH" },
+    "t": { "$ref": "../../common/event-name.schema.json#/$defs/TYPING_START" },
+    "s": { "type": "integer", "minimum": 0, "description": "Gateway Session内で単調増加するEvent Sequenceです。" },
+    "d": { "$ref": "../../resources/typing-start.schema.json" }
+  }
+}
