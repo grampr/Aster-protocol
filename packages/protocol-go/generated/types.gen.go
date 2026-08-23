@@ -205,9 +205,13 @@ type CreateGuildRequest struct {
 
 // CreateMessageRequest Text Channelへ投稿するMessage本文です。
 //
-// Examples: {"content":"10月24日で進める方向でよいでしょうか？"}
+// Examples: {"content":"10月24日で進める方向でよいでしょうか？","reply_to_message_id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"}
 type CreateMessageRequest struct {
 	Content string `json:"content"`
+
+	// ReplyToMessageId 同じText Channel内で返信するMessage IDです。
+	// 指定したMessageが存在しない、同じChannelに属さない、または参照できない場合は404を返します。
+	ReplyToMessageId *UUID `json:"reply_to_message_id,omitempty"`
 }
 
 // Email Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
@@ -374,7 +378,7 @@ type LogoutRequest struct {
 
 // Message Text Channelに投稿されたMessageです。
 //
-// Examples: {"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2"}
+// Examples: {"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reply_to":{"author":{"avatar_url":null,"display_name":"Bob","id":"0198b8ed-7ba1-7165-b028-9ecf14ed1e7b"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進めませんか？","created_at":"2026-08-17T06:10:00Z","edited_at":null,"id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"},"reply_to_message_id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"}
 type Message struct {
 	// Author Messageなどで表示するUserの公開情報です。
 	//
@@ -399,11 +403,19 @@ type Message struct {
 	//
 	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 	Id UUID `json:"id"`
+
+	// ReplyTo 表示可能な返信元Messageです。通常のMessage、削除済み、または参照不能の場合はnullです。
+	// reply_to_message_idがnullでなく、このFieldがnullの場合、Clientは返信元を表示できない状態として扱います。
+	ReplyTo *MessageReply `json:"reply_to"`
+
+	// ReplyToMessageId 返信元Message IDです。通常のMessageではnullです。
+	// 返信元が削除済みまたは参照不能でも、返信関係を示すためIDは保持します。
+	ReplyToMessageId *UUID `json:"reply_to_message_id"`
 }
 
 // MessageList Text ChannelのMessageを新しい順で返すPageです。
 //
-// Examples: {"items":[{"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2"}],"page":{"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9"}}
+// Examples: {"items":[{"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reply_to":null,"reply_to_message_id":null}],"page":{"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9"}}
 type MessageList struct {
 	Items []Message `json:"items"`
 
@@ -411,6 +423,34 @@ type MessageList struct {
 	//
 	// Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
 	Page PageInfo `json:"page"`
+}
+
+// MessageReply 返信元Messageを表示するための軽量な参照です。
+// 再帰的なMessage構造を避けるため、返信元自身のreply_toは含みません。
+type MessageReply struct {
+	// Author Messageなどで表示するUserの公開情報です。
+	//
+	// Examples: {"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"}
+	Author UserSummary `json:"author"`
+
+	// ChannelId 返信元Messageが属するText Channel IDです。
+	ChannelId UUID `json:"channel_id"`
+
+	// Content 返信元MessageのUTF-8本文です。
+	Content string `json:"content"`
+
+	// CreatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	CreatedAt Timestamp `json:"created_at"`
+
+	// EditedAt 返信元Messageを最後に編集した時刻です。未編集の場合はnullです。
+	EditedAt *Timestamp `json:"edited_at"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id UUID `json:"id"`
 }
 
 // OAuthClientState Desktop ClientがLogin開始とDeep Link Callbackを照合するために生成する不透明な値です。

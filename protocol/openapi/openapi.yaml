@@ -150,6 +150,8 @@ components:
       $ref: ./components/schemas/auth/LogoutRequest.yaml
     Message:
       $ref: ./components/schemas/messages/Message.yaml
+    MessageReply:
+      $ref: ./components/schemas/messages/MessageReply.yaml
     MessageList:
       $ref: ./components/schemas/messages/MessageList.yaml
     PageInfo:

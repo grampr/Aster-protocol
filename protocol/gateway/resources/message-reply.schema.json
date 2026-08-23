@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/resources/message-reply.schema.json",
+  "title": "GatewayMessageReplyResource",
+  "description": "返信元Messageを表示するための軽量な参照です。再帰的なreply_toは含みません。MESSAGE_CONTENT Intentが許可されない接続ではcontentをnullにします。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "channel_id", "author", "content", "created_at", "edited_at"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "description": "返信元Message IDです。" },
+    "channel_id": { "type": "string", "format": "uuid", "description": "返信元Messageが属するText Channel IDです。" },
+    "author": { "$ref": "./user-summary.schema.json" },
+    "content": {
+      "description": "返信元MessageのUTF-8本文です。MESSAGE_CONTENT Intentが許可されない場合はnullです。",
+      "oneOf": [
+        { "type": "string", "minLength": 1, "maxLength": 4000 },
+        { "type": "null" }
+      ]
+    },
+    "created_at": { "type": "string", "format": "date-time", "description": "返信元Messageを作成した時刻です。" },
+    "edited_at": {
+      "description": "返信元Messageを最後に編集した時刻です。未編集の場合はnullです。",
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    }
+  }
+}
