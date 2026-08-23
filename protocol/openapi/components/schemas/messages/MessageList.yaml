@@ -23,6 +23,7 @@ examples:
         content: 10月24日で進める方向でよいでしょうか？
         reply_to_message_id: null
         reply_to: null
+        reactions: []
         created_at: 2026-08-17T06:12:00Z
         edited_at: null
     page:

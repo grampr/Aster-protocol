@@ -25,3 +25,4 @@ Aster Protocol の利用者に影響する変更を記録します。
 - Message作成・更新・削除を配信するGateway Event Schema
 - TypeScript用Gateway Event名Runtime Constant
 - 同じText Channel内のMessageへ返信するOpenAPIとGatewayの参照契約
+- Unicode絵文字によるMessage ReactionのOpenAPIとGateway Event契約

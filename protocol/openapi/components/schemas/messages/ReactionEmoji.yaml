@@ -1,0 +1,6 @@
+title: ReactionEmoji
+description: Message Reactionに使うUnicode絵文字列です。Variation SelectorやZWJを含むSequence全体を一つの値として扱います。
+type: string
+minLength: 1
+maxLength: 64
+example: 👍

@@ -1,0 +1,22 @@
+title: MessageReaction
+description: Messageに付いた同じ絵文字のReaction集計です。Message内ではcountが1以上の項目だけを返します。
+type: object
+additionalProperties: false
+required:
+  - emoji
+  - count
+  - me
+properties:
+  emoji:
+    $ref: ./ReactionEmoji.yaml
+  count:
+    type: integer
+    minimum: 0
+    description: Operation完了後にこの絵文字が付いている件数です。解除Responseでは0になる場合があります。
+  me:
+    type: boolean
+    description: 認証済みUser自身がこのReactionを付けている場合はtrueです。
+example:
+  emoji: 👍
+  count: 3
+  me: true

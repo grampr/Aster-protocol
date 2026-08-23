@@ -108,6 +108,10 @@ Message本文は1〜4000文字とし、初期契約では添付ファイルだ�
 Responseの`reply_to`は返信表示に必要な軽量参照で、再帰的な返信構造を持ちません。
 返信元が削除済みまたは参照不能になった場合も`reply_to_message_id`は保持し、`reply_to`を`null`にすることでClientが「返信元を表示できない」状態を区別できます。
 
+ReactionはUnicode絵文字を単位として集計し、Messageの`reactions`に件数と認証済みUser自身の状態を返します。
+追加と解除は同じResourceへの`PUT`と`DELETE`で冪等に扱い、再試行で件数が重複しないようにします。
+Custom Emojiは識別子と利用権限の契約が必要なため、初期Versionには含めません。
+
 ## Cursor Pagination
 
 一覧 API は `cursor` と `limit` を共通 Query Parameter として使用します。
@@ -156,10 +160,15 @@ Text Channelの同期には次のDispatch Eventを使用します。
 - `MESSAGE_CREATE`：作成されたMessage全体を配信する
 - `MESSAGE_UPDATE`：更新後のMessage全体を配信する
 - `MESSAGE_DELETE`：削除されたMessageの`id`と`channel_id`を配信する
+- `MESSAGE_REACTION_ADD`：Reactionを付けたUserと操作後の件数を配信する
+- `MESSAGE_REACTION_REMOVE`：Reactionを外したUserと操作後の件数を配信する
 
 Message Eventは`GUILD_MESSAGES` Intentを購読した接続へ配信します。
 `MESSAGE_CONTENT` Intentが許可されない接続でもEvent自体は配信しますが、Messageと返信元参照の`content`は`null`にします。
 投稿者自身の接続も配信対象に含め、ClientはMessage IDを使ってREST ResponseとGateway Eventを重複排除します。
+
+Reaction Eventは`REACTIONS` Intentを購読した接続へ配信します。
+Eventの`count`は増減値ではなく操作後の現在値であり、Clientは再配信されたEventを重ねて加算しません。
 
 すべてのDispatch EventはGateway Session内で単調増加する`s`を持ちます。
 Clientは最後に適用したSequenceをHeartbeatとResumeへ渡し、再配信されたEventをSequenceとResource IDで安全に処理します。

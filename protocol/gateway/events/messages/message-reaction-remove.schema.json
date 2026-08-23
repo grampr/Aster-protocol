@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/events/messages/message-reaction-remove.schema.json",
+  "title": "MessageReactionRemoveEvent",
+  "description": "ServerがREACTIONS Intentを購読中のClientまたはBotへ、Message Reactionの解除を配信します。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "t", "s", "d"],
+  "properties": {
+    "op": { "$ref": "../../common/opcode.schema.json#/$defs/DISPATCH" },
+    "t": { "$ref": "../../common/event-name.schema.json#/$defs/MESSAGE_REACTION_REMOVE" },
+    "s": { "type": "integer", "minimum": 0, "description": "Gateway Session内で単調増加するEvent Sequenceです。" },
+    "d": { "$ref": "../../resources/message-reaction-event.schema.json" }
+  }
+}

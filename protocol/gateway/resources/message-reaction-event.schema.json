@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/resources/message-reaction-event.schema.json",
+  "title": "GatewayMessageReactionEventResource",
+  "description": "Message Reaction操作後の識別情報と集計です。countを現在値として適用することで再配信を安全に処理できます。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["message_id", "channel_id", "user_id", "emoji", "count"],
+  "properties": {
+    "message_id": { "type": "string", "format": "uuid", "description": "Reaction対象のMessage IDです。" },
+    "channel_id": { "type": "string", "format": "uuid", "description": "Messageが属するText Channel IDです。" },
+    "user_id": { "type": "string", "format": "uuid", "description": "Reactionを追加または解除したUser IDです。" },
+    "emoji": { "type": "string", "minLength": 1, "maxLength": 64, "description": "操作対象のUnicode絵文字列です。" },
+    "count": { "type": "integer", "minimum": 0, "description": "操作完了後にこの絵文字が付いている件数です。" }
+  }
+}

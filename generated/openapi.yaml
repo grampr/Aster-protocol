@@ -864,6 +864,71 @@ paths:
           $ref: '#/components/responses/RateLimited'
         default:
           $ref: '#/components/responses/Error'
+  /channels/{channel_id}/messages/{message_id}/reactions/{emoji}:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+      - $ref: '#/components/parameters/MessageId'
+      - $ref: '#/components/parameters/ReactionEmoji'
+    put:
+      operationId: addMessageReaction
+      tags:
+        - Messages
+      summary: MessageにReactionを付ける
+      description: |
+        同じUserが同じ絵文字を複数回付けても1件として扱います。
+        Messageが指定したText Channelに属し、認証済みUserから参照できる場合だけ更新します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 追加後のReaction集計です。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageReaction'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: removeMessageReaction
+      tags:
+        - Messages
+      summary: Messageから自分のReactionを外す
+      description: |
+        Reactionが付いていない場合も成功として扱い、現在の集計を返します。
+        Messageが指定したText Channelに属し、認証済みUserから参照できる場合だけ更新します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 解除後のReaction集計です。最後の1件を外した場合はcountが0になります。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageReaction'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
   /health:
     get:
       operationId: getHealth
@@ -997,6 +1062,14 @@ components:
       schema:
         $ref: '#/components/schemas/UUID'
       example: 0198b8f2-4f80-7e67-b250-b4051415e3c2
+    ReactionEmoji:
+      name: emoji
+      in: path
+      required: true
+      description: URL EncodingしたUnicode絵文字です。初期VersionではCustom Emojiを受け付けません。
+      schema:
+        $ref: '#/components/schemas/ReactionEmoji'
+      example: 👍
   responses:
     EmailAlreadyRegistered:
       description: 指定された Email Address は登録済みです。
@@ -1551,6 +1624,7 @@ components:
         - content
         - reply_to_message_id
         - reply_to
+        - reactions
         - created_at
         - edited_at
       properties:
@@ -1581,6 +1655,11 @@ components:
           oneOf:
             - $ref: '#/components/schemas/MessageReply'
             - type: 'null'
+        reactions:
+          type: array
+          description: 絵文字ごとのReaction集計です。Reactionがない場合は空配列です。
+          items:
+            $ref: '#/components/schemas/MessageReaction'
         created_at:
           $ref: '#/components/schemas/Timestamp'
         edited_at:
@@ -1607,6 +1686,10 @@ components:
             content: 10月24日で進めませんか？
             created_at: '2026-08-17T06:10:00Z'
             edited_at: null
+          reactions:
+            - emoji: 👍
+              count: 3
+              me: true
           created_at: '2026-08-17T06:12:00Z'
           edited_at: null
     MessageReply:
@@ -1644,6 +1727,29 @@ components:
           oneOf:
             - $ref: '#/components/schemas/Timestamp'
             - type: 'null'
+    MessageReaction:
+      title: MessageReaction
+      description: Messageに付いた同じ絵文字のReaction集計です。Message内ではcountが1以上の項目だけを返します。
+      type: object
+      additionalProperties: false
+      required:
+        - emoji
+        - count
+        - me
+      properties:
+        emoji:
+          $ref: '#/components/schemas/ReactionEmoji'
+        count:
+          type: integer
+          minimum: 0
+          description: Operation完了後にこの絵文字が付いている件数です。解除Responseでは0になる場合があります。
+        me:
+          type: boolean
+          description: 認証済みUser自身がこのReactionを付けている場合はtrueです。
+      example:
+        emoji: 👍
+        count: 3
+        me: true
     MessageList:
       title: MessageList
       description: Text ChannelのMessageを新しい順で返すPageです。
@@ -1670,6 +1776,7 @@ components:
               content: 10月24日で進める方向でよいでしょうか？
               reply_to_message_id: null
               reply_to: null
+              reactions: []
               created_at: '2026-08-17T06:12:00Z'
               edited_at: null
           page:
@@ -1776,6 +1883,13 @@ components:
       format: uuid
       examples:
         - 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    ReactionEmoji:
+      title: ReactionEmoji
+      description: Message Reactionに使うUnicode絵文字列です。Variation SelectorやZWJを含むSequence全体を一つの値として扱います。
+      type: string
+      minLength: 1
+      maxLength: 64
+      example: 👍
     RefreshSessionRequest:
       title: RefreshSessionRequest
       description: Refresh Token を Rotation して Aster Session を更新する Request です。

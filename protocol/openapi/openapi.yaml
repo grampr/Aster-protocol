@@ -57,6 +57,8 @@ paths:
     $ref: ./paths/channels/messages.yaml
   /channels/{channel_id}/messages/{message_id}:
     $ref: ./paths/messages/message.yaml
+  /channels/{channel_id}/messages/{message_id}/reactions/{emoji}:
+    $ref: ./paths/messages/reaction.yaml
   /health:
     $ref: ./paths/system/health.yaml
 
@@ -88,6 +90,8 @@ components:
       $ref: ./components/parameters/Limit.yaml
     MessageId:
       $ref: ./components/parameters/MessageId.yaml
+    ReactionEmoji:
+      $ref: ./components/parameters/ReactionEmoji.yaml
   responses:
     EmailAlreadyRegistered:
       $ref: ./components/responses/EmailAlreadyRegistered.yaml
@@ -152,6 +156,8 @@ components:
       $ref: ./components/schemas/messages/Message.yaml
     MessageReply:
       $ref: ./components/schemas/messages/MessageReply.yaml
+    MessageReaction:
+      $ref: ./components/schemas/messages/MessageReaction.yaml
     MessageList:
       $ref: ./components/schemas/messages/MessageList.yaml
     PageInfo:
@@ -172,6 +178,8 @@ components:
       $ref: ./components/schemas/common/RateLimitError.yaml
     RequestId:
       $ref: ./components/schemas/common/RequestId.yaml
+    ReactionEmoji:
+      $ref: ./components/schemas/messages/ReactionEmoji.yaml
     RefreshSessionRequest:
       $ref: ./components/schemas/auth/RefreshSessionRequest.yaml
     RefreshToken:
