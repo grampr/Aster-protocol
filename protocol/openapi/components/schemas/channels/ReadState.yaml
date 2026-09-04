@@ -1,0 +1,14 @@
+title: ReadState
+description: UserごとのChannel最終既読位置です。
+type: object
+additionalProperties: false
+required: [channel_id, last_read_message_id, updated_at]
+properties:
+  channel_id:
+    $ref: ../common/UUID.yaml
+  last_read_message_id:
+    oneOf:
+      - $ref: ../common/UUID.yaml
+      - type: "null"
+  updated_at:
+    $ref: ../common/Timestamp.yaml

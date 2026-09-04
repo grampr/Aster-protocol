@@ -77,12 +77,22 @@ paths:
     $ref: ./paths/invites/accept.yaml
   /users/@me/presence:
     $ref: ./paths/users/presence.yaml
+  /users/@me/channels:
+    $ref: ./paths/users/channels.yaml
+  /users/@me/read-states:
+    $ref: ./paths/users/read-states.yaml
+  /guilds/{guild_id}/messages/search:
+    $ref: ./paths/guilds/message-search.yaml
   /channels/{channel_id}:
     $ref: ./paths/channels/channel.yaml
   /channels/{channel_id}/messages:
     $ref: ./paths/channels/messages.yaml
   /channels/{channel_id}/typing:
     $ref: ./paths/channels/typing.yaml
+  /channels/{channel_id}/threads:
+    $ref: ./paths/channels/threads.yaml
+  /channels/{channel_id}/read-state:
+    $ref: ./paths/channels/read-state.yaml
   /channels/{channel_id}/messages/{message_id}:
     $ref: ./paths/messages/message.yaml
   /channels/{channel_id}/messages/{message_id}/reactions/{emoji}:
@@ -128,6 +138,8 @@ components:
       $ref: ./components/parameters/UserId.yaml
     ReactionEmoji:
       $ref: ./components/parameters/ReactionEmoji.yaml
+    SearchQuery:
+      $ref: ./components/parameters/SearchQuery.yaml
   responses:
     EmailAlreadyRegistered:
       $ref: ./components/responses/EmailAlreadyRegistered.yaml
@@ -162,6 +174,16 @@ components:
       $ref: ./components/schemas/channels/ChannelType.yaml
     CreateChannelRequest:
       $ref: ./components/schemas/channels/CreateChannelRequest.yaml
+    CreateDirectChannelRequest:
+      $ref: ./components/schemas/channels/CreateDirectChannelRequest.yaml
+    CreateThreadRequest:
+      $ref: ./components/schemas/channels/CreateThreadRequest.yaml
+    ReadState:
+      $ref: ./components/schemas/channels/ReadState.yaml
+    ReadStateList:
+      $ref: ./components/schemas/channels/ReadStateList.yaml
+    UpdateReadStateRequest:
+      $ref: ./components/schemas/channels/UpdateReadStateRequest.yaml
     CreateGuildRequest:
       $ref: ./components/schemas/guilds/CreateGuildRequest.yaml
     CreateMessageRequest:
@@ -224,6 +246,10 @@ components:
       $ref: ./components/schemas/messages/MessageReaction.yaml
     MessageList:
       $ref: ./components/schemas/messages/MessageList.yaml
+    MessageSearchResult:
+      $ref: ./components/schemas/messages/MessageSearchResult.yaml
+    MessageSearchResultList:
+      $ref: ./components/schemas/messages/MessageSearchResultList.yaml
     PageInfo:
       $ref: ./components/schemas/common/PageInfo.yaml
     PaginationCursor:

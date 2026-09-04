@@ -26,7 +26,11 @@ export type AsterGatewayMessage =
   | MemberJoinEvent
   | MemberUpdateEvent
   | MemberLeaveEvent
-  | PresenceUpdateEvent;
+  | PresenceUpdateEvent
+  | ChannelCreateEvent
+  | ChannelUpdateEvent
+  | ChannelDeleteEvent
+  | ReadStateUpdateEvent;
 /**
  * 購読する Gateway Event 群を表す32-bit Bitfield です。未割り当て Bit は Server が意味を定義するまで使用しません。
  */
@@ -451,4 +455,106 @@ export interface PresenceUpdateEvent {
     guild_id: string;
     presence: GatewayPresence;
   };
+}
+export interface ChannelCreateEvent {
+  op: 0;
+  t: "CHANNEL_CREATE";
+  s: number;
+  d: GatewayChannel;
+}
+export interface GatewayChannel {
+  id: string;
+  guild_id: string | null;
+  parent_id: string | null;
+  type: "TEXT" | "VOICE" | "CATEGORY" | "THREAD" | "DIRECT";
+  name: string | null;
+  topic: string | null;
+  position: number;
+  created_at: string;
+  /**
+   * @maxItems 10
+   */
+  recipients:
+    | []
+    | [GatewayUserSummary]
+    | [GatewayUserSummary, GatewayUserSummary]
+    | [GatewayUserSummary, GatewayUserSummary, GatewayUserSummary]
+    | [GatewayUserSummary, GatewayUserSummary, GatewayUserSummary, GatewayUserSummary]
+    | [GatewayUserSummary, GatewayUserSummary, GatewayUserSummary, GatewayUserSummary, GatewayUserSummary]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ];
+}
+export interface ChannelUpdateEvent {
+  op: 0;
+  t: "CHANNEL_UPDATE";
+  s: number;
+  d: GatewayChannel;
+}
+export interface ChannelDeleteEvent {
+  op: 0;
+  t: "CHANNEL_DELETE";
+  s: number;
+  d: {
+    id: string;
+    guild_id: string | null;
+  };
+}
+export interface ReadStateUpdateEvent {
+  op: 0;
+  t: "READ_STATE_UPDATE";
+  s: number;
+  d: GatewayReadState;
+}
+export interface GatewayReadState {
+  channel_id: string;
+  last_read_message_id: string | null;
+  updated_at: string;
 }

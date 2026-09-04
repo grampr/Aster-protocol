@@ -1,0 +1,12 @@
+title: CreateThreadRequest
+description: Text ChannelまたはMessageを起点にThreadを作成します。
+type: object
+additionalProperties: false
+required: [name]
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+  message_id:
+    $ref: ../common/UUID.yaml

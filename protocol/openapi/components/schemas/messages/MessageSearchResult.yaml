@@ -1,0 +1,11 @@
+title: MessageSearchResult
+type: object
+additionalProperties: false
+required: [message, excerpt]
+properties:
+  message:
+    $ref: ./Message.yaml
+  excerpt:
+    description: 検索語の周辺をServerが安全に切り出したPlain Textです。
+    type: string
+    maxLength: 500

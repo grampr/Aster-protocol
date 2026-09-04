@@ -1,0 +1,8 @@
+name: query
+in: query
+required: true
+description: 大文字小文字を区別せずMessage本文から探す文字列です。
+schema:
+  type: string
+  minLength: 2
+  maxLength: 100

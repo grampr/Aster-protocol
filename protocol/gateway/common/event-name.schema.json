@@ -16,6 +16,10 @@
     { "$ref": "#/$defs/MEMBER_UPDATE" },
     { "$ref": "#/$defs/MEMBER_LEAVE" },
     { "$ref": "#/$defs/PRESENCE_UPDATE" }
+    ,{ "$ref": "#/$defs/CHANNEL_CREATE" }
+    ,{ "$ref": "#/$defs/CHANNEL_UPDATE" }
+    ,{ "$ref": "#/$defs/CHANNEL_DELETE" }
+    ,{ "$ref": "#/$defs/READ_STATE_UPDATE" }
   ],
   "$defs": {
     "READY": { "const": "READY", "description": "新しいGateway Sessionが開始したことを通知します。" },
@@ -29,6 +33,10 @@
     "MEMBER_JOIN": { "const": "MEMBER_JOIN", "description": "UserがGuildへ参加したことを通知します。" },
     "MEMBER_UPDATE": { "const": "MEMBER_UPDATE", "description": "Guild MemberのNicknameまたはRoleが変わったことを通知します。" },
     "MEMBER_LEAVE": { "const": "MEMBER_LEAVE", "description": "UserがGuildから退出または削除されたことを通知します。" },
-    "PRESENCE_UPDATE": { "const": "PRESENCE_UPDATE", "description": "Guild Memberの短命なPresenceが変わったことを通知します。" }
+    "PRESENCE_UPDATE": { "const": "PRESENCE_UPDATE", "description": "Guild Memberの短命なPresenceが変わったことを通知します。" },
+    "CHANNEL_CREATE": { "const": "CHANNEL_CREATE", "description": "参照可能なChannelが作成されたことを通知します。" },
+    "CHANNEL_UPDATE": { "const": "CHANNEL_UPDATE", "description": "Channelの設定が変わったことを通知します。" },
+    "CHANNEL_DELETE": { "const": "CHANNEL_DELETE", "description": "Channelが削除されたことを通知します。" },
+    "READ_STATE_UPDATE": { "const": "READ_STATE_UPDATE", "description": "自分のChannel既読位置が変わったことを通知します。" }
   }
 }

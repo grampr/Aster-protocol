@@ -547,6 +547,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/@me/channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Direct Message Channelを取得する
+         * @description 認証済みUserが参加しているDirect Message Channelを更新順で返します。
+         */
+        get: operations["listCurrentUserDirectChannels"];
+        put?: never;
+        /**
+         * Direct Message Channelを開始する
+         * @description 同じ2 UserのDirect Message Channelが存在する場合は既存Channelを返します。
+         */
+        post: operations["createDirectChannel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/read-states": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 自分の既読位置を取得する
+         * @description 認証済みUserが参照できるChannelの既読位置をまとめて返します。
+         */
+        get: operations["listCurrentUserReadStates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/guilds/{guild_id}/messages/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Guild内のMessageを検索する
+         * @description 閲覧権限を持つText Channelだけを対象に、Message本文を新しい順で検索します。
+         */
+        get: operations["searchGuildMessages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{channel_id}": {
         parameters: {
             query?: never;
@@ -635,6 +705,62 @@ export interface paths {
          *     Clientは入力が続く間だけ定期的に呼び出し、Messageを保存する用途には使用しません。
          */
         post: operations["startChannelTyping"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{channel_id}/threads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * ChannelのThreadを取得する
+         * @description 指定したText Channelを親とするThreadを更新順で返します。
+         */
+        get: operations["listChannelThreads"];
+        put?: never;
+        /**
+         * Threadを作成する
+         * @description Text ChannelまたはそのMessageを起点にThreadを作成します。
+         */
+        post: operations["createChannelThread"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{channel_id}/read-state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Channelの既読位置を更新する
+         * @description 指定したChannel内のMessageまで読んだことを記録し、既読位置を後方へは戻しません。
+         */
+        put: operations["updateChannelReadState"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -762,28 +888,35 @@ export interface components {
         AuthenticationMethod: "PASSWORD" | "GOOGLE";
         /**
          * Channel
-         * @description Guild内のText ChannelまたはVoice Channelです。
+         * @description Guild内のChannel、Thread、またはUser間のDirect Message Channelです。
          * @example {
          *       "id": "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
          *       "guild_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0",
+         *       "parent_id": null,
          *       "type": "TEXT",
          *       "name": "イベント企画",
          *       "topic": "次回イベントの日程と内容を相談します",
          *       "position": 2,
-         *       "created_at": "2026-08-17T06:05:00Z"
+         *       "created_at": "2026-08-17T06:05:00Z",
+         *       "recipients": []
          *     }
          */
         Channel: {
             id: components["schemas"]["UUID"];
-            /** @description Channelが属するGuild IDです。 */
-            guild_id: components["schemas"]["UUID"];
+            /** @description Channelが属するGuild IDです。Direct Messageの場合はnullです。 */
+            guild_id: components["schemas"]["UUID"] | null;
+            /** @description CategoryまたはThreadの親Channel IDです。親がない場合はnullです。 */
+            parent_id: components["schemas"]["UUID"] | null;
             type: components["schemas"]["ChannelType"];
-            name: string;
+            /** @description Guild Channelの名前です。Direct Messageの場合はnullです。 */
+            name: string | null;
             /** @description Text Channelの説明です。未設定またはVoice Channelの場合はnullです。 */
             topic: string | null;
             /** @description 同じGuild内での表示順です。小さい値を先に表示します。 */
             position: number;
             created_at: components["schemas"]["Timestamp"];
+            /** @description Direct Messageの参加Userです。それ以外では空配列です。 */
+            recipients: components["schemas"]["UserSummary"][];
         };
         /**
          * ChannelList
@@ -793,11 +926,13 @@ export interface components {
          *         {
          *           "id": "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
          *           "guild_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0",
+         *           "parent_id": null,
          *           "type": "TEXT",
          *           "name": "イベント企画",
          *           "topic": "次回イベントの日程と内容を相談します",
          *           "position": 2,
-         *           "created_at": "2026-08-17T06:05:00Z"
+         *           "created_at": "2026-08-17T06:05:00Z",
+         *           "recipients": []
          *         }
          *       ],
          *       "page": {
@@ -816,7 +951,7 @@ export interface components {
          * @example TEXT
          * @enum {string}
          */
-        ChannelType: "TEXT" | "VOICE";
+        ChannelType: "TEXT" | "VOICE" | "CATEGORY" | "THREAD" | "DIRECT";
         /**
          * CreateChannelRequest
          * @description Guild内に新しいChannelを作成するときの設定です。
@@ -827,9 +962,43 @@ export interface components {
          *     }
          */
         CreateChannelRequest: {
-            type: components["schemas"]["ChannelType"];
+            /** @enum {string} */
+            type: "TEXT" | "VOICE" | "CATEGORY";
             name: string;
             topic?: string;
+            parent_id?: components["schemas"]["UUID"];
+        };
+        /**
+         * CreateDirectChannelRequest
+         * @description 指定したUserとのDirect Message Channelを作成または取得します。
+         */
+        CreateDirectChannelRequest: {
+            recipient_id: components["schemas"]["UUID"];
+        };
+        /**
+         * CreateThreadRequest
+         * @description Text ChannelまたはMessageを起点にThreadを作成します。
+         */
+        CreateThreadRequest: {
+            name: string;
+            message_id?: components["schemas"]["UUID"];
+        };
+        /**
+         * ReadState
+         * @description UserごとのChannel最終既読位置です。
+         */
+        ReadState: {
+            channel_id: components["schemas"]["UUID"];
+            last_read_message_id: components["schemas"]["UUID"] | null;
+            updated_at: components["schemas"]["Timestamp"];
+        };
+        /** ReadStateList */
+        ReadStateList: {
+            items: components["schemas"]["ReadState"][];
+        };
+        /** UpdateReadStateRequest */
+        UpdateReadStateRequest: {
+            last_read_message_id: components["schemas"]["UUID"];
         };
         /**
          * CreateGuildRequest
@@ -1283,6 +1452,17 @@ export interface components {
             items: components["schemas"]["Message"][];
             page: components["schemas"]["PageInfo"];
         };
+        /** MessageSearchResult */
+        MessageSearchResult: {
+            message: components["schemas"]["Message"];
+            /** @description 検索語の周辺をServerが安全に切り出したPlain Textです。 */
+            excerpt: string;
+        };
+        /** MessageSearchResultList */
+        MessageSearchResultList: {
+            items: components["schemas"]["MessageSearchResult"][];
+            page: components["schemas"]["PageInfo"];
+        };
         /**
          * PageInfo
          * @description Cursor Pagination の継続情報です。
@@ -1442,6 +1622,8 @@ export interface components {
             /** @description nullを指定するとTopicを削除します。 */
             topic?: string | null;
             position?: number;
+            /** @description nullを指定するとCategoryとの関連を解除します。 */
+            parent_id?: components["schemas"]["UUID"] | null;
         };
         /**
          * UpdateGuildRequest
@@ -1741,6 +1923,8 @@ export interface components {
          * @example 👍
          */
         ReactionEmoji: components["schemas"]["ReactionEmoji"];
+        /** @description 大文字小文字を区別せずMessage本文から探す文字列です。 */
+        SearchQuery: string;
     };
     requestBodies: never;
     headers: {
@@ -2850,6 +3034,134 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    listCurrentUserDirectChannels: {
+        parameters: {
+            query?: {
+                /**
+                 * @description 前の Response が返した次ページ用 Cursor です。
+                 *     Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+                 * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+                 */
+                cursor?: components["parameters"]["Cursor"];
+                /**
+                 * @description 1回の Response で取得する最大件数です。
+                 * @example 50
+                 */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Direct Message ChannelのPageです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createDirectChannel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDirectChannelRequest"];
+            };
+        };
+        responses: {
+            /** @description 作成または取得したDirect Message Channelです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    listCurrentUserReadStates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Channelごとの既読位置です。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadStateList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["Error"];
+        };
+    };
+    searchGuildMessages: {
+        parameters: {
+            query: {
+                /** @description 大文字小文字を区別せずMessage本文から探す文字列です。 */
+                query: components["parameters"]["SearchQuery"];
+                /**
+                 * @description 前の Response が返した次ページ用 Cursor です。
+                 *     Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+                 * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+                 */
+                cursor?: components["parameters"]["Cursor"];
+                /**
+                 * @description 1回の Response で取得する最大件数です。
+                 * @example 50
+                 */
+                limit?: components["parameters"]["Limit"];
+                channel_id?: components["schemas"]["UUID"];
+                author_id?: components["schemas"]["UUID"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 検索結果のPageです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageSearchResultList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
     getChannel: {
         parameters: {
             query?: never;
@@ -3064,6 +3376,114 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["ResourceNotFound"];
             429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
+    listChannelThreads: {
+        parameters: {
+            query?: {
+                /**
+                 * @description 前の Response が返した次ページ用 Cursor です。
+                 *     Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+                 * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+                 */
+                cursor?: components["parameters"]["Cursor"];
+                /**
+                 * @description 1回の Response で取得する最大件数です。
+                 * @example 50
+                 */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description ThreadのPageです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createChannelThread: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateThreadRequest"];
+            };
+        };
+        responses: {
+            /** @description 作成したThreadです。 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    updateChannelReadState: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReadStateRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新後の既読位置です。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadState"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
             default: components["responses"]["Error"];
         };
     };
