@@ -9,6 +9,7 @@ Aster Protocol の利用者に影響する変更を記録します。
 ### Added
 
 - AttachmentのUpload Intent、Finalize、権限付きDownload契約
+- Web/Tauriが署名URLを安全に取得するAttachment Download Intent契約
 - Messageへ最大10件のAttachmentを紐付ける契約
 - Voice Channelのjoin、leave、state更新、Provider-neutral Session契約
 - `VOICE_STATE_UPDATE` Gateway Event

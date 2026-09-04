@@ -279,6 +279,16 @@ type Attachment struct {
 	UploaderId UUID `json:"uploader_id"`
 }
 
+// AttachmentDownloadIntent 単一Objectへの短命な直接ダウンロード指示です。URLはBearer Tokenとして扱います。
+type AttachmentDownloadIntent struct {
+	DownloadUrl string `json:"download_url"`
+
+	// ExpiresAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	ExpiresAt Timestamp `json:"expires_at"`
+}
+
 // AttachmentStatus Attachmentのアップロード状態です。
 type AttachmentStatus string
 

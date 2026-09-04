@@ -867,6 +867,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/attachments/{attachment_id}/download-intents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Attachmentの直接ダウンロード指示を作成する
+         * @description Channelの閲覧権限を確認し、Object Storageから直接取得するための短命な署名付きURLを返します。
+         */
+        post: operations["createAttachmentDownloadIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{channel_id}/voice": {
         parameters: {
             query?: never;
@@ -1080,6 +1103,15 @@ export interface components {
             upload_headers: {
                 [key: string]: string;
             };
+            expires_at: components["schemas"]["Timestamp"];
+        };
+        /**
+         * AttachmentDownloadIntent
+         * @description 単一Objectへの短命な直接ダウンロード指示です。URLはBearer Tokenとして扱います。
+         */
+        AttachmentDownloadIntent: {
+            /** Format: uri */
+            download_url: string;
             expires_at: components["schemas"]["Timestamp"];
         };
         /**
@@ -3899,6 +3931,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createAttachmentDownloadIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 短命な直接ダウンロード指示です。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttachmentDownloadIntent"];
+                };
             };
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["ResourceNotFound"];

@@ -1525,6 +1525,30 @@ paths:
           $ref: '#/components/responses/ResourceNotFound'
         default:
           $ref: '#/components/responses/Error'
+  /attachments/{attachment_id}/download-intents:
+    parameters:
+      - $ref: '#/components/parameters/AttachmentId'
+    post:
+      operationId: createAttachmentDownloadIntent
+      tags:
+        - Media
+      summary: Attachmentの直接ダウンロード指示を作成する
+      description: Channelの閲覧権限を確認し、Object Storageから直接取得するための短命な署名付きURLを返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 短命な直接ダウンロード指示です。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentDownloadIntent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
   /channels/{channel_id}/voice:
     parameters:
       - $ref: '#/components/parameters/ChannelId'
@@ -2204,6 +2228,20 @@ components:
           additionalProperties:
             type: string
           description: 署名に含まれるため、ClientがPUT時にそのまま送るHeaderです。
+        expires_at:
+          $ref: '#/components/schemas/Timestamp'
+    AttachmentDownloadIntent:
+      title: AttachmentDownloadIntent
+      description: 単一Objectへの短命な直接ダウンロード指示です。URLはBearer Tokenとして扱います。
+      type: object
+      additionalProperties: false
+      required:
+        - download_url
+        - expires_at
+      properties:
+        download_url:
+          type: string
+          format: uri
         expires_at:
           $ref: '#/components/schemas/Timestamp'
     CreateAttachmentUploadIntentRequest:

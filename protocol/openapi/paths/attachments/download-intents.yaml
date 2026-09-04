@@ -1,0 +1,24 @@
+parameters:
+  - $ref: ../../components/parameters/AttachmentId.yaml
+
+post:
+  operationId: createAttachmentDownloadIntent
+  tags:
+    - Media
+  summary: Attachmentの直接ダウンロード指示を作成する
+  description: Channelの閲覧権限を確認し、Object Storageから直接取得するための短命な署名付きURLを返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 短命な直接ダウンロード指示です。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/media/AttachmentDownloadIntent.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

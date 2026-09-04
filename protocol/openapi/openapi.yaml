@@ -105,6 +105,8 @@ paths:
     $ref: ./paths/attachments/finalize.yaml
   /attachments/{attachment_id}/content:
     $ref: ./paths/attachments/content.yaml
+  /attachments/{attachment_id}/download-intents:
+    $ref: ./paths/attachments/download-intents.yaml
   /channels/{channel_id}/voice:
     $ref: ./paths/channels/voice.yaml
   /voice/sessions/@me:
@@ -188,6 +190,8 @@ components:
       $ref: ./components/schemas/media/AttachmentStatus.yaml
     AttachmentUploadIntent:
       $ref: ./components/schemas/media/AttachmentUploadIntent.yaml
+    AttachmentDownloadIntent:
+      $ref: ./components/schemas/media/AttachmentDownloadIntent.yaml
     CreateAttachmentUploadIntentRequest:
       $ref: ./components/schemas/media/CreateAttachmentUploadIntentRequest.yaml
     AuthenticationMethod:
