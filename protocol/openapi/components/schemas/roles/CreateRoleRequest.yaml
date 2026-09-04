@@ -1,0 +1,17 @@
+title: CreateRoleRequest
+type: object
+additionalProperties: false
+required:
+  - name
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+  color:
+    oneOf:
+      - type: string
+        pattern: "^#[0-9A-Fa-f]{6}$"
+      - type: "null"
+  permissions:
+    $ref: ./PermissionBits.yaml

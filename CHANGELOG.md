@@ -8,6 +8,8 @@ Aster Protocol の利用者に影響する変更を記録します。
 
 ### Added
 
+- Guild Member、Presence、Role、Permission、InviteのREST契約
+- `MEMBER_JOIN`、`MEMBER_UPDATE`、`MEMBER_LEAVE`、`PRESENCE_UPDATE` Gateway Event
 - 人間が編集する分割 OpenAPI Schema
 - REST API の Health Check と共通 Error Schema
 - Gateway 接続 Lifecycle の JSON Schema

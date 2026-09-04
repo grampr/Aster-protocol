@@ -11,7 +11,11 @@
     { "$ref": "#/$defs/MESSAGE_DELETE" },
     { "$ref": "#/$defs/MESSAGE_REACTION_ADD" },
     { "$ref": "#/$defs/MESSAGE_REACTION_REMOVE" },
-    { "$ref": "#/$defs/TYPING_START" }
+    { "$ref": "#/$defs/TYPING_START" },
+    { "$ref": "#/$defs/MEMBER_JOIN" },
+    { "$ref": "#/$defs/MEMBER_UPDATE" },
+    { "$ref": "#/$defs/MEMBER_LEAVE" },
+    { "$ref": "#/$defs/PRESENCE_UPDATE" }
   ],
   "$defs": {
     "READY": { "const": "READY", "description": "新しいGateway Sessionが開始したことを通知します。" },
@@ -21,6 +25,10 @@
     "MESSAGE_DELETE": { "const": "MESSAGE_DELETE", "description": "Text ChannelのMessageが削除されたことを通知します。" },
     "MESSAGE_REACTION_ADD": { "const": "MESSAGE_REACTION_ADD", "description": "MessageにReactionが追加されたことを通知します。" },
     "MESSAGE_REACTION_REMOVE": { "const": "MESSAGE_REACTION_REMOVE", "description": "MessageからReactionが解除されたことを通知します。" },
-    "TYPING_START": { "const": "TYPING_START", "description": "Text ChannelでUserが入力を開始または継続したことを通知します。" }
+    "TYPING_START": { "const": "TYPING_START", "description": "Text ChannelでUserが入力を開始または継続したことを通知します。" },
+    "MEMBER_JOIN": { "const": "MEMBER_JOIN", "description": "UserがGuildへ参加したことを通知します。" },
+    "MEMBER_UPDATE": { "const": "MEMBER_UPDATE", "description": "Guild MemberのNicknameまたはRoleが変わったことを通知します。" },
+    "MEMBER_LEAVE": { "const": "MEMBER_LEAVE", "description": "UserがGuildから退出または削除されたことを通知します。" },
+    "PRESENCE_UPDATE": { "const": "PRESENCE_UPDATE", "description": "Guild Memberの短命なPresenceが変わったことを通知します。" }
   }
 }

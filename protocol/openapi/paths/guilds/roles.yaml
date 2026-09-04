@@ -1,0 +1,52 @@
+parameters:
+  - $ref: ../../components/parameters/GuildId.yaml
+
+get:
+  operationId: listGuildRoles
+  tags: [Roles]
+  summary: GuildのRoleを取得する
+  description: Guildを参照できるUserへ、既定Roleを含むRoleを表示順で返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 表示順に並んだRoleです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/roles/RoleList.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+post:
+  operationId: createGuildRole
+  tags: [Roles]
+  summary: GuildにRoleを作成する
+  description: Role管理権限を持つUserが、新しいRoleと初期Permissionを作成します。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/roles/CreateRoleRequest.yaml
+  responses:
+    "201":
+      description: 作成したRoleです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/roles/Role.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

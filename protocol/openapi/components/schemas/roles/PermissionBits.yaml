@@ -1,0 +1,6 @@
+title: PermissionBits
+description: GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+type: integer
+format: int64
+minimum: 0
+maximum: 2147483647

@@ -1,0 +1,54 @@
+parameters:
+  - $ref: ../../components/parameters/GuildId.yaml
+
+get:
+  operationId: listGuildInvites
+  tags: [Invites]
+  summary: Guildの有効なInviteを取得する
+  description: Invite管理権限を持つUserへ、期限内かつ無効化されていないInviteを返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 有効なInviteです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/invites/InviteList.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+post:
+  operationId: createGuildInvite
+  tags: [Invites]
+  summary: GuildへのInviteを作成する
+  description: Invite管理権限を持つUserが、有効期限と利用回数を制限できるInviteを作成します。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/invites/CreateInviteRequest.yaml
+  responses:
+    "201":
+      description: 作成したInviteです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/invites/Invite.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

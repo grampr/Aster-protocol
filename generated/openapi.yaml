@@ -21,6 +21,12 @@ tags:
     description: User が参加する Guild とその設定を扱う Operation
   - name: Channels
     description: Guild 内の Text Channel と Voice Channel を扱う Operation
+  - name: Members
+    description: Guildへの参加、Member情報、Presenceを扱うOperation
+  - name: Roles
+    description: Guild内のRoleとPermissionを扱うOperation
+  - name: Invites
+    description: Guildへ参加するためのInviteを扱うOperation
   - name: Messages
     description: Text Channel 内の Message を扱う Operation
   - name: System
@@ -610,6 +616,395 @@ paths:
           $ref: '#/components/responses/RateLimited'
         default:
           $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/members:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+    get:
+      operationId: listGuildMembers
+      tags:
+        - Members
+      summary: GuildのMemberを取得する
+      description: Guildを参照できるUserへ、Memberと現在のPresenceを参加順で返します。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Guild MemberのPageです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuildMemberList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/members/{user_id}:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+      - $ref: '#/components/parameters/UserId'
+    get:
+      operationId: getGuildMember
+      tags:
+        - Members
+      summary: Guild Memberを取得する
+      description: Guildを参照できるUserへ、指定したMemberのGuild内設定と現在のPresenceを返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 指定したGuild Memberです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuildMember'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: updateGuildMember
+      tags:
+        - Members
+      summary: Guild Memberを変更する
+      description: Nicknameは本人または管理権限を持つUser、RoleはRole管理権限を持つUserだけが変更できます。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGuildMemberRequest'
+      responses:
+        '200':
+          description: 変更後のGuild Memberです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuildMember'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: removeGuildMember
+      tags:
+        - Members
+      summary: GuildからMemberを削除する
+      description: Member管理権限を持つUserが対象をGuildから削除します。Ownerは削除できません。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Memberを削除しました。
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/members/@me:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+    delete:
+      operationId: leaveGuild
+      tags:
+        - Members
+      summary: Guildから退出する
+      description: 認証済みUser自身をGuildから削除します。Ownerは所有権を移譲するかGuildを削除する必要があります。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Guildから退出しました。
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/roles:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+    get:
+      operationId: listGuildRoles
+      tags:
+        - Roles
+      summary: GuildのRoleを取得する
+      description: Guildを参照できるUserへ、既定Roleを含むRoleを表示順で返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 表示順に並んだRoleです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createGuildRole
+      tags:
+        - Roles
+      summary: GuildにRoleを作成する
+      description: Role管理権限を持つUserが、新しいRoleと初期Permissionを作成します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoleRequest'
+      responses:
+        '201':
+          description: 作成したRoleです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/roles/{role_id}:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+      - $ref: '#/components/parameters/RoleId'
+    patch:
+      operationId: updateGuildRole
+      tags:
+        - Roles
+      summary: Roleを変更する
+      description: Role管理権限を持つUserが、名前、色、Permission、表示順を変更します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoleRequest'
+      responses:
+        '200':
+          description: 変更後のRoleです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: deleteGuildRole
+      tags:
+        - Roles
+      summary: Roleを削除する
+      description: Server管理RoleとGuildの既定Roleは削除できません。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Roleを削除しました。
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/invites:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+    get:
+      operationId: listGuildInvites
+      tags:
+        - Invites
+      summary: Guildの有効なInviteを取得する
+      description: Invite管理権限を持つUserへ、期限内かつ無効化されていないInviteを返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 有効なInviteです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createGuildInvite
+      tags:
+        - Invites
+      summary: GuildへのInviteを作成する
+      description: Invite管理権限を持つUserが、有効期限と利用回数を制限できるInviteを作成します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInviteRequest'
+      responses:
+        '201':
+          description: 作成したInviteです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invite'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/invites/{invite_id}:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+      - $ref: '#/components/parameters/InviteId'
+    delete:
+      operationId: deleteGuildInvite
+      tags:
+        - Invites
+      summary: Inviteを無効化する
+      description: Invite管理権限を持つUserが、指定したInviteを以後利用できない状態にします。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Inviteを無効化しました。
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /invites/{invite_code}:
+    parameters:
+      - $ref: '#/components/parameters/InviteCode'
+    get:
+      operationId: getInvite
+      tags:
+        - Invites
+      summary: Inviteの参加先を確認する
+      description: 認証後、参加前にGuild名や期限を確認するためのOperationです。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 有効なInviteです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invite'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /invites/{invite_code}/accept:
+    parameters:
+      - $ref: '#/components/parameters/InviteCode'
+    post:
+      operationId: acceptInvite
+      tags:
+        - Invites
+      summary: Inviteを使用してGuildへ参加する
+      description: 同じInviteの再送は冪等で、既存Memberを返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Guild Memberとして参加しました。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuildMember'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '409':
+          description: Inviteの利用回数を使い切ったか、期限切れです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /users/@me/presence:
+    put:
+      operationId: updateCurrentUserPresence
+      tags:
+        - Members
+      summary: 自分のPresenceを更新する
+      description: Presenceは永続的なプロフィールではなく、短命なリアルタイム状態として扱います。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePresenceRequest'
+      responses:
+        '200':
+          description: 更新後のPresenceです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presence'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
   /channels/{channel_id}:
     parameters:
       - $ref: '#/components/parameters/ChannelId'
@@ -1070,6 +1465,21 @@ components:
       schema:
         $ref: '#/components/schemas/UUID'
       example: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    InviteCode:
+      name: invite_code
+      in: path
+      required: true
+      description: 招待URLに含まれる推測困難なCodeです。
+      schema:
+        type: string
+        pattern: ^[A-Za-z0-9_-]{16,64}$
+    InviteId:
+      name: invite_id
+      in: path
+      required: true
+      description: 対象InviteのUUIDです。
+      schema:
+        $ref: '#/components/schemas/UUID'
     Limit:
       name: limit
       in: query
@@ -1089,6 +1499,20 @@ components:
       schema:
         $ref: '#/components/schemas/UUID'
       example: 0198b8f2-4f80-7e67-b250-b4051415e3c2
+    RoleId:
+      name: role_id
+      in: path
+      required: true
+      description: 対象RoleのUUIDです。
+      schema:
+        $ref: '#/components/schemas/UUID'
+    UserId:
+      name: user_id
+      in: path
+      required: true
+      description: 対象UserのUUIDです。
+      schema:
+        $ref: '#/components/schemas/UUID'
     ReactionEmoji:
       name: emoji
       in: path
@@ -1611,6 +2035,286 @@ components:
           page:
             has_more: false
             next_cursor: null
+    GuildMember:
+      title: GuildMember
+      description: Guildに参加しているUserとGuild内設定です。
+      type: object
+      additionalProperties: false
+      required:
+        - guild_id
+        - user
+        - nickname
+        - role_ids
+        - joined_at
+        - presence
+      properties:
+        guild_id:
+          $ref: '#/components/schemas/UUID'
+        user:
+          $ref: '#/components/schemas/UserSummary'
+        nickname:
+          oneOf:
+            - type: string
+              minLength: 1
+              maxLength: 64
+            - type: 'null'
+        role_ids:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/UUID'
+        joined_at:
+          $ref: '#/components/schemas/Timestamp'
+        presence:
+          $ref: '#/components/schemas/Presence'
+    GuildMemberList:
+      title: GuildMemberList
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - page
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/GuildMember'
+        page:
+          $ref: '#/components/schemas/PageInfo'
+    UpdateGuildMemberRequest:
+      title: UpdateGuildMemberRequest
+      description: Guild内のNicknameまたは割り当てるRoleを変更します。
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        nickname:
+          oneOf:
+            - type: string
+              minLength: 1
+              maxLength: 64
+            - type: 'null'
+        role_ids:
+          type: array
+          maxItems: 100
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/UUID'
+    Presence:
+      title: Presence
+      description: Process Memoryなどの短命なStoreで管理するUserのPresenceです。
+      type: object
+      additionalProperties: false
+      required:
+        - user_id
+        - status
+        - updated_at
+      properties:
+        user_id:
+          $ref: '#/components/schemas/UUID'
+        status:
+          $ref: '#/components/schemas/PresenceStatus'
+        custom_text:
+          description: Userが設定した短い状態文です。未設定の場合はnullです。
+          oneOf:
+            - type: string
+              minLength: 1
+              maxLength: 128
+            - type: 'null'
+        updated_at:
+          $ref: '#/components/schemas/Timestamp'
+    PresenceStatus:
+      title: PresenceStatus
+      description: Userが公開する現在のオンライン状態です。
+      type: string
+      enum:
+        - ONLINE
+        - IDLE
+        - DO_NOT_DISTURB
+        - OFFLINE
+    UpdatePresenceRequest:
+      title: UpdatePresenceRequest
+      description: 認証済みUser自身の公開Presenceを更新します。
+      type: object
+      additionalProperties: false
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - ONLINE
+            - IDLE
+            - DO_NOT_DISTURB
+        custom_text:
+          oneOf:
+            - type: string
+              minLength: 1
+              maxLength: 128
+            - type: 'null'
+    Role:
+      title: Role
+      description: Guild Memberへ権限をまとめて割り当てるRoleです。
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - guild_id
+        - name
+        - color
+        - permissions
+        - position
+        - managed
+        - created_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        guild_id:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        color:
+          description: 表示色です。未設定の場合はnullです。
+          oneOf:
+            - type: string
+              pattern: ^#[0-9A-Fa-f]{6}$
+            - type: 'null'
+        permissions:
+          $ref: '#/components/schemas/PermissionBits'
+        position:
+          type: integer
+          minimum: 0
+        managed:
+          type: boolean
+          description: Serverが管理しUserから削除できないRoleかを示します。
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+    RoleList:
+      title: RoleList
+      type: object
+      additionalProperties: false
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    CreateRoleRequest:
+      title: CreateRoleRequest
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        color:
+          oneOf:
+            - type: string
+              pattern: ^#[0-9A-Fa-f]{6}$
+            - type: 'null'
+        permissions:
+          $ref: '#/components/schemas/PermissionBits'
+    UpdateRoleRequest:
+      title: UpdateRoleRequest
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        color:
+          oneOf:
+            - type: string
+              pattern: ^#[0-9A-Fa-f]{6}$
+            - type: 'null'
+        permissions:
+          $ref: '#/components/schemas/PermissionBits'
+        position:
+          type: integer
+          minimum: 0
+    PermissionBits:
+      title: PermissionBits
+      description: GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+      type: integer
+      format: int64
+      minimum: 0
+      maximum: 2147483647
+    Invite:
+      title: Invite
+      description: Guildへ参加するための期限と利用回数を持つ招待です。
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - code
+        - guild
+        - inviter
+        - uses
+        - max_uses
+        - expires_at
+        - created_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        code:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{16,64}$
+        guild:
+          $ref: '#/components/schemas/Guild'
+        inviter:
+          $ref: '#/components/schemas/UserSummary'
+        uses:
+          type: integer
+          minimum: 0
+        max_uses:
+          oneOf:
+            - type: integer
+              minimum: 1
+            - type: 'null'
+        expires_at:
+          oneOf:
+            - $ref: '#/components/schemas/Timestamp'
+            - type: 'null'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+    InviteList:
+      title: InviteList
+      type: object
+      additionalProperties: false
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invite'
+    CreateInviteRequest:
+      title: CreateInviteRequest
+      type: object
+      additionalProperties: false
+      properties:
+        expires_in:
+          description: 有効秒数です。nullの場合は期限を設けません。
+          oneOf:
+            - type: integer
+              minimum: 300
+              maximum: 604800
+            - type: 'null'
+        max_uses:
+          description: 利用回数の上限です。nullの場合は上限を設けません。
+          oneOf:
+            - type: integer
+              minimum: 1
+              maximum: 1000
+            - type: 'null'
     LoginPasswordRequest:
       title: LoginPasswordRequest
       description: Email Address と Password で Aster Session を作成する Request です。

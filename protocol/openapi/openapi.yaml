@@ -23,6 +23,12 @@ tags:
     description: User が参加する Guild とその設定を扱う Operation
   - name: Channels
     description: Guild 内の Text Channel と Voice Channel を扱う Operation
+  - name: Members
+    description: Guildへの参加、Member情報、Presenceを扱うOperation
+  - name: Roles
+    description: Guild内のRoleとPermissionを扱うOperation
+  - name: Invites
+    description: Guildへ参加するためのInviteを扱うOperation
   - name: Messages
     description: Text Channel 内の Message を扱う Operation
   - name: System
@@ -51,6 +57,26 @@ paths:
     $ref: ./paths/guilds/guild.yaml
   /guilds/{guild_id}/channels:
     $ref: ./paths/guilds/channels.yaml
+  /guilds/{guild_id}/members:
+    $ref: ./paths/guilds/members.yaml
+  /guilds/{guild_id}/members/{user_id}:
+    $ref: ./paths/guilds/member.yaml
+  /guilds/{guild_id}/members/@me:
+    $ref: ./paths/guilds/member-me.yaml
+  /guilds/{guild_id}/roles:
+    $ref: ./paths/guilds/roles.yaml
+  /guilds/{guild_id}/roles/{role_id}:
+    $ref: ./paths/guilds/role.yaml
+  /guilds/{guild_id}/invites:
+    $ref: ./paths/guilds/invites.yaml
+  /guilds/{guild_id}/invites/{invite_id}:
+    $ref: ./paths/guilds/invite.yaml
+  /invites/{invite_code}:
+    $ref: ./paths/invites/invite.yaml
+  /invites/{invite_code}/accept:
+    $ref: ./paths/invites/accept.yaml
+  /users/@me/presence:
+    $ref: ./paths/users/presence.yaml
   /channels/{channel_id}:
     $ref: ./paths/channels/channel.yaml
   /channels/{channel_id}/messages:
@@ -88,10 +114,18 @@ components:
       $ref: ./components/parameters/Cursor.yaml
     GuildId:
       $ref: ./components/parameters/GuildId.yaml
+    InviteCode:
+      $ref: ./components/parameters/InviteCode.yaml
+    InviteId:
+      $ref: ./components/parameters/InviteId.yaml
     Limit:
       $ref: ./components/parameters/Limit.yaml
     MessageId:
       $ref: ./components/parameters/MessageId.yaml
+    RoleId:
+      $ref: ./components/parameters/RoleId.yaml
+    UserId:
+      $ref: ./components/parameters/UserId.yaml
     ReactionEmoji:
       $ref: ./components/parameters/ReactionEmoji.yaml
   responses:
@@ -150,6 +184,34 @@ components:
       $ref: ./components/schemas/guilds/Guild.yaml
     GuildList:
       $ref: ./components/schemas/guilds/GuildList.yaml
+    GuildMember:
+      $ref: ./components/schemas/members/GuildMember.yaml
+    GuildMemberList:
+      $ref: ./components/schemas/members/GuildMemberList.yaml
+    UpdateGuildMemberRequest:
+      $ref: ./components/schemas/members/UpdateGuildMemberRequest.yaml
+    Presence:
+      $ref: ./components/schemas/members/Presence.yaml
+    PresenceStatus:
+      $ref: ./components/schemas/members/PresenceStatus.yaml
+    UpdatePresenceRequest:
+      $ref: ./components/schemas/members/UpdatePresenceRequest.yaml
+    Role:
+      $ref: ./components/schemas/roles/Role.yaml
+    RoleList:
+      $ref: ./components/schemas/roles/RoleList.yaml
+    CreateRoleRequest:
+      $ref: ./components/schemas/roles/CreateRoleRequest.yaml
+    UpdateRoleRequest:
+      $ref: ./components/schemas/roles/UpdateRoleRequest.yaml
+    PermissionBits:
+      $ref: ./components/schemas/roles/PermissionBits.yaml
+    Invite:
+      $ref: ./components/schemas/invites/Invite.yaml
+    InviteList:
+      $ref: ./components/schemas/invites/InviteList.yaml
+    CreateInviteRequest:
+      $ref: ./components/schemas/invites/CreateInviteRequest.yaml
     LoginPasswordRequest:
       $ref: ./components/schemas/auth/LoginPasswordRequest.yaml
     LogoutRequest:

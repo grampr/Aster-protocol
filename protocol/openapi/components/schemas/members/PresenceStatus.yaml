@@ -1,0 +1,8 @@
+title: PresenceStatus
+description: Userが公開する現在のオンライン状態です。
+type: string
+enum:
+  - ONLINE
+  - IDLE
+  - DO_NOT_DISTURB
+  - OFFLINE

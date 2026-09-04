@@ -1,0 +1,6 @@
+name: role_id
+in: path
+required: true
+description: 対象RoleのUUIDです。
+schema:
+  $ref: ../schemas/common/UUID.yaml

@@ -112,6 +112,17 @@ ReactionはUnicode絵文字を単位として集計し、Messageの`reactions`�
 追加と解除は同じResourceへの`PUT`と`DELETE`で冪等に扱い、再試行で件数が重複しないようにします。
 Custom Emojiは識別子と利用権限の契約が必要なため、初期Versionには含めません。
 
+## Member、Presence、Role、Invite
+
+Guildへの参加状態は`GuildMember`で表し、Userの公開情報、Guild内Nickname、割り当てられたRole、参加日時を返します。
+Presenceは永続プロフィールと分離した短命な状態で、`ONLINE`、`IDLE`、`DO_NOT_DISTURB`、`OFFLINE`を扱います。
+
+Permissionは32-bit Bitfieldとして契約し、Roleへ集約します。
+Guild Owner、既定Role、Memberへ割り当てたRoleをServer側の一つのPermission Engineで評価する前提です。
+
+Inviteは推測困難なCode、有効期限、利用回数上限を持ちます。
+同じUserがInviteを再利用した場合は既存Memberを返し、参加操作を冪等に扱います。
+
 ## Cursor Pagination
 
 一覧 API は `cursor` と `limit` を共通 Query Parameter として使用します。

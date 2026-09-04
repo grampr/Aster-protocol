@@ -1,0 +1,31 @@
+title: GuildMember
+description: Guildに参加しているUserとGuild内設定です。
+type: object
+additionalProperties: false
+required:
+  - guild_id
+  - user
+  - nickname
+  - role_ids
+  - joined_at
+  - presence
+properties:
+  guild_id:
+    $ref: ../common/UUID.yaml
+  user:
+    $ref: ../users/UserSummary.yaml
+  nickname:
+    oneOf:
+      - type: string
+        minLength: 1
+        maxLength: 64
+      - type: "null"
+  role_ids:
+    type: array
+    uniqueItems: true
+    items:
+      $ref: ../common/UUID.yaml
+  joined_at:
+    $ref: ../common/Timestamp.yaml
+  presence:
+    $ref: ./Presence.yaml

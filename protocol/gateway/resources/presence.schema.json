@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/resources/presence.schema.json",
+  "title": "GatewayPresence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["user_id", "status", "updated_at"],
+  "properties": {
+    "user_id": { "type": "string", "format": "uuid" },
+    "status": { "enum": ["ONLINE", "IDLE", "DO_NOT_DISTURB", "OFFLINE"] },
+    "custom_text": { "type": ["string", "null"], "minLength": 1, "maxLength": 128 },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

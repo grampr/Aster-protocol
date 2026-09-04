@@ -1,0 +1,23 @@
+parameters:
+  - $ref: ../../components/parameters/InviteCode.yaml
+
+get:
+  operationId: getInvite
+  tags: [Invites]
+  summary: Inviteの参加先を確認する
+  description: 認証後、参加前にGuild名や期限を確認するためのOperationです。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 有効なInviteです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/invites/Invite.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

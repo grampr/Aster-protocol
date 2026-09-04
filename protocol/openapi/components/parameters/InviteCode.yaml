@@ -1,0 +1,7 @@
+name: invite_code
+in: path
+required: true
+description: 招待URLに含まれる推測困難なCodeです。
+schema:
+  type: string
+  pattern: "^[A-Za-z0-9_-]{16,64}$"

@@ -1,0 +1,38 @@
+title: Role
+description: Guild Memberへ権限をまとめて割り当てるRoleです。
+type: object
+additionalProperties: false
+required:
+  - id
+  - guild_id
+  - name
+  - color
+  - permissions
+  - position
+  - managed
+  - created_at
+properties:
+  id:
+    $ref: ../common/UUID.yaml
+  guild_id:
+    $ref: ../common/UUID.yaml
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+  color:
+    description: 表示色です。未設定の場合はnullです。
+    oneOf:
+      - type: string
+        pattern: "^#[0-9A-Fa-f]{6}$"
+      - type: "null"
+  permissions:
+    $ref: ./PermissionBits.yaml
+  position:
+    type: integer
+    minimum: 0
+  managed:
+    type: boolean
+    description: Serverが管理しUserから削除できないRoleかを示します。
+  created_at:
+    $ref: ../common/Timestamp.yaml

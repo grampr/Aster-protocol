@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/events/guilds/member-leave.schema.json",
+  "title": "MemberLeaveEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "t", "s", "d"],
+  "properties": {
+    "op": { "const": 0 },
+    "t": { "const": "MEMBER_LEAVE" },
+    "s": { "type": "integer", "minimum": 0 },
+    "d": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["guild_id", "user_id"],
+      "properties": {
+        "guild_id": { "type": "string", "format": "uuid" },
+        "user_id": { "type": "string", "format": "uuid" }
+      }
+    }
+  }
+}

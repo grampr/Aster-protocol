@@ -22,7 +22,11 @@ export type AsterGatewayMessage =
   | MessageDeleteEvent
   | MessageReactionAddEvent
   | MessageReactionRemoveEvent
-  | TypingStartEvent;
+  | TypingStartEvent
+  | MemberJoinEvent
+  | MemberUpdateEvent
+  | MemberLeaveEvent
+  | PresenceUpdateEvent;
 /**
  * 購読する Gateway Event 群を表す32-bit Bitfield です。未割り当て Bit は Server が意味を定義するまで使用しません。
  */
@@ -403,4 +407,48 @@ export interface GatewayTypingStartResource {
    * Serverが入力開始または継続を受け付けた時刻です。
    */
   started_at: string;
+}
+export interface MemberJoinEvent {
+  op: 0;
+  t: "MEMBER_JOIN";
+  s: number;
+  d: GatewayGuildMember;
+}
+export interface GatewayGuildMember {
+  guild_id: string;
+  user: GatewayUserSummary;
+  nickname: string | null;
+  role_ids: string[];
+  joined_at: string;
+  presence: GatewayPresence;
+}
+export interface GatewayPresence {
+  user_id: string;
+  status: "ONLINE" | "IDLE" | "DO_NOT_DISTURB" | "OFFLINE";
+  custom_text?: string | null;
+  updated_at: string;
+}
+export interface MemberUpdateEvent {
+  op: 0;
+  t: "MEMBER_UPDATE";
+  s: number;
+  d: GatewayGuildMember;
+}
+export interface MemberLeaveEvent {
+  op: 0;
+  t: "MEMBER_LEAVE";
+  s: number;
+  d: {
+    guild_id: string;
+    user_id: string;
+  };
+}
+export interface PresenceUpdateEvent {
+  op: 0;
+  t: "PRESENCE_UPDATE";
+  s: number;
+  d: {
+    guild_id: string;
+    presence: GatewayPresence;
+  };
 }

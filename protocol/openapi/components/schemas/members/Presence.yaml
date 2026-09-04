@@ -1,0 +1,22 @@
+title: Presence
+description: Process Memoryなどの短命なStoreで管理するUserのPresenceです。
+type: object
+additionalProperties: false
+required:
+  - user_id
+  - status
+  - updated_at
+properties:
+  user_id:
+    $ref: ../common/UUID.yaml
+  status:
+    $ref: ./PresenceStatus.yaml
+  custom_text:
+    description: Userが設定した短い状態文です。未設定の場合はnullです。
+    oneOf:
+      - type: string
+        minLength: 1
+        maxLength: 128
+      - type: "null"
+  updated_at:
+    $ref: ../common/Timestamp.yaml

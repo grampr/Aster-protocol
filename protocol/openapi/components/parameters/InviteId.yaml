@@ -1,0 +1,6 @@
+name: invite_id
+in: path
+required: true
+description: 対象InviteのUUIDです。
+schema:
+  $ref: ../schemas/common/UUID.yaml

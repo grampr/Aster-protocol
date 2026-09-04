@@ -1,0 +1,72 @@
+parameters:
+  - $ref: ../../components/parameters/GuildId.yaml
+  - $ref: ../../components/parameters/UserId.yaml
+
+get:
+  operationId: getGuildMember
+  tags: [Members]
+  summary: Guild Memberを取得する
+  description: Guildを参照できるUserへ、指定したMemberのGuild内設定と現在のPresenceを返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 指定したGuild Memberです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/members/GuildMember.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+patch:
+  operationId: updateGuildMember
+  tags: [Members]
+  summary: Guild Memberを変更する
+  description: Nicknameは本人または管理権限を持つUser、RoleはRole管理権限を持つUserだけが変更できます。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/members/UpdateGuildMemberRequest.yaml
+  responses:
+    "200":
+      description: 変更後のGuild Memberです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/members/GuildMember.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+delete:
+  operationId: removeGuildMember
+  tags: [Members]
+  summary: GuildからMemberを削除する
+  description: Member管理権限を持つUserが対象をGuildから削除します。Ownerは削除できません。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: Memberを削除しました。
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
