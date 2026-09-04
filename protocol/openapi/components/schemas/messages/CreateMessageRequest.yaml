@@ -1,14 +1,20 @@
 title: CreateMessageRequest
-description: Text Channelへ投稿するMessage本文です。
+description: Text Channelへ投稿する本文とAttachmentです。contentまたは1件以上のattachment_idsを必ず指定します。
 type: object
 additionalProperties: false
-required:
-  - content
 properties:
   content:
     type: string
     minLength: 1
     maxLength: 4000
+  attachment_ids:
+    type: array
+    minItems: 1
+    maxItems: 10
+    uniqueItems: true
+    description: UploadをFinalize済みで、同じChannel用に作成したAttachment IDです。
+    items:
+      $ref: ../common/UUID.yaml
   reply_to_message_id:
     allOf:
       - $ref: ../common/UUID.yaml

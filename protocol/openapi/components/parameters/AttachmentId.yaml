@@ -1,0 +1,7 @@
+name: attachment_id
+in: path
+required: true
+description: 対象AttachmentのUUIDv7です。
+schema:
+  $ref: ../schemas/common/UUID.yaml
+
