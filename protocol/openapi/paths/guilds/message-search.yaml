@@ -5,21 +5,30 @@ get:
   tags: [Messages]
   summary: Guild内のMessageを検索する
   description: 閲覧権限を持つText Channelだけを対象に、Message本文を新しい順で検索します。
-  security: [{ BearerAuth: [] }]
+  security:
+    - BearerAuth: []
   parameters:
     - $ref: ../../components/parameters/SearchQuery.yaml
     - $ref: ../../components/parameters/Cursor.yaml
     - $ref: ../../components/parameters/Limit.yaml
     - name: channel_id
       in: query
-      schema: { $ref: ../../components/schemas/common/UUID.yaml }
+      schema:
+        $ref: ../../components/schemas/common/UUID.yaml
     - name: author_id
       in: query
-      schema: { $ref: ../../components/schemas/common/UUID.yaml }
+      schema:
+        $ref: ../../components/schemas/common/UUID.yaml
   responses:
     "200":
       description: 検索結果のPageです。
-      content: { application/json: { schema: { $ref: ../../components/schemas/messages/MessageSearchResultList.yaml } } }
-    "401": { $ref: ../../components/responses/Unauthorized.yaml }
-    "404": { $ref: ../../components/responses/ResourceNotFound.yaml }
-    default: { $ref: ../../components/responses/Error.yaml }
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/messages/MessageSearchResultList.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
