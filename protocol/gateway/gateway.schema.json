@@ -22,5 +22,9 @@
     { "$ref": "./events/guilds/member-update.schema.json" },
     { "$ref": "./events/guilds/member-leave.schema.json" },
     { "$ref": "./events/guilds/presence-update.schema.json" }
+    ,{ "$ref": "./events/channels/channel-create.schema.json" }
+    ,{ "$ref": "./events/channels/channel-update.schema.json" }
+    ,{ "$ref": "./events/channels/channel-delete.schema.json" }
+    ,{ "$ref": "./events/channels/read-state-update.schema.json" }
   ]
 }

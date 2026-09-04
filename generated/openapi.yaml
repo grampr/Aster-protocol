@@ -1005,6 +1005,112 @@ paths:
           $ref: '#/components/responses/RateLimited'
         default:
           $ref: '#/components/responses/Error'
+  /users/@me/channels:
+    get:
+      operationId: listCurrentUserDirectChannels
+      tags:
+        - Channels
+      summary: Direct Message Channelを取得する
+      description: 認証済みUserが参加しているDirect Message Channelを更新順で返します。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Direct Message ChannelのPageです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createDirectChannel
+      tags:
+        - Channels
+      summary: Direct Message Channelを開始する
+      description: 同じ2 UserのDirect Message Channelが存在する場合は既存Channelを返します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDirectChannelRequest'
+      responses:
+        '200':
+          description: 作成または取得したDirect Message Channelです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /users/@me/read-states:
+    get:
+      operationId: listCurrentUserReadStates
+      tags:
+        - Channels
+      summary: 自分の既読位置を取得する
+      description: 認証済みUserが参照できるChannelの既読位置をまとめて返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Channelごとの既読位置です。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadStateList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/messages/search:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+    get:
+      operationId: searchGuildMessages
+      tags:
+        - Messages
+      summary: Guild内のMessageを検索する
+      description: 閲覧権限を持つText Channelだけを対象に、Message本文を新しい順で検索します。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SearchQuery'
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - name: channel_id
+          in: query
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: author_id
+          in: query
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 検索結果のPageです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageSearchResultList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
   /channels/{channel_id}:
     parameters:
       - $ref: '#/components/parameters/ChannelId'
@@ -1194,6 +1300,92 @@ paths:
           $ref: '#/components/responses/ResourceNotFound'
         '429':
           $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /channels/{channel_id}/threads:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    get:
+      operationId: listChannelThreads
+      tags:
+        - Channels
+      summary: ChannelのThreadを取得する
+      description: 指定したText Channelを親とするThreadを更新順で返します。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: ThreadのPageです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createChannelThread
+      tags:
+        - Channels
+      summary: Threadを作成する
+      description: Text ChannelまたはそのMessageを起点にThreadを作成します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateThreadRequest'
+      responses:
+        '201':
+          description: 作成したThreadです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /channels/{channel_id}/read-state:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    put:
+      operationId: updateChannelReadState
+      tags:
+        - Channels
+      summary: Channelの既読位置を更新する
+      description: 指定したChannel内のMessageまで読んだことを記録し、既読位置を後方へは戻しません。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReadStateRequest'
+      responses:
+        '200':
+          description: 更新後の既読位置です。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadState'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
         default:
           $ref: '#/components/responses/Error'
   /channels/{channel_id}/messages/{message_id}:
@@ -1521,6 +1713,15 @@ components:
       schema:
         $ref: '#/components/schemas/ReactionEmoji'
       example: 👍
+    SearchQuery:
+      name: query
+      in: query
+      required: true
+      description: 大文字小文字を区別せずMessage本文から探す文字列です。
+      schema:
+        type: string
+        minLength: 2
+        maxLength: 100
   responses:
     EmailAlreadyRegistered:
       description: 指定された Email Address は登録済みです。
@@ -1692,30 +1893,41 @@ components:
         - PASSWORD
     Channel:
       title: Channel
-      description: Guild内のText ChannelまたはVoice Channelです。
+      description: Guild内のChannel、Thread、またはUser間のDirect Message Channelです。
       type: object
       additionalProperties: false
       required:
         - id
         - guild_id
+        - parent_id
         - type
         - name
         - topic
         - position
         - created_at
+        - recipients
       properties:
         id:
           $ref: '#/components/schemas/UUID'
         guild_id:
-          allOf:
+          description: Channelが属するGuild IDです。Direct Messageの場合はnullです。
+          oneOf:
             - $ref: '#/components/schemas/UUID'
-          description: Channelが属するGuild IDです。
+            - type: 'null'
+        parent_id:
+          description: CategoryまたはThreadの親Channel IDです。親がない場合はnullです。
+          oneOf:
+            - $ref: '#/components/schemas/UUID'
+            - type: 'null'
         type:
           $ref: '#/components/schemas/ChannelType'
         name:
-          type: string
-          minLength: 1
-          maxLength: 100
+          description: Guild Channelの名前です。Direct Messageの場合はnullです。
+          oneOf:
+            - type: string
+              minLength: 1
+              maxLength: 100
+            - type: 'null'
         topic:
           description: Text Channelの説明です。未設定またはVoice Channelの場合はnullです。
           oneOf:
@@ -1728,14 +1940,22 @@ components:
           description: 同じGuild内での表示順です。小さい値を先に表示します。
         created_at:
           $ref: '#/components/schemas/Timestamp'
+        recipients:
+          description: Direct Messageの参加Userです。それ以外では空配列です。
+          type: array
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/UserSummary'
       examples:
         - id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
           guild_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+          parent_id: null
           type: TEXT
           name: イベント企画
           topic: 次回イベントの日程と内容を相談します
           position: 2
           created_at: '2026-08-17T06:05:00Z'
+          recipients: []
     ChannelList:
       title: ChannelList
       description: Guild内のChannelをpositionの昇順で返すPageです。
@@ -1755,11 +1975,13 @@ components:
         - items:
             - id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
               guild_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+              parent_id: null
               type: TEXT
               name: イベント企画
               topic: 次回イベントの日程と内容を相談します
               position: 2
               created_at: '2026-08-17T06:05:00Z'
+              recipients: []
           page:
             has_more: false
             next_cursor: null
@@ -1770,6 +1992,9 @@ components:
       enum:
         - TEXT
         - VOICE
+        - CATEGORY
+        - THREAD
+        - DIRECT
       examples:
         - TEXT
     CreateChannelRequest:
@@ -1782,7 +2007,11 @@ components:
         - name
       properties:
         type:
-          $ref: '#/components/schemas/ChannelType'
+          type: string
+          enum:
+            - TEXT
+            - VOICE
+            - CATEGORY
         name:
           type: string
           minLength: 1
@@ -1790,10 +2019,74 @@ components:
         topic:
           type: string
           maxLength: 1024
+        parent_id:
+          $ref: '#/components/schemas/UUID'
       examples:
         - type: TEXT
           name: イベント企画
           topic: 次回イベントの日程と内容を相談します
+    CreateDirectChannelRequest:
+      title: CreateDirectChannelRequest
+      description: 指定したUserとのDirect Message Channelを作成または取得します。
+      type: object
+      additionalProperties: false
+      required:
+        - recipient_id
+      properties:
+        recipient_id:
+          $ref: '#/components/schemas/UUID'
+    CreateThreadRequest:
+      title: CreateThreadRequest
+      description: Text ChannelまたはMessageを起点にThreadを作成します。
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        message_id:
+          $ref: '#/components/schemas/UUID'
+    ReadState:
+      title: ReadState
+      description: UserごとのChannel最終既読位置です。
+      type: object
+      additionalProperties: false
+      required:
+        - channel_id
+        - last_read_message_id
+        - updated_at
+      properties:
+        channel_id:
+          $ref: '#/components/schemas/UUID'
+        last_read_message_id:
+          oneOf:
+            - $ref: '#/components/schemas/UUID'
+            - type: 'null'
+        updated_at:
+          $ref: '#/components/schemas/Timestamp'
+    ReadStateList:
+      title: ReadStateList
+      type: object
+      additionalProperties: false
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadState'
+    UpdateReadStateRequest:
+      title: UpdateReadStateRequest
+      type: object
+      additionalProperties: false
+      required:
+        - last_read_message_id
+      properties:
+        last_read_message_id:
+          $ref: '#/components/schemas/UUID'
     CreateGuildRequest:
       title: CreateGuildRequest
       description: 新しいGuildを作成するときの設定です。
@@ -2527,6 +2820,34 @@ components:
           page:
             has_more: true
             next_cursor: eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9
+    MessageSearchResult:
+      title: MessageSearchResult
+      type: object
+      additionalProperties: false
+      required:
+        - message
+        - excerpt
+      properties:
+        message:
+          $ref: '#/components/schemas/Message'
+        excerpt:
+          description: 検索語の周辺をServerが安全に切り出したPlain Textです。
+          type: string
+          maxLength: 500
+    MessageSearchResultList:
+      title: MessageSearchResultList
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - page
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageSearchResult'
+        page:
+          $ref: '#/components/schemas/PageInfo'
     PageInfo:
       title: PageInfo
       description: Cursor Pagination の継続情報です。
@@ -2745,6 +3066,11 @@ components:
         position:
           type: integer
           minimum: 0
+        parent_id:
+          description: nullを指定するとCategoryとの関連を解除します。
+          oneOf:
+            - $ref: '#/components/schemas/UUID'
+            - type: 'null'
       examples:
         - name: 秋のイベント企画
           position: 3

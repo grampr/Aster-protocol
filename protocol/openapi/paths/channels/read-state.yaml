@@ -1,0 +1,18 @@
+parameters:
+  - $ref: ../../components/parameters/ChannelId.yaml
+put:
+  operationId: updateChannelReadState
+  tags: [Channels]
+  summary: Channelの既読位置を更新する
+  description: 指定したChannel内のMessageまで読んだことを記録し、既読位置を後方へは戻しません。
+  security: [{ BearerAuth: [] }]
+  requestBody:
+    required: true
+    content: { application/json: { schema: { $ref: ../../components/schemas/channels/UpdateReadStateRequest.yaml } } }
+  responses:
+    "200":
+      description: 更新後の既読位置です。
+      content: { application/json: { schema: { $ref: ../../components/schemas/channels/ReadState.yaml } } }
+    "401": { $ref: ../../components/responses/Unauthorized.yaml }
+    "404": { $ref: ../../components/responses/ResourceNotFound.yaml }
+    default: { $ref: ../../components/responses/Error.yaml }

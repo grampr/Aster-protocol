@@ -7,7 +7,8 @@ required:
   - name
 properties:
   type:
-    $ref: ./ChannelType.yaml
+    type: string
+    enum: [TEXT, VOICE, CATEGORY]
   name:
     type: string
     minLength: 1
@@ -15,6 +16,8 @@ properties:
   topic:
     type: string
     maxLength: 1024
+  parent_id:
+    $ref: ../common/UUID.yaml
 examples:
   - type: TEXT
     name: イベント企画

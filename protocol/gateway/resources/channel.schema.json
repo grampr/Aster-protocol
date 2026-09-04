@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/resources/channel.schema.json",
+  "title": "GatewayChannel",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "guild_id", "parent_id", "type", "name", "topic", "position", "created_at", "recipients"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "guild_id": { "type": ["string", "null"], "format": "uuid" },
+    "parent_id": { "type": ["string", "null"], "format": "uuid" },
+    "type": { "enum": ["TEXT", "VOICE", "CATEGORY", "THREAD", "DIRECT"] },
+    "name": { "type": ["string", "null"], "minLength": 1, "maxLength": 100 },
+    "topic": { "type": ["string", "null"], "maxLength": 1024 },
+    "position": { "type": "integer", "minimum": 0 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "recipients": { "type": "array", "maxItems": 10, "items": { "$ref": "./user-summary.schema.json" } }
+  }
+}

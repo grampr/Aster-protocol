@@ -1,0 +1,35 @@
+parameters:
+  - $ref: ../../components/parameters/ChannelId.yaml
+get:
+  operationId: listChannelThreads
+  tags: [Channels]
+  summary: ChannelのThreadを取得する
+  description: 指定したText Channelを親とするThreadを更新順で返します。
+  security: [{ BearerAuth: [] }]
+  parameters:
+    - $ref: ../../components/parameters/Cursor.yaml
+    - $ref: ../../components/parameters/Limit.yaml
+  responses:
+    "200":
+      description: ThreadのPageです。
+      content: { application/json: { schema: { $ref: ../../components/schemas/channels/ChannelList.yaml } } }
+    "401": { $ref: ../../components/responses/Unauthorized.yaml }
+    "404": { $ref: ../../components/responses/ResourceNotFound.yaml }
+    default: { $ref: ../../components/responses/Error.yaml }
+post:
+  operationId: createChannelThread
+  tags: [Channels]
+  summary: Threadを作成する
+  description: Text ChannelまたはそのMessageを起点にThreadを作成します。
+  security: [{ BearerAuth: [] }]
+  requestBody:
+    required: true
+    content: { application/json: { schema: { $ref: ../../components/schemas/channels/CreateThreadRequest.yaml } } }
+  responses:
+    "201":
+      description: 作成したThreadです。
+      content: { application/json: { schema: { $ref: ../../components/schemas/channels/Channel.yaml } } }
+    "401": { $ref: ../../components/responses/Unauthorized.yaml }
+    "403": { $ref: ../../components/responses/Forbidden.yaml }
+    "404": { $ref: ../../components/responses/ResourceNotFound.yaml }
+    default: { $ref: ../../components/responses/Error.yaml }

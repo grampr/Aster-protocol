@@ -1,0 +1,31 @@
+get:
+  operationId: listCurrentUserDirectChannels
+  tags: [Channels]
+  summary: Direct Message Channelを取得する
+  description: 認証済みUserが参加しているDirect Message Channelを更新順で返します。
+  security: [{ BearerAuth: [] }]
+  parameters:
+    - $ref: ../../components/parameters/Cursor.yaml
+    - $ref: ../../components/parameters/Limit.yaml
+  responses:
+    "200":
+      description: Direct Message ChannelのPageです。
+      content: { application/json: { schema: { $ref: ../../components/schemas/channels/ChannelList.yaml } } }
+    "401": { $ref: ../../components/responses/Unauthorized.yaml }
+    default: { $ref: ../../components/responses/Error.yaml }
+post:
+  operationId: createDirectChannel
+  tags: [Channels]
+  summary: Direct Message Channelを開始する
+  description: 同じ2 UserのDirect Message Channelが存在する場合は既存Channelを返します。
+  security: [{ BearerAuth: [] }]
+  requestBody:
+    required: true
+    content: { application/json: { schema: { $ref: ../../components/schemas/channels/CreateDirectChannelRequest.yaml } } }
+  responses:
+    "200":
+      description: 作成または取得したDirect Message Channelです。
+      content: { application/json: { schema: { $ref: ../../components/schemas/channels/Channel.yaml } } }
+    "401": { $ref: ../../components/responses/Unauthorized.yaml }
+    "404": { $ref: ../../components/responses/ResourceNotFound.yaml }
+    default: { $ref: ../../components/responses/Error.yaml }

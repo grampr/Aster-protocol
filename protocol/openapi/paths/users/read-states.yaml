@@ -1,0 +1,12 @@
+get:
+  operationId: listCurrentUserReadStates
+  tags: [Channels]
+  summary: 自分の既読位置を取得する
+  description: 認証済みUserが参照できるChannelの既読位置をまとめて返します。
+  security: [{ BearerAuth: [] }]
+  responses:
+    "200":
+      description: Channelごとの既読位置です。
+      content: { application/json: { schema: { $ref: ../../components/schemas/channels/ReadStateList.yaml } } }
+    "401": { $ref: ../../components/responses/Unauthorized.yaml }
+    default: { $ref: ../../components/responses/Error.yaml }
