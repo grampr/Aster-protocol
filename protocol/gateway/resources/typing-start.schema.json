@@ -5,10 +5,24 @@
   "description": "Text Channelで入力を開始または継続したUserと、その通知時刻です。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["channel_id", "user", "started_at"],
+  "required": [
+    "channel_id",
+    "user",
+    "started_at"
+  ],
   "properties": {
-    "channel_id": { "type": "string", "format": "uuid", "description": "入力中のText Channel IDです。" },
-    "user": { "$ref": "./user-summary.schema.json" },
-    "started_at": { "type": "string", "format": "date-time", "description": "Serverが入力開始または継続を受け付けた時刻です。" }
+    "channel_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "入力中のText Channel IDです。"
+    },
+    "user": {
+      "$ref": "./user-summary.schema.json"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Serverが入力開始または継続を受け付けた時刻です。"
+    }
   }
 }

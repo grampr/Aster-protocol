@@ -8,6 +8,10 @@ Aster Protocol の利用者に影響する変更を記録します。
 
 ### Added
 
+- AttachmentのUpload Intent、Finalize、権限付きDownload契約
+- Messageへ最大10件のAttachmentを紐付ける契約
+- Voice Channelのjoin、leave、state更新、Provider-neutral Session契約
+- `VOICE_STATE_UPDATE` Gateway Event
 - Guild Member、Presence、Role、Permission、InviteのREST契約
 - `MEMBER_JOIN`、`MEMBER_UPDATE`、`MEMBER_LEAVE`、`PRESENCE_UPDATE` Gateway Event
 - Category、Direct Message、Thread、Message検索、Channel既読位置のREST契約

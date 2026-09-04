@@ -4,13 +4,44 @@
   "title": "GatewayGuildMember",
   "type": "object",
   "additionalProperties": false,
-  "required": ["guild_id", "user", "nickname", "role_ids", "joined_at", "presence"],
+  "required": [
+    "guild_id",
+    "user",
+    "nickname",
+    "role_ids",
+    "joined_at",
+    "presence"
+  ],
   "properties": {
-    "guild_id": { "type": "string", "format": "uuid" },
-    "user": { "$ref": "./user-summary.schema.json" },
-    "nickname": { "type": ["string", "null"], "minLength": 1, "maxLength": 64 },
-    "role_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "format": "uuid" } },
-    "joined_at": { "type": "string", "format": "date-time" },
-    "presence": { "$ref": "./presence.schema.json" }
+    "guild_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "user": {
+      "$ref": "./user-summary.schema.json"
+    },
+    "nickname": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "role_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "joined_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "presence": {
+      "$ref": "./presence.schema.json"
+    }
   }
 }

@@ -1,0 +1,44 @@
+parameters:
+  - $ref: ../../components/parameters/AttachmentId.yaml
+
+get:
+  operationId: getAttachment
+  tags:
+    - Media
+  summary: Attachment metadataを取得する
+  description: 参照可能なChannelに属するAttachment metadataを返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: Attachment metadataです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/media/Attachment.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+delete:
+  operationId: deleteAttachment
+  tags:
+    - Media
+  summary: 未使用または自分が投稿したAttachmentを削除する
+  description: Uploader本人がMessageへ未使用のAttachmentを削除します。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: Attachmentを削除しました。
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

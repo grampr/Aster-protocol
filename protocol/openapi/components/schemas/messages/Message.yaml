@@ -10,6 +10,7 @@ required:
   - reply_to_message_id
   - reply_to
   - reactions
+  - attachments
   - created_at
   - edited_at
 properties:
@@ -23,9 +24,8 @@ properties:
     $ref: ../users/UserSummary.yaml
   content:
     type: string
-    minLength: 1
     maxLength: 4000
-    description: UTF-8のMessage本文です。
+    description: UTF-8のMessage本文です。AttachmentのみのMessageでは空文字列です。
   reply_to_message_id:
     description: |
       返信元Message IDです。通常のMessageではnullです。
@@ -45,6 +45,11 @@ properties:
     description: 絵文字ごとのReaction集計です。Reactionがない場合は空配列です。
     items:
       $ref: ./MessageReaction.yaml
+  attachments:
+    type: array
+    description: Messageへ紐付いたREADY状態のAttachmentです。
+    items:
+      $ref: ../media/Attachment.yaml
   created_at:
     $ref: ../common/Timestamp.yaml
   edited_at:
@@ -75,5 +80,6 @@ examples:
       - emoji: 👍
         count: 3
         me: true
+    attachments: []
     created_at: 2026-08-17T06:12:00Z
     edited_at: null

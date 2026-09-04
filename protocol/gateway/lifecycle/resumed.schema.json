@@ -5,11 +5,24 @@
   "description": "Server が Gateway Session と Event 配信の再開を通知します。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["op", "t", "s", "d"],
+  "required": [
+    "op",
+    "t",
+    "s",
+    "d"
+  ],
   "properties": {
-    "op": { "$ref": "../common/opcode.schema.json#/$defs/DISPATCH" },
-    "t": { "$ref": "../common/event-name.schema.json#/$defs/RESUMED" },
-    "s": { "type": "integer", "minimum": 0, "description": "Event Sequence です。" },
+    "op": {
+      "$ref": "../common/opcode.schema.json#/$defs/DISPATCH"
+    },
+    "t": {
+      "$ref": "../common/event-name.schema.json#/$defs/RESUMED"
+    },
+    "s": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Event Sequence です。"
+    },
     "d": {
       "type": "object",
       "additionalProperties": false,

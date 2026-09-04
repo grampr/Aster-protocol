@@ -4,10 +4,26 @@
   "title": "GatewayReadState",
   "type": "object",
   "additionalProperties": false,
-  "required": ["channel_id", "last_read_message_id", "updated_at"],
+  "required": [
+    "channel_id",
+    "last_read_message_id",
+    "updated_at"
+  ],
   "properties": {
-    "channel_id": { "type": "string", "format": "uuid" },
-    "last_read_message_id": { "type": ["string", "null"], "format": "uuid" },
-    "updated_at": { "type": "string", "format": "date-time" }
+    "channel_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "last_read_message_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
   }
 }

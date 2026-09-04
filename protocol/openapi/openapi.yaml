@@ -31,6 +31,10 @@ tags:
     description: Guildへ参加するためのInviteを扱うOperation
   - name: Messages
     description: Text Channel 内の Message を扱う Operation
+  - name: Media
+    description: Object Storageへ直接転送するAttachmentを扱うOperation
+  - name: Voice
+    description: Voice Providerへ接続するControl Plane Operation
   - name: System
     description: Instance の稼働状態を確認する Operation
 
@@ -93,6 +97,18 @@ paths:
     $ref: ./paths/channels/threads.yaml
   /channels/{channel_id}/read-state:
     $ref: ./paths/channels/read-state.yaml
+  /channels/{channel_id}/attachments/intents:
+    $ref: ./paths/channels/attachment-intents.yaml
+  /attachments/{attachment_id}:
+    $ref: ./paths/attachments/attachment.yaml
+  /attachments/{attachment_id}/finalize:
+    $ref: ./paths/attachments/finalize.yaml
+  /attachments/{attachment_id}/content:
+    $ref: ./paths/attachments/content.yaml
+  /channels/{channel_id}/voice:
+    $ref: ./paths/channels/voice.yaml
+  /voice/sessions/@me:
+    $ref: ./paths/voice/session-me.yaml
   /channels/{channel_id}/messages/{message_id}:
     $ref: ./paths/messages/message.yaml
   /channels/{channel_id}/messages/{message_id}/reactions/{emoji}:
@@ -118,6 +134,8 @@ components:
     RetryAfter:
       $ref: ./components/headers/RetryAfter.yaml
   parameters:
+    AttachmentId:
+      $ref: ./components/parameters/AttachmentId.yaml
     ChannelId:
       $ref: ./components/parameters/ChannelId.yaml
     Cursor:
@@ -164,6 +182,14 @@ components:
   schemas:
     AccessToken:
       $ref: ./components/schemas/auth/AccessToken.yaml
+    Attachment:
+      $ref: ./components/schemas/media/Attachment.yaml
+    AttachmentStatus:
+      $ref: ./components/schemas/media/AttachmentStatus.yaml
+    AttachmentUploadIntent:
+      $ref: ./components/schemas/media/AttachmentUploadIntent.yaml
+    CreateAttachmentUploadIntentRequest:
+      $ref: ./components/schemas/media/CreateAttachmentUploadIntentRequest.yaml
     AuthenticationMethod:
       $ref: ./components/schemas/auth/AuthenticationMethod.yaml
     Channel:
@@ -184,6 +210,16 @@ components:
       $ref: ./components/schemas/channels/ReadStateList.yaml
     UpdateReadStateRequest:
       $ref: ./components/schemas/channels/UpdateReadStateRequest.yaml
+    VoiceSession:
+      $ref: ./components/schemas/voice/VoiceSession.yaml
+    VoiceState:
+      $ref: ./components/schemas/voice/VoiceState.yaml
+    VoiceStateList:
+      $ref: ./components/schemas/voice/VoiceStateList.yaml
+    JoinVoiceChannelRequest:
+      $ref: ./components/schemas/voice/JoinVoiceChannelRequest.yaml
+    UpdateVoiceStateRequest:
+      $ref: ./components/schemas/voice/UpdateVoiceStateRequest.yaml
     CreateGuildRequest:
       $ref: ./components/schemas/guilds/CreateGuildRequest.yaml
     CreateMessageRequest:

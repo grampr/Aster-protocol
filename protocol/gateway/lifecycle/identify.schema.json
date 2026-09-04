@@ -5,20 +5,30 @@
   "description": "Client または Bot が新しい Gateway Session を開始します。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["op", "d"],
+  "required": [
+    "op",
+    "d"
+  ],
   "properties": {
-    "op": { "$ref": "../common/opcode.schema.json#/$defs/IDENTIFY" },
+    "op": {
+      "$ref": "../common/opcode.schema.json#/$defs/IDENTIFY"
+    },
     "d": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["token", "intents"],
+      "required": [
+        "token",
+        "intents"
+      ],
       "properties": {
         "token": {
           "type": "string",
           "minLength": 1,
           "description": "Session または Bot の認証 Token です。"
         },
-        "intents": { "$ref": "../common/intents.schema.json" }
+        "intents": {
+          "$ref": "../common/intents.schema.json"
+        }
       }
     }
   }

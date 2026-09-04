@@ -30,7 +30,8 @@ export type AsterGatewayMessage =
   | ChannelCreateEvent
   | ChannelUpdateEvent
   | ChannelDeleteEvent
-  | ReadStateUpdateEvent;
+  | ReadStateUpdateEvent
+  | VoiceStateUpdateEvent;
 /**
  * 購読する Gateway Event 群を表す32-bit Bitfield です。未割り当て Bit は Server が意味を定義するまで使用しません。
  */
@@ -223,6 +224,59 @@ export interface GatewayMessageResource {
    */
   reply_to: GatewayMessageReplyResource | null;
   /**
+   * @maxItems 10
+   */
+  attachments:
+    | []
+    | [GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment, GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment]
+    | [
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment
+      ]
+    | [
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment
+      ]
+    | [
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment
+      ]
+    | [
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment
+      ];
+  /**
    * Messageを作成した時刻です。
    */
   created_at: string;
@@ -273,6 +327,18 @@ export interface GatewayMessageReplyResource {
    * 返信元Messageを最後に編集した時刻です。未編集の場合はnullです。
    */
   edited_at: string | null;
+}
+export interface GatewayAttachment {
+  id: string;
+  uploader_id: string;
+  channel_id: string;
+  filename: string;
+  content_type: string;
+  size: number;
+  checksum_sha256: string;
+  status: "READY";
+  download_url: string;
+  created_at: string;
 }
 /**
  * Serverが購読中のClientまたはBotへ、更新後のMessage全体を配信します。
@@ -556,5 +622,21 @@ export interface ReadStateUpdateEvent {
 export interface GatewayReadState {
   channel_id: string;
   last_read_message_id: string | null;
+  updated_at: string;
+}
+export interface VoiceStateUpdateEvent {
+  op: 0;
+  t: "VOICE_STATE_UPDATE";
+  s: number;
+  d: GatewayVoiceState;
+}
+export interface GatewayVoiceState {
+  user_id: string;
+  channel_id: string | null;
+  session_id: string | null;
+  self_mute: boolean;
+  self_deaf: boolean;
+  self_video: boolean;
+  self_stream: boolean;
   updated_at: string;
 }
