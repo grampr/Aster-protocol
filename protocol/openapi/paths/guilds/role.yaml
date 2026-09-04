@@ -1,0 +1,51 @@
+parameters:
+  - $ref: ../../components/parameters/GuildId.yaml
+  - $ref: ../../components/parameters/RoleId.yaml
+
+patch:
+  operationId: updateGuildRole
+  tags: [Roles]
+  summary: Roleを変更する
+  description: Role管理権限を持つUserが、名前、色、Permission、表示順を変更します。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/roles/UpdateRoleRequest.yaml
+  responses:
+    "200":
+      description: 変更後のRoleです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/roles/Role.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+delete:
+  operationId: deleteGuildRole
+  tags: [Roles]
+  summary: Roleを削除する
+  description: Server管理RoleとGuildの既定Roleは削除できません。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: Roleを削除しました。
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

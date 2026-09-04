@@ -23,6 +23,7 @@ export const GatewayIntent = Object.freeze({
   GUILD_PRESENCES: 64,
   REACTIONS: 128,
   APPLICATION_INTERACTIONS: 256,
+  TYPING: 512,
 } as const);
 
 export type GatewayIntentValue = (typeof GatewayIntent)[keyof typeof GatewayIntent];
@@ -35,6 +36,11 @@ export const GatewayEvent = Object.freeze({
   MESSAGE_DELETE: "MESSAGE_DELETE",
   MESSAGE_REACTION_ADD: "MESSAGE_REACTION_ADD",
   MESSAGE_REACTION_REMOVE: "MESSAGE_REACTION_REMOVE",
+  TYPING_START: "TYPING_START",
+  MEMBER_JOIN: "MEMBER_JOIN",
+  MEMBER_UPDATE: "MEMBER_UPDATE",
+  MEMBER_LEAVE: "MEMBER_LEAVE",
+  PRESENCE_UPDATE: "PRESENCE_UPDATE",
 } as const);
 
 export type GatewayEventValue = (typeof GatewayEvent)[keyof typeof GatewayEvent];

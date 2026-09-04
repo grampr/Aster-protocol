@@ -1,0 +1,13 @@
+title: GuildMemberList
+type: object
+additionalProperties: false
+required:
+  - items
+  - page
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./GuildMember.yaml
+  page:
+    $ref: ../common/PageInfo.yaml

@@ -16,6 +16,11 @@
     { "$ref": "./events/messages/message-update.schema.json" },
     { "$ref": "./events/messages/message-delete.schema.json" },
     { "$ref": "./events/messages/message-reaction-add.schema.json" },
-    { "$ref": "./events/messages/message-reaction-remove.schema.json" }
+    { "$ref": "./events/messages/message-reaction-remove.schema.json" },
+    { "$ref": "./events/channels/typing-start.schema.json" },
+    { "$ref": "./events/guilds/member-join.schema.json" },
+    { "$ref": "./events/guilds/member-update.schema.json" },
+    { "$ref": "./events/guilds/member-leave.schema.json" },
+    { "$ref": "./events/guilds/presence-update.schema.json" }
   ]
 }

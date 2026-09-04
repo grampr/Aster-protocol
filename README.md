@@ -112,6 +112,17 @@ ReactionはUnicode絵文字を単位として集計し、Messageの`reactions`�
 追加と解除は同じResourceへの`PUT`と`DELETE`で冪等に扱い、再試行で件数が重複しないようにします。
 Custom Emojiは識別子と利用権限の契約が必要なため、初期Versionには含めません。
 
+## Member、Presence、Role、Invite
+
+Guildへの参加状態は`GuildMember`で表し、Userの公開情報、Guild内Nickname、割り当てられたRole、参加日時を返します。
+Presenceは永続プロフィールと分離した短命な状態で、`ONLINE`、`IDLE`、`DO_NOT_DISTURB`、`OFFLINE`を扱います。
+
+Permissionは32-bit Bitfieldとして契約し、Roleへ集約します。
+Guild Owner、既定Role、Memberへ割り当てたRoleをServer側の一つのPermission Engineで評価する前提です。
+
+Inviteは推測困難なCode、有効期限、利用回数上限を持ちます。
+同じUserがInviteを再利用した場合は既存Memberを返し、参加操作を冪等に扱います。
+
 ## Cursor Pagination
 
 一覧 API は `cursor` と `limit` を共通 Query Parameter として使用します。
@@ -162,6 +173,7 @@ Text Channelの同期には次のDispatch Eventを使用します。
 - `MESSAGE_DELETE`：削除されたMessageの`id`と`channel_id`を配信する
 - `MESSAGE_REACTION_ADD`：Reactionを付けたUserと操作後の件数を配信する
 - `MESSAGE_REACTION_REMOVE`：Reactionを外したUserと操作後の件数を配信する
+- `TYPING_START`：Text Channelで入力を開始または継続したUserを配信する
 
 Message Eventは`GUILD_MESSAGES` Intentを購読した接続へ配信します。
 `MESSAGE_CONTENT` Intentが許可されない接続でもEvent自体は配信しますが、Messageと返信元参照の`content`は`null`にします。
@@ -169,6 +181,10 @@ Message Eventは`GUILD_MESSAGES` Intentを購読した接続へ配信します�
 
 Reaction Eventは`REACTIONS` Intentを購読した接続へ配信します。
 Eventの`count`は増減値ではなく操作後の現在値であり、Clientは再配信されたEventを重ねて加算しません。
+
+入力中通知は`TYPING` Intentを購読した接続へ配信します。
+Clientは入力が続く間にREST APIを定期的に呼び出し、受信側は`started_at`から10秒を過ぎたUserを表示から外します。
+新しい`TYPING_START`を受信した場合は同じUserの期限を更新します。
 
 すべてのDispatch EventはGateway Session内で単調増加する`s`を持ちます。
 Clientは最後に適用したSequenceをHeartbeatとResumeへ渡し、再配信されたEventをSequenceとResource IDで安全に処理します。
@@ -186,7 +202,7 @@ TypeScriptで利用するRuntime Constantも同じSchemaから生成します。
 | `HELLO` | 10 |
 | `HEARTBEAT_ACK` | 11 |
 
-Intent は32-bit Bitfield とし、初期割り当ては `GUILDS` から `APPLICATION_INTERACTIONS` までの9種類です。
+Intent は32-bit Bitfield とし、初期割り当ては `GUILDS` から `TYPING` までの10種類です。
 未割り当て Bit は、Schema と Changelog で意味を定義してから使用します。
 
 ## 開発コマンド

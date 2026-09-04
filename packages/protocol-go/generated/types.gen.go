@@ -90,6 +90,30 @@ func (e HealthResponseStatus) Valid() bool {
 	}
 }
 
+// Defines values for PresenceStatus.
+const (
+	PresenceStatusDONOTDISTURB PresenceStatus = "DO_NOT_DISTURB"
+	PresenceStatusIDLE         PresenceStatus = "IDLE"
+	PresenceStatusOFFLINE      PresenceStatus = "OFFLINE"
+	PresenceStatusONLINE       PresenceStatus = "ONLINE"
+)
+
+// Valid indicates whether the value is a known member of the PresenceStatus enum.
+func (e PresenceStatus) Valid() bool {
+	switch e {
+	case PresenceStatusDONOTDISTURB:
+		return true
+	case PresenceStatusIDLE:
+		return true
+	case PresenceStatusOFFLINE:
+		return true
+	case PresenceStatusONLINE:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for RateLimitErrorCode.
 const (
 	RateLimitErrorCodeRateLimited RateLimitErrorCode = "RATE_LIMITED"
@@ -114,6 +138,27 @@ const (
 func (e SessionTokenResponseTokenType) Valid() bool {
 	switch e {
 	case Bearer:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for UpdatePresenceRequestStatus.
+const (
+	UpdatePresenceRequestStatusDONOTDISTURB UpdatePresenceRequestStatus = "DO_NOT_DISTURB"
+	UpdatePresenceRequestStatusIDLE         UpdatePresenceRequestStatus = "IDLE"
+	UpdatePresenceRequestStatusONLINE       UpdatePresenceRequestStatus = "ONLINE"
+)
+
+// Valid indicates whether the value is a known member of the UpdatePresenceRequestStatus enum.
+func (e UpdatePresenceRequestStatus) Valid() bool {
+	switch e {
+	case UpdatePresenceRequestStatusDONOTDISTURB:
+		return true
+	case UpdatePresenceRequestStatusIDLE:
+		return true
+	case UpdatePresenceRequestStatusONLINE:
 		return true
 	default:
 		return false
@@ -203,6 +248,15 @@ type CreateGuildRequest struct {
 	Name        string  `json:"name"`
 }
 
+// CreateInviteRequest defines model for CreateInviteRequest.
+type CreateInviteRequest struct {
+	// ExpiresIn 有効秒数です。nullの場合は期限を設けません。
+	ExpiresIn *int `json:"expires_in,omitempty"`
+
+	// MaxUses 利用回数の上限です。nullの場合は上限を設けません。
+	MaxUses *int `json:"max_uses,omitempty"`
+}
+
 // CreateMessageRequest Text Channelへ投稿するMessage本文です。
 //
 // Examples: {"content":"10月24日で進める方向でよいでしょうか？","reply_to_message_id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"}
@@ -212,6 +266,28 @@ type CreateMessageRequest struct {
 	// ReplyToMessageId 同じText Channel内で返信するMessage IDです。
 	// 指定したMessageが存在しない、同じChannelに属さない、または参照できない場合は404を返します。
 	ReplyToMessageId *UUID `json:"reply_to_message_id,omitempty"`
+}
+
+// CreateRoleRequest defines model for CreateRoleRequest.
+type CreateRoleRequest struct {
+	Color *string `json:"color,omitempty"`
+	Name  string  `json:"name"`
+
+	// Permissions GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+	// 初期割り当ては次のとおりです。
+	//
+	// - `1 << 0` VIEW_CHANNEL
+	// - `1 << 1` SEND_MESSAGES
+	// - `1 << 2` MANAGE_MESSAGES
+	// - `1 << 3` MANAGE_CHANNELS
+	// - `1 << 4` MANAGE_GUILD
+	// - `1 << 5` MANAGE_ROLES
+	// - `1 << 6` MANAGE_MEMBERS
+	// - `1 << 7` CREATE_INVITE
+	// - `1 << 8` CONNECT
+	// - `1 << 9` SPEAK
+	// - `1 << 10` STREAM
+	Permissions *PermissionBits `json:"permissions,omitempty"`
 }
 
 // Email Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
@@ -330,6 +406,39 @@ type GuildList struct {
 	Page PageInfo `json:"page"`
 }
 
+// GuildMember Guildに参加しているUserとGuild内設定です。
+type GuildMember struct {
+	// GuildId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	GuildId UUID `json:"guild_id"`
+
+	// JoinedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	JoinedAt Timestamp `json:"joined_at"`
+	Nickname *string   `json:"nickname"`
+
+	// Presence Process Memoryなどの短命なStoreで管理するUserのPresenceです。
+	Presence Presence `json:"presence"`
+	RoleIds  []UUID   `json:"role_ids"`
+
+	// User Messageなどで表示するUserの公開情報です。
+	//
+	// Examples: {"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"}
+	User UserSummary `json:"user"`
+}
+
+// GuildMemberList defines model for GuildMemberList.
+type GuildMemberList struct {
+	Items []GuildMember `json:"items"`
+
+	// Page Cursor Pagination の継続情報です。
+	//
+	// Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
+	Page PageInfo `json:"page"`
+}
+
 // HealthResponse HTTP Server の稼働状態です。
 type HealthResponse struct {
 	// Status HTTP Server が稼働している場合は `ok` です。
@@ -348,6 +457,39 @@ type HealthResponse struct {
 
 // HealthResponseStatus HTTP Server が稼働している場合は `ok` です。
 type HealthResponseStatus string
+
+// Invite Guildへ参加するための期限と利用回数を持つ招待です。
+type Invite struct {
+	Code string `json:"code"`
+
+	// CreatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	CreatedAt Timestamp  `json:"created_at"`
+	ExpiresAt *Timestamp `json:"expires_at"`
+
+	// Guild Userが参加し、ChannelをまとめるCommunityです。
+	//
+	// Examples: {"created_at":"2026-08-17T06:00:00Z","description":"創作とイベント企画のためのコミュニティ","icon_url":"https://cdn.example.com/guild-icons/aster.png","id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","name":"星屑コミュニティ","owner_id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"}
+	Guild Guild `json:"guild"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id UUID `json:"id"`
+
+	// Inviter Messageなどで表示するUserの公開情報です。
+	//
+	// Examples: {"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"}
+	Inviter UserSummary `json:"inviter"`
+	MaxUses *int        `json:"max_uses"`
+	Uses    int         `json:"uses"`
+}
+
+// InviteList defines model for InviteList.
+type InviteList struct {
+	Items []Invite `json:"items"`
+}
 
 // LoginPasswordRequest Email Address と Password で Aster Session を作成する Request です。
 //
@@ -495,6 +637,22 @@ type PaginationCursor = string
 // Examples: <password-with-15-or-more-characters>
 type Password = string
 
+// PermissionBits GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+// 初期割り当ては次のとおりです。
+//
+// - `1 << 0` VIEW_CHANNEL
+// - `1 << 1` SEND_MESSAGES
+// - `1 << 2` MANAGE_MESSAGES
+// - `1 << 3` MANAGE_CHANNELS
+// - `1 << 4` MANAGE_GUILD
+// - `1 << 5` MANAGE_ROLES
+// - `1 << 6` MANAGE_MEMBERS
+// - `1 << 7` CREATE_INVITE
+// - `1 << 8` CONNECT
+// - `1 << 9` SPEAK
+// - `1 << 10` STREAM
+type PermissionBits = int64
+
 // PkceCodeChallenge PKCE S256でCode Verifierから生成した、PaddingなしのBase64url値です。
 //
 // Examples: E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
@@ -504,6 +662,28 @@ type PkceCodeChallenge = string
 //
 // Examples: dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 type PkceCodeVerifier = string
+
+// Presence Process Memoryなどの短命なStoreで管理するUserのPresenceです。
+type Presence struct {
+	// CustomText Userが設定した短い状態文です。未設定の場合はnullです。
+	CustomText *string `json:"custom_text,omitempty"`
+
+	// Status Userが公開する現在のオンライン状態です。
+	Status PresenceStatus `json:"status"`
+
+	// UpdatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	UpdatedAt Timestamp `json:"updated_at"`
+
+	// UserId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	UserId UUID `json:"user_id"`
+}
+
+// PresenceStatus Userが公開する現在のオンライン状態です。
+type PresenceStatus string
 
 // RateLimitDetails Rate Limit Error に固有の再試行情報です。
 type RateLimitDetails struct {
@@ -578,6 +758,53 @@ type RegisterPasswordRequest struct {
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 type RequestId = openapi_types.UUID
 
+// Role Guild Memberへ権限をまとめて割り当てるRoleです。
+type Role struct {
+	// Color 表示色です。未設定の場合はnullです。
+	Color *string `json:"color"`
+
+	// CreatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	CreatedAt Timestamp `json:"created_at"`
+
+	// GuildId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	GuildId UUID `json:"guild_id"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id UUID `json:"id"`
+
+	// Managed Serverが管理しUserから削除できないRoleかを示します。
+	Managed bool   `json:"managed"`
+	Name    string `json:"name"`
+
+	// Permissions GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+	// 初期割り当ては次のとおりです。
+	//
+	// - `1 << 0` VIEW_CHANNEL
+	// - `1 << 1` SEND_MESSAGES
+	// - `1 << 2` MANAGE_MESSAGES
+	// - `1 << 3` MANAGE_CHANNELS
+	// - `1 << 4` MANAGE_GUILD
+	// - `1 << 5` MANAGE_ROLES
+	// - `1 << 6` MANAGE_MEMBERS
+	// - `1 << 7` CREATE_INVITE
+	// - `1 << 8` CONNECT
+	// - `1 << 9` SPEAK
+	// - `1 << 10` STREAM
+	Permissions PermissionBits `json:"permissions"`
+	Position    int            `json:"position"`
+}
+
+// RoleList defines model for RoleList.
+type RoleList struct {
+	Items []Role `json:"items"`
+}
+
 // SessionTokenResponse 認証方法に依存しない Aster Session の Token 一式です。
 //
 // Examples: {"access_token":"example-access-token","expires_in":900,"refresh_expires_in":2592000,"refresh_token":"example-refresh-token","session_id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","token_type":"Bearer"}
@@ -629,6 +856,12 @@ type UpdateChannelRequest struct {
 	Topic *string `json:"topic,omitempty"`
 }
 
+// UpdateGuildMemberRequest Guild内のNicknameまたは割り当てるRoleを変更します。
+type UpdateGuildMemberRequest struct {
+	Nickname *string `json:"nickname,omitempty"`
+	RoleIds  *[]UUID `json:"role_ids,omitempty"`
+}
+
 // UpdateGuildRequest Guildの変更するFieldだけを指定します。
 //
 // Examples: {"description":null,"name":"星屑クリエイターズ"}
@@ -643,6 +876,38 @@ type UpdateGuildRequest struct {
 // Examples: {"content":"10月24日（土）で進める方向でよいでしょうか？"}
 type UpdateMessageRequest struct {
 	Content string `json:"content"`
+}
+
+// UpdatePresenceRequest 認証済みUser自身の公開Presenceを更新します。
+type UpdatePresenceRequest struct {
+	CustomText *string                     `json:"custom_text,omitempty"`
+	Status     UpdatePresenceRequestStatus `json:"status"`
+}
+
+// UpdatePresenceRequestStatus defines model for UpdatePresenceRequest.Status.
+type UpdatePresenceRequestStatus string
+
+// UpdateRoleRequest defines model for UpdateRoleRequest.
+type UpdateRoleRequest struct {
+	Color *string `json:"color,omitempty"`
+	Name  *string `json:"name,omitempty"`
+
+	// Permissions GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+	// 初期割り当ては次のとおりです。
+	//
+	// - `1 << 0` VIEW_CHANNEL
+	// - `1 << 1` SEND_MESSAGES
+	// - `1 << 2` MANAGE_MESSAGES
+	// - `1 << 3` MANAGE_CHANNELS
+	// - `1 << 4` MANAGE_GUILD
+	// - `1 << 5` MANAGE_ROLES
+	// - `1 << 6` MANAGE_MEMBERS
+	// - `1 << 7` CREATE_INVITE
+	// - `1 << 8` CONNECT
+	// - `1 << 9` SPEAK
+	// - `1 << 10` STREAM
+	Permissions *PermissionBits `json:"permissions,omitempty"`
+	Position    *int            `json:"position,omitempty"`
 }
 
 // UserSelf 認証済み User 自身にだけ返す Account 情報です。
@@ -704,6 +969,14 @@ type Cursor = PaginationCursor
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 type GuildId = UUID
 
+// InviteCode defines model for InviteCode.
+type InviteCode = string
+
+// InviteId UUIDv7 を使用する Resource Identifier です。
+//
+// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+type InviteId = UUID
+
 // Limit defines model for Limit.
 type Limit = int
 
@@ -711,6 +984,16 @@ type Limit = int
 //
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 type MessageId = UUID
+
+// RoleId UUIDv7 を使用する Resource Identifier です。
+//
+// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+type RoleId = UUID
+
+// UserId UUIDv7 を使用する Resource Identifier です。
+//
+// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+type UserId = UUID
 
 // AccountLinkRequired API Error の共通形式です。
 type AccountLinkRequired = Error
@@ -784,6 +1067,16 @@ type ListGuildChannelsParams struct {
 	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// ListGuildMembersParams defines parameters for ListGuildMembers.
+type ListGuildMembersParams struct {
+	// Cursor 前の Response が返した次ページ用 Cursor です。
+	// Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// Limit 1回の Response で取得する最大件数です。
+	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
 // BeginGoogleAuthorizationJSONRequestBody defines body for BeginGoogleAuthorization for application/json ContentType.
 type BeginGoogleAuthorizationJSONRequestBody = GoogleAuthorizationRequest
 
@@ -819,3 +1112,18 @@ type UpdateGuildJSONRequestBody = UpdateGuildRequest
 
 // CreateGuildChannelJSONRequestBody defines body for CreateGuildChannel for application/json ContentType.
 type CreateGuildChannelJSONRequestBody = CreateChannelRequest
+
+// CreateGuildInviteJSONRequestBody defines body for CreateGuildInvite for application/json ContentType.
+type CreateGuildInviteJSONRequestBody = CreateInviteRequest
+
+// UpdateGuildMemberJSONRequestBody defines body for UpdateGuildMember for application/json ContentType.
+type UpdateGuildMemberJSONRequestBody = UpdateGuildMemberRequest
+
+// CreateGuildRoleJSONRequestBody defines body for CreateGuildRole for application/json ContentType.
+type CreateGuildRoleJSONRequestBody = CreateRoleRequest
+
+// UpdateGuildRoleJSONRequestBody defines body for UpdateGuildRole for application/json ContentType.
+type UpdateGuildRoleJSONRequestBody = UpdateRoleRequest
+
+// UpdateCurrentUserPresenceJSONRequestBody defines body for UpdateCurrentUserPresence for application/json ContentType.
+type UpdateCurrentUserPresenceJSONRequestBody = UpdatePresenceRequest

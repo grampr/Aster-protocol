@@ -1,0 +1,21 @@
+parameters:
+  - $ref: ../../components/parameters/GuildId.yaml
+
+delete:
+  operationId: leaveGuild
+  tags: [Members]
+  summary: Guildから退出する
+  description: 認証済みUser自身をGuildから削除します。Ownerは所有権を移譲するかGuildを削除する必要があります。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: Guildから退出しました。
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

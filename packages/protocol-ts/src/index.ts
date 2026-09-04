@@ -11,6 +11,7 @@ export type {
   MessageCreateEvent,
   MessageDeleteEvent,
   MessageUpdateEvent,
+  TypingStartEvent,
 } from "./generated/gateway.js";
 
 export {

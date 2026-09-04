@@ -1,0 +1,22 @@
+parameters:
+  - $ref: ../../components/parameters/GuildId.yaml
+  - $ref: ../../components/parameters/InviteId.yaml
+
+delete:
+  operationId: deleteGuildInvite
+  tags: [Invites]
+  summary: Inviteを無効化する
+  description: Invite管理権限を持つUserが、指定したInviteを以後利用できない状態にします。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: Inviteを無効化しました。
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

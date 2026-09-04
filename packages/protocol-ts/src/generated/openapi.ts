@@ -273,6 +273,280 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/guilds/{guild_id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * GuildのMemberを取得する
+         * @description Guildを参照できるUserへ、Memberと現在のPresenceを参加順で返します。
+         */
+        get: operations["listGuildMembers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/guilds/{guild_id}/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+                /** @description 対象UserのUUIDです。 */
+                user_id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Guild Memberを取得する
+         * @description Guildを参照できるUserへ、指定したMemberのGuild内設定と現在のPresenceを返します。
+         */
+        get: operations["getGuildMember"];
+        put?: never;
+        post?: never;
+        /**
+         * GuildからMemberを削除する
+         * @description Member管理権限を持つUserが対象をGuildから削除します。Ownerは削除できません。
+         */
+        delete: operations["removeGuildMember"];
+        options?: never;
+        head?: never;
+        /**
+         * Guild Memberを変更する
+         * @description Nicknameは本人または管理権限を持つUser、RoleはRole管理権限を持つUserだけが変更できます。
+         */
+        patch: operations["updateGuildMember"];
+        trace?: never;
+    };
+    "/guilds/{guild_id}/members/@me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Guildから退出する
+         * @description 認証済みUser自身をGuildから削除します。Ownerは所有権を移譲するかGuildを削除する必要があります。
+         */
+        delete: operations["leaveGuild"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/guilds/{guild_id}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * GuildのRoleを取得する
+         * @description Guildを参照できるUserへ、既定Roleを含むRoleを表示順で返します。
+         */
+        get: operations["listGuildRoles"];
+        put?: never;
+        /**
+         * GuildにRoleを作成する
+         * @description Role管理権限を持つUserが、新しいRoleと初期Permissionを作成します。
+         */
+        post: operations["createGuildRole"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/guilds/{guild_id}/roles/{role_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+                /** @description 対象RoleのUUIDです。 */
+                role_id: components["parameters"]["RoleId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Roleを削除する
+         * @description Server管理RoleとGuildの既定Roleは削除できません。
+         */
+        delete: operations["deleteGuildRole"];
+        options?: never;
+        head?: never;
+        /**
+         * Roleを変更する
+         * @description Role管理権限を持つUserが、名前、色、Permission、表示順を変更します。
+         */
+        patch: operations["updateGuildRole"];
+        trace?: never;
+    };
+    "/guilds/{guild_id}/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Guildの有効なInviteを取得する
+         * @description Invite管理権限を持つUserへ、期限内かつ無効化されていないInviteを返します。
+         */
+        get: operations["listGuildInvites"];
+        put?: never;
+        /**
+         * GuildへのInviteを作成する
+         * @description Invite管理権限を持つUserが、有効期限と利用回数を制限できるInviteを作成します。
+         */
+        post: operations["createGuildInvite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/guilds/{guild_id}/invites/{invite_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+                /** @description 対象InviteのUUIDです。 */
+                invite_id: components["parameters"]["InviteId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Inviteを無効化する
+         * @description Invite管理権限を持つUserが、指定したInviteを以後利用できない状態にします。
+         */
+        delete: operations["deleteGuildInvite"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invites/{invite_code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 招待URLに含まれる推測困難なCodeです。 */
+                invite_code: components["parameters"]["InviteCode"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Inviteの参加先を確認する
+         * @description 認証後、参加前にGuild名や期限を確認するためのOperationです。
+         */
+        get: operations["getInvite"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invites/{invite_code}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 招待URLに含まれる推測困難なCodeです。 */
+                invite_code: components["parameters"]["InviteCode"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Inviteを使用してGuildへ参加する
+         * @description 同じInviteの再送は冪等で、既存Memberを返します。
+         */
+        post: operations["acceptInvite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/presence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 自分のPresenceを更新する
+         * @description Presenceは永続的なプロフィールではなく、短命なリアルタイム状態として扱います。
+         */
+        put: operations["updateCurrentUserPresence"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{channel_id}": {
         parameters: {
             query?: never;
@@ -334,6 +608,33 @@ export interface paths {
          *     reply_to_message_idを指定すると、同じText Channel内の参照可能なMessageへの返信として作成します。
          */
         post: operations["createChannelMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{channel_id}/typing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Text Channelで入力開始を通知する
+         * @description 認証済みUserがText Channelへ入力中であることを、Gatewayを通じて同じGuildの接続へ通知します。
+         *     Clientは入力が続く間だけ定期的に呼び出し、Messageを保存する用途には使用しません。
+         */
+        post: operations["startChannelTyping"];
         delete?: never;
         options?: never;
         head?: never;
@@ -709,6 +1010,134 @@ export interface components {
         GuildList: {
             items: components["schemas"]["Guild"][];
             page: components["schemas"]["PageInfo"];
+        };
+        /**
+         * GuildMember
+         * @description Guildに参加しているUserとGuild内設定です。
+         */
+        GuildMember: {
+            guild_id: components["schemas"]["UUID"];
+            user: components["schemas"]["UserSummary"];
+            nickname: string | null;
+            role_ids: components["schemas"]["UUID"][];
+            joined_at: components["schemas"]["Timestamp"];
+            presence: components["schemas"]["Presence"];
+        };
+        /** GuildMemberList */
+        GuildMemberList: {
+            items: components["schemas"]["GuildMember"][];
+            page: components["schemas"]["PageInfo"];
+        };
+        /**
+         * UpdateGuildMemberRequest
+         * @description Guild内のNicknameまたは割り当てるRoleを変更します。
+         */
+        UpdateGuildMemberRequest: {
+            nickname?: string | null;
+            role_ids?: components["schemas"]["UUID"][];
+        };
+        /**
+         * Presence
+         * @description Process Memoryなどの短命なStoreで管理するUserのPresenceです。
+         */
+        Presence: {
+            user_id: components["schemas"]["UUID"];
+            status: components["schemas"]["PresenceStatus"];
+            /** @description Userが設定した短い状態文です。未設定の場合はnullです。 */
+            custom_text?: string | null;
+            updated_at: components["schemas"]["Timestamp"];
+        };
+        /**
+         * PresenceStatus
+         * @description Userが公開する現在のオンライン状態です。
+         * @enum {string}
+         */
+        PresenceStatus: "ONLINE" | "IDLE" | "DO_NOT_DISTURB" | "OFFLINE";
+        /**
+         * UpdatePresenceRequest
+         * @description 認証済みUser自身の公開Presenceを更新します。
+         */
+        UpdatePresenceRequest: {
+            /** @enum {string} */
+            status: "ONLINE" | "IDLE" | "DO_NOT_DISTURB";
+            custom_text?: string | null;
+        };
+        /**
+         * Role
+         * @description Guild Memberへ権限をまとめて割り当てるRoleです。
+         */
+        Role: {
+            id: components["schemas"]["UUID"];
+            guild_id: components["schemas"]["UUID"];
+            name: string;
+            /** @description 表示色です。未設定の場合はnullです。 */
+            color: string | null;
+            permissions: components["schemas"]["PermissionBits"];
+            position: number;
+            /** @description Serverが管理しUserから削除できないRoleかを示します。 */
+            managed: boolean;
+            created_at: components["schemas"]["Timestamp"];
+        };
+        /** RoleList */
+        RoleList: {
+            items: components["schemas"]["Role"][];
+        };
+        /** CreateRoleRequest */
+        CreateRoleRequest: {
+            name: string;
+            color?: string | null;
+            permissions?: components["schemas"]["PermissionBits"];
+        };
+        /** UpdateRoleRequest */
+        UpdateRoleRequest: {
+            name?: string;
+            color?: string | null;
+            permissions?: components["schemas"]["PermissionBits"];
+            position?: number;
+        };
+        /**
+         * PermissionBits
+         * Format: int64
+         * @description GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+         *     初期割り当ては次のとおりです。
+         *
+         *     - `1 << 0` VIEW_CHANNEL
+         *     - `1 << 1` SEND_MESSAGES
+         *     - `1 << 2` MANAGE_MESSAGES
+         *     - `1 << 3` MANAGE_CHANNELS
+         *     - `1 << 4` MANAGE_GUILD
+         *     - `1 << 5` MANAGE_ROLES
+         *     - `1 << 6` MANAGE_MEMBERS
+         *     - `1 << 7` CREATE_INVITE
+         *     - `1 << 8` CONNECT
+         *     - `1 << 9` SPEAK
+         *     - `1 << 10` STREAM
+         */
+        PermissionBits: number;
+        /**
+         * Invite
+         * @description Guildへ参加するための期限と利用回数を持つ招待です。
+         */
+        Invite: {
+            id: components["schemas"]["UUID"];
+            code: string;
+            guild: components["schemas"]["Guild"];
+            inviter: components["schemas"]["UserSummary"];
+            uses: number;
+            max_uses: number | null;
+            expires_at: components["schemas"]["Timestamp"] | null;
+            created_at: components["schemas"]["Timestamp"];
+        };
+        /** InviteList */
+        InviteList: {
+            items: components["schemas"]["Invite"][];
+        };
+        /** CreateInviteRequest */
+        CreateInviteRequest: {
+            /** @description 有効秒数です。nullの場合は期限を設けません。 */
+            expires_in?: number | null;
+            /** @description 利用回数の上限です。nullの場合は上限を設けません。 */
+            max_uses?: number | null;
         };
         /**
          * LoginPasswordRequest
@@ -1289,6 +1718,10 @@ export interface components {
          * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
          */
         GuildId: components["schemas"]["UUID"];
+        /** @description 招待URLに含まれる推測困難なCodeです。 */
+        InviteCode: string;
+        /** @description 対象InviteのUUIDです。 */
+        InviteId: components["schemas"]["UUID"];
         /**
          * @description 1回の Response で取得する最大件数です。
          * @example 50
@@ -1299,6 +1732,10 @@ export interface components {
          * @example 0198b8f2-4f80-7e67-b250-b4051415e3c2
          */
         MessageId: components["schemas"]["UUID"];
+        /** @description 対象RoleのUUIDです。 */
+        RoleId: components["schemas"]["UUID"];
+        /** @description 対象UserのUUIDです。 */
+        UserId: components["schemas"]["UUID"];
         /**
          * @description URL EncodingしたUnicode絵文字です。初期VersionではCustom Emojiを受け付けません。
          * @example 👍
@@ -1935,6 +2372,484 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    listGuildMembers: {
+        parameters: {
+            query?: {
+                /**
+                 * @description 前の Response が返した次ページ用 Cursor です。
+                 *     Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+                 * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+                 */
+                cursor?: components["parameters"]["Cursor"];
+                /**
+                 * @description 1回の Response で取得する最大件数です。
+                 * @example 50
+                 */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guild MemberのPageです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuildMemberList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
+    getGuildMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+                /** @description 対象UserのUUIDです。 */
+                user_id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 指定したGuild Memberです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuildMember"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    removeGuildMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+                /** @description 対象UserのUUIDです。 */
+                user_id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Memberを削除しました。 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    updateGuildMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+                /** @description 対象UserのUUIDです。 */
+                user_id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGuildMemberRequest"];
+            };
+        };
+        responses: {
+            /** @description 変更後のGuild Memberです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuildMember"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    leaveGuild: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guildから退出しました。 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    listGuildRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 表示順に並んだRoleです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createGuildRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRoleRequest"];
+            };
+        };
+        responses: {
+            /** @description 作成したRoleです。 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteGuildRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+                /** @description 対象RoleのUUIDです。 */
+                role_id: components["parameters"]["RoleId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Roleを削除しました。 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    updateGuildRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+                /** @description 対象RoleのUUIDです。 */
+                role_id: components["parameters"]["RoleId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRoleRequest"];
+            };
+        };
+        responses: {
+            /** @description 変更後のRoleです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    listGuildInvites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 有効なInviteです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InviteList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createGuildInvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateInviteRequest"];
+            };
+        };
+        responses: {
+            /** @description 作成したInviteです。 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Invite"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteGuildInvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+                /** @description 対象InviteのUUIDです。 */
+                invite_id: components["parameters"]["InviteId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Inviteを無効化しました。 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    getInvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 招待URLに含まれる推測困難なCodeです。 */
+                invite_code: components["parameters"]["InviteCode"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 有効なInviteです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Invite"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    acceptInvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 招待URLに含まれる推測困難なCodeです。 */
+                invite_code: components["parameters"]["InviteCode"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guild Memberとして参加しました。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuildMember"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            /** @description Inviteの利用回数を使い切ったか、期限切れです。 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    updateCurrentUserPresence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePresenceRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新後のPresenceです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Presence"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
     getChannel: {
         parameters: {
             query?: never;
@@ -2118,6 +3033,35 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
+    startChannelTyping: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 入力開始の通知を受け付けました。 */
+            204: {
+                headers: {
+                    "X-Request-ID": components["headers"]["RequestId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["ResourceNotFound"];
             429: components["responses"]["RateLimited"];
             default: components["responses"]["Error"];

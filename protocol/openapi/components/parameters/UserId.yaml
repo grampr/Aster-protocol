@@ -1,0 +1,6 @@
+name: user_id
+in: path
+required: true
+description: 対象UserのUUIDです。
+schema:
+  $ref: ../schemas/common/UUID.yaml

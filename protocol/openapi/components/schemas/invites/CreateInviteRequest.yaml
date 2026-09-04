@@ -1,0 +1,18 @@
+title: CreateInviteRequest
+type: object
+additionalProperties: false
+properties:
+  expires_in:
+    description: 有効秒数です。nullの場合は期限を設けません。
+    oneOf:
+      - type: integer
+        minimum: 300
+        maximum: 604800
+      - type: "null"
+  max_uses:
+    description: 利用回数の上限です。nullの場合は上限を設けません。
+    oneOf:
+      - type: integer
+        minimum: 1
+        maximum: 1000
+      - type: "null"

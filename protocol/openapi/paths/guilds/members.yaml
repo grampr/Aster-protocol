@@ -1,0 +1,28 @@
+parameters:
+  - $ref: ../../components/parameters/GuildId.yaml
+
+get:
+  operationId: listGuildMembers
+  tags: [Members]
+  summary: GuildのMemberを取得する
+  description: Guildを参照できるUserへ、Memberと現在のPresenceを参加順で返します。
+  security:
+    - BearerAuth: []
+  parameters:
+    - $ref: ../../components/parameters/Cursor.yaml
+    - $ref: ../../components/parameters/Limit.yaml
+  responses:
+    "200":
+      description: Guild MemberのPageです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/members/GuildMemberList.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

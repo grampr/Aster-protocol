@@ -1,0 +1,29 @@
+parameters:
+  - $ref: ../../components/parameters/InviteCode.yaml
+
+post:
+  operationId: acceptInvite
+  tags: [Invites]
+  summary: Inviteを使用してGuildへ参加する
+  description: 同じInviteの再送は冪等で、既存Memberを返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: Guild Memberとして参加しました。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/members/GuildMember.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "409":
+      description: Inviteの利用回数を使い切ったか、期限切れです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/Error.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

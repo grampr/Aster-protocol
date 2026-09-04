@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/events/guilds/presence-update.schema.json",
+  "title": "PresenceUpdateEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "t", "s", "d"],
+  "properties": {
+    "op": { "const": 0 },
+    "t": { "const": "PRESENCE_UPDATE" },
+    "s": { "type": "integer", "minimum": 0 },
+    "d": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["guild_id", "presence"],
+      "properties": {
+        "guild_id": { "type": "string", "format": "uuid" },
+        "presence": { "$ref": "../../resources/presence.schema.json" }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+put:
+  operationId: updateCurrentUserPresence
+  tags: [Members]
+  summary: 自分のPresenceを更新する
+  description: Presenceは永続的なプロフィールではなく、短命なリアルタイム状態として扱います。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/members/UpdatePresenceRequest.yaml
+  responses:
+    "200":
+      description: 更新後のPresenceです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/members/Presence.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

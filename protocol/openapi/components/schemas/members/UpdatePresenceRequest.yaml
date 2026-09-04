@@ -1,0 +1,19 @@
+title: UpdatePresenceRequest
+description: 認証済みUser自身の公開Presenceを更新します。
+type: object
+additionalProperties: false
+required:
+  - status
+properties:
+  status:
+    type: string
+    enum:
+      - ONLINE
+      - IDLE
+      - DO_NOT_DISTURB
+  custom_text:
+    oneOf:
+      - type: string
+        minLength: 1
+        maxLength: 128
+      - type: "null"

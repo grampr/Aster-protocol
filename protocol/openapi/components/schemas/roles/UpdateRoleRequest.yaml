@@ -1,0 +1,19 @@
+title: UpdateRoleRequest
+type: object
+additionalProperties: false
+minProperties: 1
+properties:
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+  color:
+    oneOf:
+      - type: string
+        pattern: "^#[0-9A-Fa-f]{6}$"
+      - type: "null"
+  permissions:
+    $ref: ./PermissionBits.yaml
+  position:
+    type: integer
+    minimum: 0

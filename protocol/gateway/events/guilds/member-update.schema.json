@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/events/guilds/member-update.schema.json",
+  "title": "MemberUpdateEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "t", "s", "d"],
+  "properties": {
+    "op": { "const": 0 },
+    "t": { "const": "MEMBER_UPDATE" },
+    "s": { "type": "integer", "minimum": 0 },
+    "d": { "$ref": "../../resources/guild-member.schema.json" }
+  }
+}
