@@ -274,6 +274,19 @@ type CreateRoleRequest struct {
 	Name  string  `json:"name"`
 
 	// Permissions GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+	// 初期割り当ては次のとおりです。
+	//
+	// - `1 << 0` VIEW_CHANNEL
+	// - `1 << 1` SEND_MESSAGES
+	// - `1 << 2` MANAGE_MESSAGES
+	// - `1 << 3` MANAGE_CHANNELS
+	// - `1 << 4` MANAGE_GUILD
+	// - `1 << 5` MANAGE_ROLES
+	// - `1 << 6` MANAGE_MEMBERS
+	// - `1 << 7` CREATE_INVITE
+	// - `1 << 8` CONNECT
+	// - `1 << 9` SPEAK
+	// - `1 << 10` STREAM
 	Permissions *PermissionBits `json:"permissions,omitempty"`
 }
 
@@ -625,6 +638,19 @@ type PaginationCursor = string
 type Password = string
 
 // PermissionBits GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+// 初期割り当ては次のとおりです。
+//
+// - `1 << 0` VIEW_CHANNEL
+// - `1 << 1` SEND_MESSAGES
+// - `1 << 2` MANAGE_MESSAGES
+// - `1 << 3` MANAGE_CHANNELS
+// - `1 << 4` MANAGE_GUILD
+// - `1 << 5` MANAGE_ROLES
+// - `1 << 6` MANAGE_MEMBERS
+// - `1 << 7` CREATE_INVITE
+// - `1 << 8` CONNECT
+// - `1 << 9` SPEAK
+// - `1 << 10` STREAM
 type PermissionBits = int64
 
 // PkceCodeChallenge PKCE S256でCode Verifierから生成した、PaddingなしのBase64url値です。
@@ -757,6 +783,19 @@ type Role struct {
 	Name    string `json:"name"`
 
 	// Permissions GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+	// 初期割り当ては次のとおりです。
+	//
+	// - `1 << 0` VIEW_CHANNEL
+	// - `1 << 1` SEND_MESSAGES
+	// - `1 << 2` MANAGE_MESSAGES
+	// - `1 << 3` MANAGE_CHANNELS
+	// - `1 << 4` MANAGE_GUILD
+	// - `1 << 5` MANAGE_ROLES
+	// - `1 << 6` MANAGE_MEMBERS
+	// - `1 << 7` CREATE_INVITE
+	// - `1 << 8` CONNECT
+	// - `1 << 9` SPEAK
+	// - `1 << 10` STREAM
 	Permissions PermissionBits `json:"permissions"`
 	Position    int            `json:"position"`
 }
@@ -854,6 +893,19 @@ type UpdateRoleRequest struct {
 	Name  *string `json:"name,omitempty"`
 
 	// Permissions GuildとChannelで許可する操作を表す32-bit Bitfieldです。
+	// 初期割り当ては次のとおりです。
+	//
+	// - `1 << 0` VIEW_CHANNEL
+	// - `1 << 1` SEND_MESSAGES
+	// - `1 << 2` MANAGE_MESSAGES
+	// - `1 << 3` MANAGE_CHANNELS
+	// - `1 << 4` MANAGE_GUILD
+	// - `1 << 5` MANAGE_ROLES
+	// - `1 << 6` MANAGE_MEMBERS
+	// - `1 << 7` CREATE_INVITE
+	// - `1 << 8` CONNECT
+	// - `1 << 9` SPEAK
+	// - `1 << 10` STREAM
 	Permissions *PermissionBits `json:"permissions,omitempty"`
 	Position    *int            `json:"position,omitempty"`
 }
