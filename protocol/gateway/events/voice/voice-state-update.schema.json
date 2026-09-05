@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/events/voice/voice-state-update.schema.json",
+  "title": "VoiceStateUpdateEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "op",
+    "t",
+    "s",
+    "d"
+  ],
+  "properties": {
+    "op": {
+      "const": 0
+    },
+    "t": {
+      "const": "VOICE_STATE_UPDATE"
+    },
+    "s": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "d": {
+      "$ref": "../../resources/voice-state.schema.json"
+    }
+  }
+}

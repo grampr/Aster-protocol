@@ -5,12 +5,20 @@
   "description": "Client が接続維持と最後に受信した Sequence を通知します。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["op", "d"],
+  "required": [
+    "op",
+    "d"
+  ],
   "properties": {
-    "op": { "$ref": "../common/opcode.schema.json#/$defs/HEARTBEAT" },
+    "op": {
+      "$ref": "../common/opcode.schema.json#/$defs/HEARTBEAT"
+    },
     "d": {
       "description": "最後に受信した Sequence です。Event 受信前は null です。",
-      "type": ["integer", "null"],
+      "type": [
+        "integer",
+        "null"
+      ],
       "minimum": 0
     }
   }

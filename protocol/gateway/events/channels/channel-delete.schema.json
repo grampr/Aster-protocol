@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/events/channels/channel-delete.schema.json",
+  "title": "ChannelDeleteEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "op",
+    "t",
+    "s",
+    "d"
+  ],
+  "properties": {
+    "op": {
+      "const": 0
+    },
+    "t": {
+      "const": "CHANNEL_DELETE"
+    },
+    "s": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "d": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "guild_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "guild_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        }
+      }
+    }
+  }
+}

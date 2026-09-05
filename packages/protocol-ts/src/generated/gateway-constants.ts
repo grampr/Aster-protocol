@@ -41,6 +41,11 @@ export const GatewayEvent = Object.freeze({
   MEMBER_UPDATE: "MEMBER_UPDATE",
   MEMBER_LEAVE: "MEMBER_LEAVE",
   PRESENCE_UPDATE: "PRESENCE_UPDATE",
+  CHANNEL_CREATE: "CHANNEL_CREATE",
+  CHANNEL_UPDATE: "CHANNEL_UPDATE",
+  CHANNEL_DELETE: "CHANNEL_DELETE",
+  READ_STATE_UPDATE: "READ_STATE_UPDATE",
+  VOICE_STATE_UPDATE: "VOICE_STATE_UPDATE",
 } as const);
 
 export type GatewayEventValue = (typeof GatewayEvent)[keyof typeof GatewayEvent];

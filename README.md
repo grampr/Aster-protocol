@@ -132,6 +132,15 @@ Response は Resource ごとの `items` と共通の `page` を持つ形にし�
 `page` は `has_more` と `next_cursor` を返し、全件数は含めません。
 全件数を共通契約にすると、大きな Table でも毎回の集計が必要になるためです。
 
+## Category、Direct Message、Thread、検索、既読
+
+Guild Channelは`parent_id`でCategoryとの親子関係を表します。
+Threadも独立したChannelとして扱い、親Text Channelを`parent_id`で参照します。
+Direct Messageは`guild_id`を持たず、`recipients`に参加Userを含めます。
+
+Message検索は閲覧可能なChannelだけを対象にし、Serverが生成したPlain Textの抜粋を返します。
+既読位置はUserとChannelの組で保持し、同じChannel内で古いMessageへ後退させません。
+
 ## Rate Limit
 
 Rate Limit Response は `429`、共通 Error Body、再試行情報を返します。
@@ -174,6 +183,9 @@ Text Channelの同期には次のDispatch Eventを使用します。
 - `MESSAGE_REACTION_ADD`：Reactionを付けたUserと操作後の件数を配信する
 - `MESSAGE_REACTION_REMOVE`：Reactionを外したUserと操作後の件数を配信する
 - `TYPING_START`：Text Channelで入力を開始または継続したUserを配信する
+- `CHANNEL_CREATE`、`CHANNEL_UPDATE`、`CHANNEL_DELETE`：参照可能なChannelの変更を配信する
+- `READ_STATE_UPDATE`：認証済みUser自身の既読位置を配信する
+- `VOICE_STATE_UPDATE`：Voice Channelの参加、退出、Mute、Deafen、Camera、Screen Share状態を配信する
 
 Message Eventは`GUILD_MESSAGES` Intentを購読した接続へ配信します。
 `MESSAGE_CONTENT` Intentが許可されない接続でもEvent自体は配信しますが、Messageと返信元参照の`content`は`null`にします。
@@ -185,6 +197,17 @@ Eventの`count`は増減値ではなく操作後の現在値であり、Client�
 入力中通知は`TYPING` Intentを購読した接続へ配信します。
 Clientは入力が続く間にREST APIを定期的に呼び出し、受信側は`started_at`から10秒を過ぎたUserを表示から外します。
 新しい`TYPING_START`を受信した場合は同じUserの期限を更新します。
+
+## Media契約
+
+Attachmentは、Aster ServerがChannel権限、MIME、Size、Quotaを確認してUpload Intentを発行し、ClientがObject Storageへ直接PUTします。
+Upload完了後はFinalize APIでObjectのMetadataを照合し、`READY`になったAttachmentだけをMessageへ紐付けます。
+DownloadはAster APIでChannel権限を確認した後、短命な署名付きObject Storage URLへRedirectします。
+Presigned URLとVoice CredentialはBearer Tokenとして扱い、Logや永続Client設定へ保存しません。
+
+Voice APIはMedia Packetを運ばず、参加権限、Voice State、Provider Session発行だけを担当します。
+Clientは`VoiceSession.provider`でAdapterを選び、`endpoint`と短命な`credential`を使ってProviderへ直接接続します。
+Mute、Deafen、Camera、Screen Shareの公開状態は`VOICE_STATE_UPDATE`として`GUILD_VOICE_STATES` Intentへ配信します。
 
 すべてのDispatch EventはGateway Session内で単調増加する`s`を持ちます。
 Clientは最後に適用したSequenceをHeartbeatとResumeへ渡し、再配信されたEventをSequenceとResource IDで安全に処理します。

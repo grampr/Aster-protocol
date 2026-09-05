@@ -1,0 +1,14 @@
+title: UpdateVoiceStateRequest
+type: object
+additionalProperties: false
+minProperties: 1
+properties:
+  self_mute:
+    type: boolean
+  self_deaf:
+    type: boolean
+  self_video:
+    type: boolean
+  self_stream:
+    type: boolean
+

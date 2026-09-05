@@ -1,0 +1,11 @@
+title: VoiceStateList
+type: object
+additionalProperties: false
+required:
+  - items
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./VoiceState.yaml
+

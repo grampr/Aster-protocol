@@ -547,6 +547,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/@me/channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Direct Message Channelを取得する
+         * @description 認証済みUserが参加しているDirect Message Channelを更新順で返します。
+         */
+        get: operations["listCurrentUserDirectChannels"];
+        put?: never;
+        /**
+         * Direct Message Channelを開始する
+         * @description 同じ2 UserのDirect Message Channelが存在する場合は既存Channelを返します。
+         */
+        post: operations["createDirectChannel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/read-states": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 自分の既読位置を取得する
+         * @description 認証済みUserが参照できるChannelの既読位置をまとめて返します。
+         */
+        get: operations["listCurrentUserReadStates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/guilds/{guild_id}/messages/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Guild内のMessageを検索する
+         * @description 閲覧権限を持つText Channelだけを対象に、Message本文を新しい順で検索します。
+         */
+        get: operations["searchGuildMessages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{channel_id}": {
         parameters: {
             query?: never;
@@ -639,6 +709,239 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/channels/{channel_id}/threads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * ChannelのThreadを取得する
+         * @description 指定したText Channelを親とするThreadを更新順で返します。
+         */
+        get: operations["listChannelThreads"];
+        put?: never;
+        /**
+         * Threadを作成する
+         * @description Text ChannelまたはそのMessageを起点にThreadを作成します。
+         */
+        post: operations["createChannelThread"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{channel_id}/read-state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Channelの既読位置を更新する
+         * @description 指定したChannel内のMessageまで読んだことを記録し、既読位置を後方へは戻しません。
+         */
+        put: operations["updateChannelReadState"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{channel_id}/attachments/intents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Attachmentの直接Upload URLを発行する
+         * @description Channelの送信権限とUpload quotaを確認し、単一ObjectだけへPUTできる短命URLを返します。
+         *     ファイル本体はAster Serverを経由しません。Upload後はFinalizeが必要です。
+         */
+        post: operations["createAttachmentUploadIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/attachments/{attachment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Attachment metadataを取得する
+         * @description 参照可能なChannelに属するAttachment metadataを返します。
+         */
+        get: operations["getAttachment"];
+        put?: never;
+        post?: never;
+        /**
+         * 未使用または自分が投稿したAttachmentを削除する
+         * @description Uploader本人がMessageへ未使用のAttachmentを削除します。
+         */
+        delete: operations["deleteAttachment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/attachments/{attachment_id}/finalize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 直接UploadしたAttachmentを確定する
+         * @description Object Storage上のsize、Content-Type、checksumを宣言値と照合してREADYにします。
+         */
+        post: operations["finalizeAttachmentUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/attachments/{attachment_id}/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Attachmentの短命なObject Storage URLへ移動する
+         * @description Channelの閲覧権限を確認してから、短命な署名付きGET URLへ303 Redirectします。
+         */
+        get: operations["downloadAttachment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/attachments/{attachment_id}/download-intents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Attachmentの直接ダウンロード指示を作成する
+         * @description Channelの閲覧権限を確認し、Object Storageから直接取得するための短命な署名付きURLを返します。
+         */
+        post: operations["createAttachmentDownloadIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{channel_id}/voice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Voice Channelの参加状態を取得する
+         * @description 閲覧可能なVoice Channelに現在参加しているUserの状態を返します。
+         */
+        get: operations["listVoiceChannelStates"];
+        put?: never;
+        /**
+         * Voice Channelへ参加する
+         * @description CONNECT権限を確認し、Voice Providerへ接続する短命Sessionを発行します。
+         */
+        post: operations["joinVoiceChannel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/voice/sessions/@me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * 現在のVoice Channelから退出する
+         * @description Provider Sessionを閉じ、退出状態をGuild Memberへ配信します。
+         */
+        delete: operations["leaveCurrentUserVoiceChannel"];
+        options?: never;
+        head?: never;
+        /**
+         * 自分のMute・Deafen・Camera・Screen Share状態を更新する
+         * @description 現在参加中のVoice Sessionに対する自分の公開状態を更新します。
+         */
+        patch: operations["updateCurrentUserVoiceState"];
         trace?: never;
     };
     "/channels/{channel_id}/messages/{message_id}": {
@@ -754,6 +1057,75 @@ export interface components {
          */
         AccessToken: string;
         /**
+         * Attachment
+         * @description Messageへ添付できるObject Storage上のファイルです。
+         */
+        Attachment: {
+            id: components["schemas"]["UUID"];
+            uploader_id: components["schemas"]["UUID"];
+            channel_id: components["schemas"]["UUID"];
+            /** @description Userへ表示する元のファイル名です。Object Keyには使用しません。 */
+            filename: string;
+            /** @description 検証済みのIANA Media Typeです。 */
+            content_type: string;
+            /**
+             * Format: int64
+             * @description File size in bytes. MVPでは25 MiB以下です。
+             */
+            size: number;
+            /** @description ファイル全体のSHA-256を16進数で表した値です。 */
+            checksum_sha256: string;
+            status: components["schemas"]["AttachmentStatus"];
+            /**
+             * Format: uri-reference
+             * @description 認証とChannel権限確認後にObject StorageへRedirectするAster API URLです。
+             */
+            download_url: string;
+            created_at: components["schemas"]["Timestamp"];
+        };
+        /**
+         * AttachmentStatus
+         * @description Attachmentのアップロード状態です。
+         * @enum {string}
+         */
+        AttachmentStatus: "PENDING" | "READY";
+        /**
+         * AttachmentUploadIntent
+         * @description 単一Objectへの短命な直接アップロード指示です。URLはBearer Tokenとして扱います。
+         */
+        AttachmentUploadIntent: {
+            attachment: components["schemas"]["Attachment"];
+            /** Format: uri */
+            upload_url: string;
+            /** @constant */
+            upload_method: "PUT";
+            /** @description 署名に含まれるため、ClientがPUT時にそのまま送るHeaderです。 */
+            upload_headers: {
+                [key: string]: string;
+            };
+            expires_at: components["schemas"]["Timestamp"];
+        };
+        /**
+         * AttachmentDownloadIntent
+         * @description 単一Objectへの短命な直接ダウンロード指示です。URLはBearer Tokenとして扱います。
+         */
+        AttachmentDownloadIntent: {
+            /** Format: uri */
+            download_url: string;
+            expires_at: components["schemas"]["Timestamp"];
+        };
+        /**
+         * CreateAttachmentUploadIntentRequest
+         * @description ClientからObject Storageへ直接アップロードするファイルの宣言です。
+         */
+        CreateAttachmentUploadIntentRequest: {
+            filename: string;
+            content_type: string;
+            /** Format: int64 */
+            size: number;
+            checksum_sha256: string;
+        };
+        /**
          * AuthenticationMethod
          * @description User Account に Link された認証方法です。
          * @example PASSWORD
@@ -762,28 +1134,35 @@ export interface components {
         AuthenticationMethod: "PASSWORD" | "GOOGLE";
         /**
          * Channel
-         * @description Guild内のText ChannelまたはVoice Channelです。
+         * @description Guild内のChannel、Thread、またはUser間のDirect Message Channelです。
          * @example {
          *       "id": "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
          *       "guild_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0",
+         *       "parent_id": null,
          *       "type": "TEXT",
          *       "name": "イベント企画",
          *       "topic": "次回イベントの日程と内容を相談します",
          *       "position": 2,
-         *       "created_at": "2026-08-17T06:05:00Z"
+         *       "created_at": "2026-08-17T06:05:00Z",
+         *       "recipients": []
          *     }
          */
         Channel: {
             id: components["schemas"]["UUID"];
-            /** @description Channelが属するGuild IDです。 */
-            guild_id: components["schemas"]["UUID"];
+            /** @description Channelが属するGuild IDです。Direct Messageの場合はnullです。 */
+            guild_id: components["schemas"]["UUID"] | null;
+            /** @description CategoryまたはThreadの親Channel IDです。親がない場合はnullです。 */
+            parent_id: components["schemas"]["UUID"] | null;
             type: components["schemas"]["ChannelType"];
-            name: string;
+            /** @description Guild Channelの名前です。Direct Messageの場合はnullです。 */
+            name: string | null;
             /** @description Text Channelの説明です。未設定またはVoice Channelの場合はnullです。 */
             topic: string | null;
             /** @description 同じGuild内での表示順です。小さい値を先に表示します。 */
             position: number;
             created_at: components["schemas"]["Timestamp"];
+            /** @description Direct Messageの参加Userです。それ以外では空配列です。 */
+            recipients: components["schemas"]["UserSummary"][];
         };
         /**
          * ChannelList
@@ -793,11 +1172,13 @@ export interface components {
          *         {
          *           "id": "0198b8f1-3e7f-7d56-a14f-a3f40304d2b1",
          *           "guild_id": "0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0",
+         *           "parent_id": null,
          *           "type": "TEXT",
          *           "name": "イベント企画",
          *           "topic": "次回イベントの日程と内容を相談します",
          *           "position": 2,
-         *           "created_at": "2026-08-17T06:05:00Z"
+         *           "created_at": "2026-08-17T06:05:00Z",
+         *           "recipients": []
          *         }
          *       ],
          *       "page": {
@@ -816,7 +1197,7 @@ export interface components {
          * @example TEXT
          * @enum {string}
          */
-        ChannelType: "TEXT" | "VOICE";
+        ChannelType: "TEXT" | "VOICE" | "CATEGORY" | "THREAD" | "DIRECT";
         /**
          * CreateChannelRequest
          * @description Guild内に新しいChannelを作成するときの設定です。
@@ -827,9 +1208,93 @@ export interface components {
          *     }
          */
         CreateChannelRequest: {
-            type: components["schemas"]["ChannelType"];
+            /** @enum {string} */
+            type: "TEXT" | "VOICE" | "CATEGORY";
             name: string;
             topic?: string;
+            parent_id?: components["schemas"]["UUID"];
+        };
+        /**
+         * CreateDirectChannelRequest
+         * @description 指定したUserとのDirect Message Channelを作成または取得します。
+         */
+        CreateDirectChannelRequest: {
+            recipient_id: components["schemas"]["UUID"];
+        };
+        /**
+         * CreateThreadRequest
+         * @description Text ChannelまたはMessageを起点にThreadを作成します。
+         */
+        CreateThreadRequest: {
+            name: string;
+            message_id?: components["schemas"]["UUID"];
+        };
+        /**
+         * ReadState
+         * @description UserごとのChannel最終既読位置です。
+         */
+        ReadState: {
+            channel_id: components["schemas"]["UUID"];
+            last_read_message_id: components["schemas"]["UUID"] | null;
+            updated_at: components["schemas"]["Timestamp"];
+        };
+        /** ReadStateList */
+        ReadStateList: {
+            items: components["schemas"]["ReadState"][];
+        };
+        /** UpdateReadStateRequest */
+        UpdateReadStateRequest: {
+            last_read_message_id: components["schemas"]["UUID"];
+        };
+        /**
+         * VoiceSession
+         * @description Voice Providerへ接続するための短命なSessionです。Credentialはログへ記録しません。
+         */
+        VoiceSession: {
+            id: components["schemas"]["UUID"];
+            /** @description Clientが対応する接続Adapterを選択するProvider識別子です。 */
+            provider: string;
+            /**
+             * Format: uri
+             * @description Media signaling endpointです。Media PacketはAster Serverを経由しません。
+             */
+            endpoint: string;
+            /** @description Providerへ提示する短命かつ不透明なCredentialです。 */
+            credential: string;
+            expires_at: components["schemas"]["Timestamp"];
+            state: components["schemas"]["VoiceState"];
+        };
+        /**
+         * VoiceState
+         * @description Userの現在のVoice Channel参加状態です。
+         */
+        VoiceState: {
+            user_id: components["schemas"]["UUID"];
+            channel_id: components["schemas"]["UUID"] | null;
+            session_id: components["schemas"]["UUID"] | null;
+            self_mute: boolean;
+            self_deaf: boolean;
+            self_video: boolean;
+            self_stream: boolean;
+            updated_at: components["schemas"]["Timestamp"];
+        };
+        /** VoiceStateList */
+        VoiceStateList: {
+            items: components["schemas"]["VoiceState"][];
+        };
+        /** JoinVoiceChannelRequest */
+        JoinVoiceChannelRequest: {
+            /** @default false */
+            self_mute: boolean;
+            /** @default false */
+            self_deaf: boolean;
+        };
+        /** UpdateVoiceStateRequest */
+        UpdateVoiceStateRequest: {
+            self_mute?: boolean;
+            self_deaf?: boolean;
+            self_video?: boolean;
+            self_stream?: boolean;
         };
         /**
          * CreateGuildRequest
@@ -845,14 +1310,16 @@ export interface components {
         };
         /**
          * CreateMessageRequest
-         * @description Text Channelへ投稿するMessage本文です。
+         * @description Text Channelへ投稿する本文とAttachmentです。contentまたは1件以上のattachment_idsを必ず指定します。
          * @example {
          *       "content": "10月24日で進める方向でよいでしょうか？",
          *       "reply_to_message_id": "0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"
          *     }
          */
         CreateMessageRequest: {
-            content: string;
+            content?: string;
+            /** @description UploadをFinalize済みで、同じChannel用に作成したAttachment IDです。 */
+            attachment_ids?: components["schemas"]["UUID"][];
             /**
              * @description 同じText Channel内で返信するMessage IDです。
              *     指定したMessageが存在しない、同じChannelに属さない、または参照できない場合は404を返します。
@@ -1193,6 +1660,7 @@ export interface components {
          *           "me": true
          *         }
          *       ],
+         *       "attachments": [],
          *       "created_at": "2026-08-17T06:12:00Z",
          *       "edited_at": null
          *     }
@@ -1202,7 +1670,7 @@ export interface components {
             /** @description Messageが属するText Channel IDです。 */
             channel_id: components["schemas"]["UUID"];
             author: components["schemas"]["UserSummary"];
-            /** @description UTF-8のMessage本文です。 */
+            /** @description UTF-8のMessage本文です。AttachmentのみのMessageでは空文字列です。 */
             content: string;
             /**
              * @description 返信元Message IDです。通常のMessageではnullです。
@@ -1216,6 +1684,8 @@ export interface components {
             reply_to: components["schemas"]["MessageReply"] | null;
             /** @description 絵文字ごとのReaction集計です。Reactionがない場合は空配列です。 */
             reactions: components["schemas"]["MessageReaction"][];
+            /** @description Messageへ紐付いたREADY状態のAttachmentです。 */
+            attachments: components["schemas"]["Attachment"][];
             created_at: components["schemas"]["Timestamp"];
             /** @description 最後に本文を編集した時刻です。未編集の場合はnullです。 */
             edited_at: components["schemas"]["Timestamp"] | null;
@@ -1269,6 +1739,7 @@ export interface components {
          *           "reply_to_message_id": null,
          *           "reply_to": null,
          *           "reactions": [],
+         *           "attachments": [],
          *           "created_at": "2026-08-17T06:12:00Z",
          *           "edited_at": null
          *         }
@@ -1281,6 +1752,17 @@ export interface components {
          */
         MessageList: {
             items: components["schemas"]["Message"][];
+            page: components["schemas"]["PageInfo"];
+        };
+        /** MessageSearchResult */
+        MessageSearchResult: {
+            message: components["schemas"]["Message"];
+            /** @description 検索語の周辺をServerが安全に切り出したPlain Textです。 */
+            excerpt: string;
+        };
+        /** MessageSearchResultList */
+        MessageSearchResultList: {
+            items: components["schemas"]["MessageSearchResult"][];
             page: components["schemas"]["PageInfo"];
         };
         /**
@@ -1442,6 +1924,8 @@ export interface components {
             /** @description nullを指定するとTopicを削除します。 */
             topic?: string | null;
             position?: number;
+            /** @description nullを指定するとCategoryとの関連を解除します。 */
+            parent_id?: components["schemas"]["UUID"] | null;
         };
         /**
          * UpdateGuildRequest
@@ -1702,6 +2186,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description 対象AttachmentのUUIDv7です。 */
+        AttachmentId: components["schemas"]["UUID"];
         /**
          * @description 操作対象の Channel ID です。
          * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
@@ -1741,6 +2227,8 @@ export interface components {
          * @example 👍
          */
         ReactionEmoji: components["schemas"]["ReactionEmoji"];
+        /** @description 大文字小文字を区別せずMessage本文から探す文字列です。 */
+        SearchQuery: string;
     };
     requestBodies: never;
     headers: {
@@ -2850,6 +3338,134 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    listCurrentUserDirectChannels: {
+        parameters: {
+            query?: {
+                /**
+                 * @description 前の Response が返した次ページ用 Cursor です。
+                 *     Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+                 * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+                 */
+                cursor?: components["parameters"]["Cursor"];
+                /**
+                 * @description 1回の Response で取得する最大件数です。
+                 * @example 50
+                 */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Direct Message ChannelのPageです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createDirectChannel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDirectChannelRequest"];
+            };
+        };
+        responses: {
+            /** @description 作成または取得したDirect Message Channelです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    listCurrentUserReadStates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Channelごとの既読位置です。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadStateList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["Error"];
+        };
+    };
+    searchGuildMessages: {
+        parameters: {
+            query: {
+                /** @description 大文字小文字を区別せずMessage本文から探す文字列です。 */
+                query: components["parameters"]["SearchQuery"];
+                /**
+                 * @description 前の Response が返した次ページ用 Cursor です。
+                 *     Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+                 * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+                 */
+                cursor?: components["parameters"]["Cursor"];
+                /**
+                 * @description 1回の Response で取得する最大件数です。
+                 * @example 50
+                 */
+                limit?: components["parameters"]["Limit"];
+                channel_id?: components["schemas"]["UUID"];
+                author_id?: components["schemas"]["UUID"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Guild ID です。
+                 * @example 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+                 */
+                guild_id: components["parameters"]["GuildId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 検索結果のPageです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageSearchResultList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
     getChannel: {
         parameters: {
             query?: never;
@@ -3064,6 +3680,397 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["ResourceNotFound"];
             429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
+    listChannelThreads: {
+        parameters: {
+            query?: {
+                /**
+                 * @description 前の Response が返した次ページ用 Cursor です。
+                 *     Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+                 * @example eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9
+                 */
+                cursor?: components["parameters"]["Cursor"];
+                /**
+                 * @description 1回の Response で取得する最大件数です。
+                 * @example 50
+                 */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description ThreadのPageです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createChannelThread: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateThreadRequest"];
+            };
+        };
+        responses: {
+            /** @description 作成したThreadです。 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    updateChannelReadState: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReadStateRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新後の既読位置です。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadState"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createAttachmentUploadIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAttachmentUploadIntentRequest"];
+            };
+        };
+        responses: {
+            /** @description Upload Intentを発行しました。 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttachmentUploadIntent"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            429: components["responses"]["RateLimited"];
+            default: components["responses"]["Error"];
+        };
+    };
+    getAttachment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attachment metadataです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Attachment"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteAttachment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attachmentを削除しました。 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    finalizeAttachmentUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 確定したAttachmentです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Attachment"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Objectが未Uploadまたは宣言したMetadataと一致しません。 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    downloadAttachment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Object Storageの短命なDownload URLです。 */
+            303: {
+                headers: {
+                    /** @description 署名付きDownload URLです。 */
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createAttachmentDownloadIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 対象AttachmentのUUIDv7です。 */
+                attachment_id: components["parameters"]["AttachmentId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 短命な直接ダウンロード指示です。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttachmentDownloadIntent"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    listVoiceChannelStates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 現在の参加状態です。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceStateList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    joinVoiceChannel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 操作対象の Channel ID です。
+                 * @example 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
+                 */
+                channel_id: components["parameters"]["ChannelId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["JoinVoiceChannelRequest"];
+            };
+        };
+        responses: {
+            /** @description 接続に使用するVoice Sessionです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceSession"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    leaveCurrentUserVoiceChannel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Voice Channelから退出しました。 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
+            default: components["responses"]["Error"];
+        };
+    };
+    updateCurrentUserVoiceState: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateVoiceStateRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新後のVoice Stateです。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceState"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["ResourceNotFound"];
             default: components["responses"]["Error"];
         };
     };

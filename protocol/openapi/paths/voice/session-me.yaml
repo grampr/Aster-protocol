@@ -1,0 +1,45 @@
+patch:
+  operationId: updateCurrentUserVoiceState
+  tags:
+    - Voice
+  summary: 自分のMute・Deafen・Camera・Screen Share状態を更新する
+  description: 現在参加中のVoice Sessionに対する自分の公開状態を更新します。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/voice/UpdateVoiceStateRequest.yaml
+  responses:
+    "200":
+      description: 更新後のVoice Stateです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/voice/VoiceState.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+delete:
+  operationId: leaveCurrentUserVoiceChannel
+  tags:
+    - Voice
+  summary: 現在のVoice Channelから退出する
+  description: Provider Sessionを閉じ、退出状態をGuild Memberへ配信します。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: Voice Channelから退出しました。
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

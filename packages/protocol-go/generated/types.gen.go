@@ -9,6 +9,39 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for AttachmentStatus.
+const (
+	PENDING AttachmentStatus = "PENDING"
+	READY   AttachmentStatus = "READY"
+)
+
+// Valid indicates whether the value is a known member of the AttachmentStatus enum.
+func (e AttachmentStatus) Valid() bool {
+	switch e {
+	case PENDING:
+		return true
+	case READY:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AttachmentUploadIntentUploadMethod.
+const (
+	PUT AttachmentUploadIntentUploadMethod = "PUT"
+)
+
+// Valid indicates whether the value is a known member of the AttachmentUploadIntentUploadMethod enum.
+func (e AttachmentUploadIntentUploadMethod) Valid() bool {
+	switch e {
+	case PUT:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for AuthenticationMethod.
 const (
 	AuthenticationMethodGoogle   AuthenticationMethod = "GOOGLE"
@@ -29,16 +62,46 @@ func (e AuthenticationMethod) Valid() bool {
 
 // Defines values for ChannelType.
 const (
-	TEXT  ChannelType = "TEXT"
-	VOICE ChannelType = "VOICE"
+	ChannelTypeCATEGORY ChannelType = "CATEGORY"
+	ChannelTypeDIRECT   ChannelType = "DIRECT"
+	ChannelTypeTEXT     ChannelType = "TEXT"
+	ChannelTypeTHREAD   ChannelType = "THREAD"
+	ChannelTypeVOICE    ChannelType = "VOICE"
 )
 
 // Valid indicates whether the value is a known member of the ChannelType enum.
 func (e ChannelType) Valid() bool {
 	switch e {
-	case TEXT:
+	case ChannelTypeCATEGORY:
 		return true
-	case VOICE:
+	case ChannelTypeDIRECT:
+		return true
+	case ChannelTypeTEXT:
+		return true
+	case ChannelTypeTHREAD:
+		return true
+	case ChannelTypeVOICE:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CreateChannelRequestType.
+const (
+	CreateChannelRequestTypeCATEGORY CreateChannelRequestType = "CATEGORY"
+	CreateChannelRequestTypeTEXT     CreateChannelRequestType = "TEXT"
+	CreateChannelRequestTypeVOICE    CreateChannelRequestType = "VOICE"
+)
+
+// Valid indicates whether the value is a known member of the CreateChannelRequestType enum.
+func (e CreateChannelRequestType) Valid() bool {
+	switch e {
+	case CreateChannelRequestTypeCATEGORY:
+		return true
+	case CreateChannelRequestTypeTEXT:
+		return true
+	case CreateChannelRequestTypeVOICE:
 		return true
 	default:
 		return false
@@ -175,31 +238,112 @@ type AccessToken = string
 // Examples: example-one-time-aster-exchange-code
 type AsterExchangeCode = string
 
+// Attachment Messageへ添付できるObject Storage上のファイルです。
+type Attachment struct {
+	// ChannelId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	ChannelId UUID `json:"channel_id"`
+
+	// ChecksumSha256 ファイル全体のSHA-256を16進数で表した値です。
+	ChecksumSha256 string `json:"checksum_sha256"`
+
+	// ContentType 検証済みのIANA Media Typeです。
+	ContentType string `json:"content_type"`
+
+	// CreatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	CreatedAt Timestamp `json:"created_at"`
+
+	// DownloadUrl 認証とChannel権限確認後にObject StorageへRedirectするAster API URLです。
+	DownloadUrl string `json:"download_url"`
+
+	// Filename Userへ表示する元のファイル名です。Object Keyには使用しません。
+	Filename string `json:"filename"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id UUID `json:"id"`
+
+	// Size File size in bytes. MVPでは25 MiB以下です。
+	Size int64 `json:"size"`
+
+	// Status Attachmentのアップロード状態です。
+	Status AttachmentStatus `json:"status"`
+
+	// UploaderId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	UploaderId UUID `json:"uploader_id"`
+}
+
+// AttachmentDownloadIntent 単一Objectへの短命な直接ダウンロード指示です。URLはBearer Tokenとして扱います。
+type AttachmentDownloadIntent struct {
+	DownloadUrl string `json:"download_url"`
+
+	// ExpiresAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	ExpiresAt Timestamp `json:"expires_at"`
+}
+
+// AttachmentStatus Attachmentのアップロード状態です。
+type AttachmentStatus string
+
+// AttachmentUploadIntent 単一Objectへの短命な直接アップロード指示です。URLはBearer Tokenとして扱います。
+type AttachmentUploadIntent struct {
+	// Attachment Messageへ添付できるObject Storage上のファイルです。
+	Attachment Attachment `json:"attachment"`
+
+	// ExpiresAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	ExpiresAt Timestamp `json:"expires_at"`
+
+	// UploadHeaders 署名に含まれるため、ClientがPUT時にそのまま送るHeaderです。
+	UploadHeaders map[string]string                  `json:"upload_headers"`
+	UploadMethod  AttachmentUploadIntentUploadMethod `json:"upload_method"`
+	UploadUrl     string                             `json:"upload_url"`
+}
+
+// AttachmentUploadIntentUploadMethod defines model for AttachmentUploadIntent.UploadMethod.
+type AttachmentUploadIntentUploadMethod string
+
 // AuthenticationMethod User Account に Link された認証方法です。
 //
 // Examples: PASSWORD
 type AuthenticationMethod string
 
-// Channel Guild内のText ChannelまたはVoice Channelです。
+// Channel Guild内のChannel、Thread、またはUser間のDirect Message Channelです。
 //
-// Examples: {"created_at":"2026-08-17T06:05:00Z","guild_id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","name":"イベント企画","position":2,"topic":"次回イベントの日程と内容を相談します","type":"TEXT"}
+// Examples: {"created_at":"2026-08-17T06:05:00Z","guild_id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","name":"イベント企画","parent_id":null,"position":2,"recipients":[],"topic":"次回イベントの日程と内容を相談します","type":"TEXT"}
 type Channel struct {
 	// CreatedAt UTC の ISO 8601 Timestamp です。
 	//
 	// Examples: 2026-08-17T06:00:00Z
 	CreatedAt Timestamp `json:"created_at"`
 
-	// GuildId Channelが属するGuild IDです。
-	GuildId UUID `json:"guild_id"`
+	// GuildId Channelが属するGuild IDです。Direct Messageの場合はnullです。
+	GuildId *UUID `json:"guild_id"`
 
 	// Id UUIDv7 を使用する Resource Identifier です。
 	//
 	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
-	Id   UUID   `json:"id"`
-	Name string `json:"name"`
+	Id UUID `json:"id"`
+
+	// Name Guild Channelの名前です。Direct Messageの場合はnullです。
+	Name *string `json:"name"`
+
+	// ParentId CategoryまたはThreadの親Channel IDです。親がない場合はnullです。
+	ParentId *UUID `json:"parent_id"`
 
 	// Position 同じGuild内での表示順です。小さい値を先に表示します。
 	Position int `json:"position"`
+
+	// Recipients Direct Messageの参加Userです。それ以外では空配列です。
+	Recipients []UserSummary `json:"recipients"`
 
 	// Topic Text Channelの説明です。未設定またはVoice Channelの場合はnullです。
 	Topic *string `json:"topic"`
@@ -212,7 +356,7 @@ type Channel struct {
 
 // ChannelList Guild内のChannelをpositionの昇順で返すPageです。
 //
-// Examples: {"items":[{"created_at":"2026-08-17T06:05:00Z","guild_id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","name":"イベント企画","position":2,"topic":"次回イベントの日程と内容を相談します","type":"TEXT"}],"page":{"has_more":false,"next_cursor":null}}
+// Examples: {"items":[{"created_at":"2026-08-17T06:05:00Z","guild_id":"0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0","id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","name":"イベント企画","parent_id":null,"position":2,"recipients":[],"topic":"次回イベントの日程と内容を相談します","type":"TEXT"}],"page":{"has_more":false,"next_cursor":null}}
 type ChannelList struct {
 	Items []Channel `json:"items"`
 
@@ -227,17 +371,37 @@ type ChannelList struct {
 // Examples: TEXT
 type ChannelType string
 
+// CreateAttachmentUploadIntentRequest ClientからObject Storageへ直接アップロードするファイルの宣言です。
+type CreateAttachmentUploadIntentRequest struct {
+	ChecksumSha256 string `json:"checksum_sha256"`
+	ContentType    string `json:"content_type"`
+	Filename       string `json:"filename"`
+	Size           int64  `json:"size"`
+}
+
 // CreateChannelRequest Guild内に新しいChannelを作成するときの設定です。
 //
 // Examples: {"name":"イベント企画","topic":"次回イベントの日程と内容を相談します","type":"TEXT"}
 type CreateChannelRequest struct {
-	Name  string  `json:"name"`
-	Topic *string `json:"topic,omitempty"`
+	Name string `json:"name"`
 
-	// Type Channelで扱うCommunicationの種類です。
+	// ParentId UUIDv7 を使用する Resource Identifier です。
 	//
-	// Examples: TEXT
-	Type ChannelType `json:"type"`
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	ParentId *UUID                    `json:"parent_id,omitempty"`
+	Topic    *string                  `json:"topic,omitempty"`
+	Type     CreateChannelRequestType `json:"type"`
+}
+
+// CreateChannelRequestType defines model for CreateChannelRequest.Type.
+type CreateChannelRequestType string
+
+// CreateDirectChannelRequest 指定したUserとのDirect Message Channelを作成または取得します。
+type CreateDirectChannelRequest struct {
+	// RecipientId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	RecipientId UUID `json:"recipient_id"`
 }
 
 // CreateGuildRequest 新しいGuildを作成するときの設定です。
@@ -257,11 +421,13 @@ type CreateInviteRequest struct {
 	MaxUses *int `json:"max_uses,omitempty"`
 }
 
-// CreateMessageRequest Text Channelへ投稿するMessage本文です。
+// CreateMessageRequest Text Channelへ投稿する本文とAttachmentです。contentまたは1件以上のattachment_idsを必ず指定します。
 //
 // Examples: {"content":"10月24日で進める方向でよいでしょうか？","reply_to_message_id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"}
 type CreateMessageRequest struct {
-	Content string `json:"content"`
+	// AttachmentIds UploadをFinalize済みで、同じChannel用に作成したAttachment IDです。
+	AttachmentIds *[]UUID `json:"attachment_ids,omitempty"`
+	Content       *string `json:"content,omitempty"`
 
 	// ReplyToMessageId 同じText Channel内で返信するMessage IDです。
 	// 指定したMessageが存在しない、同じChannelに属さない、または参照できない場合は404を返します。
@@ -288,6 +454,15 @@ type CreateRoleRequest struct {
 	// - `1 << 9` SPEAK
 	// - `1 << 10` STREAM
 	Permissions *PermissionBits `json:"permissions,omitempty"`
+}
+
+// CreateThreadRequest Text ChannelまたはMessageを起点にThreadを作成します。
+type CreateThreadRequest struct {
+	// MessageId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	MessageId *UUID  `json:"message_id,omitempty"`
+	Name      string `json:"name"`
 }
 
 // Email Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
@@ -491,6 +666,12 @@ type InviteList struct {
 	Items []Invite `json:"items"`
 }
 
+// JoinVoiceChannelRequest defines model for JoinVoiceChannelRequest.
+type JoinVoiceChannelRequest struct {
+	SelfDeaf *bool `json:"self_deaf,omitempty"`
+	SelfMute *bool `json:"self_mute,omitempty"`
+}
+
 // LoginPasswordRequest Email Address と Password で Aster Session を作成する Request です。
 //
 // Examples: {"email":"alice@example.com","password":"\u003cpassword-with-15-or-more-characters\u003e"}
@@ -520,8 +701,11 @@ type LogoutRequest struct {
 
 // Message Text Channelに投稿されたMessageです。
 //
-// Examples: {"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reactions":[{"count":3,"emoji":"👍","me":true}],"reply_to":{"author":{"avatar_url":null,"display_name":"Bob","id":"0198b8ed-7ba1-7165-b028-9ecf14ed1e7b"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進めませんか？","created_at":"2026-08-17T06:10:00Z","edited_at":null,"id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"},"reply_to_message_id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"}
+// Examples: {"attachments":[],"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reactions":[{"count":3,"emoji":"👍","me":true}],"reply_to":{"author":{"avatar_url":null,"display_name":"Bob","id":"0198b8ed-7ba1-7165-b028-9ecf14ed1e7b"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進めませんか？","created_at":"2026-08-17T06:10:00Z","edited_at":null,"id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"},"reply_to_message_id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"}
 type Message struct {
+	// Attachments Messageへ紐付いたREADY状態のAttachmentです。
+	Attachments []Attachment `json:"attachments"`
+
 	// Author Messageなどで表示するUserの公開情報です。
 	//
 	// Examples: {"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"}
@@ -530,7 +714,7 @@ type Message struct {
 	// ChannelId Messageが属するText Channel IDです。
 	ChannelId UUID `json:"channel_id"`
 
-	// Content UTF-8のMessage本文です。
+	// Content UTF-8のMessage本文です。AttachmentのみのMessageでは空文字列です。
 	Content string `json:"content"`
 
 	// CreatedAt UTC の ISO 8601 Timestamp です。
@@ -560,7 +744,7 @@ type Message struct {
 
 // MessageList Text ChannelのMessageを新しい順で返すPageです。
 //
-// Examples: {"items":[{"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reactions":[],"reply_to":null,"reply_to_message_id":null}],"page":{"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9"}}
+// Examples: {"items":[{"attachments":[],"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reactions":[],"reply_to":null,"reply_to_message_id":null}],"page":{"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9"}}
 type MessageList struct {
 	Items []Message `json:"items"`
 
@@ -608,6 +792,27 @@ type MessageReply struct {
 	//
 	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 	Id UUID `json:"id"`
+}
+
+// MessageSearchResult defines model for MessageSearchResult.
+type MessageSearchResult struct {
+	// Excerpt 検索語の周辺をServerが安全に切り出したPlain Textです。
+	Excerpt string `json:"excerpt"`
+
+	// Message Text Channelに投稿されたMessageです。
+	//
+	// Examples: {"attachments":[],"author":{"avatar_url":"https://cdn.example.com/avatars/alice.png","display_name":"Alice","id":"0198b8ef-1c5d-7b34-892e-81d2e1e2b090"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進める方向でよいでしょうか？","created_at":"2026-08-17T06:12:00Z","edited_at":null,"id":"0198b8f2-4f80-7e67-b250-b4051415e3c2","reactions":[{"count":3,"emoji":"👍","me":true}],"reply_to":{"author":{"avatar_url":null,"display_name":"Bob","id":"0198b8ed-7ba1-7165-b028-9ecf14ed1e7b"},"channel_id":"0198b8f1-3e7f-7d56-a14f-a3f40304d2b1","content":"10月24日で進めませんか？","created_at":"2026-08-17T06:10:00Z","edited_at":null,"id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"},"reply_to_message_id":"0198b8f0-1b72-73a2-a2ef-75cf3cd276d8"}
+	Message Message `json:"message"`
+}
+
+// MessageSearchResultList defines model for MessageSearchResultList.
+type MessageSearchResultList struct {
+	Items []MessageSearchResult `json:"items"`
+
+	// Page Cursor Pagination の継続情報です。
+	//
+	// Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
+	Page PageInfo `json:"page"`
 }
 
 // OAuthClientState Desktop ClientがLogin開始とDeep Link Callbackを照合するために生成する不透明な値です。
@@ -717,6 +922,25 @@ type RateLimitErrorCode string
 
 // ReactionEmoji Message Reactionに使うUnicode絵文字列です。Variation SelectorやZWJを含むSequence全体を一つの値として扱います。
 type ReactionEmoji = string
+
+// ReadState UserごとのChannel最終既読位置です。
+type ReadState struct {
+	// ChannelId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	ChannelId         UUID  `json:"channel_id"`
+	LastReadMessageId *UUID `json:"last_read_message_id"`
+
+	// UpdatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	UpdatedAt Timestamp `json:"updated_at"`
+}
+
+// ReadStateList defines model for ReadStateList.
+type ReadStateList struct {
+	Items []ReadState `json:"items"`
+}
 
 // RefreshSessionRequest Refresh Token を Rotation して Aster Session を更新する Request です。
 //
@@ -849,8 +1073,11 @@ type UUID = openapi_types.UUID
 //
 // Examples: {"name":"秋のイベント企画","position":3}
 type UpdateChannelRequest struct {
-	Name     *string `json:"name,omitempty"`
-	Position *int    `json:"position,omitempty"`
+	Name *string `json:"name,omitempty"`
+
+	// ParentId nullを指定するとCategoryとの関連を解除します。
+	ParentId *UUID `json:"parent_id,omitempty"`
+	Position *int  `json:"position,omitempty"`
 
 	// Topic nullを指定するとTopicを削除します。
 	Topic *string `json:"topic,omitempty"`
@@ -887,6 +1114,14 @@ type UpdatePresenceRequest struct {
 // UpdatePresenceRequestStatus defines model for UpdatePresenceRequest.Status.
 type UpdatePresenceRequestStatus string
 
+// UpdateReadStateRequest defines model for UpdateReadStateRequest.
+type UpdateReadStateRequest struct {
+	// LastReadMessageId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	LastReadMessageId UUID `json:"last_read_message_id"`
+}
+
 // UpdateRoleRequest defines model for UpdateRoleRequest.
 type UpdateRoleRequest struct {
 	Color *string `json:"color,omitempty"`
@@ -908,6 +1143,14 @@ type UpdateRoleRequest struct {
 	// - `1 << 10` STREAM
 	Permissions *PermissionBits `json:"permissions,omitempty"`
 	Position    *int            `json:"position,omitempty"`
+}
+
+// UpdateVoiceStateRequest defines model for UpdateVoiceStateRequest.
+type UpdateVoiceStateRequest struct {
+	SelfDeaf   *bool `json:"self_deaf,omitempty"`
+	SelfMute   *bool `json:"self_mute,omitempty"`
+	SelfStream *bool `json:"self_stream,omitempty"`
+	SelfVideo  *bool `json:"self_video,omitempty"`
 }
 
 // UserSelf 認証済み User 自身にだけ返す Account 情報です。
@@ -954,6 +1197,61 @@ type UserSummary struct {
 	Id UUID `json:"id"`
 }
 
+// VoiceSession Voice Providerへ接続するための短命なSessionです。Credentialはログへ記録しません。
+type VoiceSession struct {
+	// Credential Providerへ提示する短命かつ不透明なCredentialです。
+	Credential string `json:"credential"`
+
+	// Endpoint Media signaling endpointです。Media PacketはAster Serverを経由しません。
+	Endpoint string `json:"endpoint"`
+
+	// ExpiresAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	ExpiresAt Timestamp `json:"expires_at"`
+
+	// Id UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	Id UUID `json:"id"`
+
+	// Provider Clientが対応する接続Adapterを選択するProvider識別子です。
+	Provider string `json:"provider"`
+
+	// State Userの現在のVoice Channel参加状態です。
+	State VoiceState `json:"state"`
+}
+
+// VoiceState Userの現在のVoice Channel参加状態です。
+type VoiceState struct {
+	ChannelId  *UUID `json:"channel_id"`
+	SelfDeaf   bool  `json:"self_deaf"`
+	SelfMute   bool  `json:"self_mute"`
+	SelfStream bool  `json:"self_stream"`
+	SelfVideo  bool  `json:"self_video"`
+	SessionId  *UUID `json:"session_id"`
+
+	// UpdatedAt UTC の ISO 8601 Timestamp です。
+	//
+	// Examples: 2026-08-17T06:00:00Z
+	UpdatedAt Timestamp `json:"updated_at"`
+
+	// UserId UUIDv7 を使用する Resource Identifier です。
+	//
+	// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+	UserId UUID `json:"user_id"`
+}
+
+// VoiceStateList defines model for VoiceStateList.
+type VoiceStateList struct {
+	Items []VoiceState `json:"items"`
+}
+
+// AttachmentId UUIDv7 を使用する Resource Identifier です。
+//
+// Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+type AttachmentId = UUID
+
 // ChannelId UUIDv7 を使用する Resource Identifier です。
 //
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
@@ -989,6 +1287,9 @@ type MessageId = UUID
 //
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 type RoleId = UUID
+
+// SearchQuery defines model for SearchQuery.
+type SearchQuery = string
 
 // UserId UUIDv7 を使用する Resource Identifier です。
 //
@@ -1047,6 +1348,16 @@ type ListChannelMessagesParams struct {
 	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// ListChannelThreadsParams defines parameters for ListChannelThreads.
+type ListChannelThreadsParams struct {
+	// Cursor 前の Response が返した次ページ用 Cursor です。
+	// Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// Limit 1回の Response で取得する最大件数です。
+	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
 // ListCurrentUserGuildsParams defines parameters for ListCurrentUserGuilds.
 type ListCurrentUserGuildsParams struct {
 	// Cursor 前の Response が返した次ページ用 Cursor です。
@@ -1077,6 +1388,31 @@ type ListGuildMembersParams struct {
 	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// SearchGuildMessagesParams defines parameters for SearchGuildMessages.
+type SearchGuildMessagesParams struct {
+	// Query 大文字小文字を区別せずMessage本文から探す文字列です。
+	Query SearchQuery `form:"query" json:"query"`
+
+	// Cursor 前の Response が返した次ページ用 Cursor です。
+	// Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// Limit 1回の Response で取得する最大件数です。
+	Limit     *Limit `form:"limit,omitempty" json:"limit,omitempty"`
+	ChannelId *UUID  `form:"channel_id,omitempty" json:"channel_id,omitempty"`
+	AuthorId  *UUID  `form:"author_id,omitempty" json:"author_id,omitempty"`
+}
+
+// ListCurrentUserDirectChannelsParams defines parameters for ListCurrentUserDirectChannels.
+type ListCurrentUserDirectChannelsParams struct {
+	// Cursor 前の Response が返した次ページ用 Cursor です。
+	// Cursor は不透明な値として扱い、Client は内容を解析または変更しません。
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// Limit 1回の Response で取得する最大件数です。
+	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
 // BeginGoogleAuthorizationJSONRequestBody defines body for BeginGoogleAuthorization for application/json ContentType.
 type BeginGoogleAuthorizationJSONRequestBody = GoogleAuthorizationRequest
 
@@ -1098,11 +1434,23 @@ type RefreshSessionJSONRequestBody = RefreshSessionRequest
 // UpdateChannelJSONRequestBody defines body for UpdateChannel for application/json ContentType.
 type UpdateChannelJSONRequestBody = UpdateChannelRequest
 
+// CreateAttachmentUploadIntentJSONRequestBody defines body for CreateAttachmentUploadIntent for application/json ContentType.
+type CreateAttachmentUploadIntentJSONRequestBody = CreateAttachmentUploadIntentRequest
+
 // CreateChannelMessageJSONRequestBody defines body for CreateChannelMessage for application/json ContentType.
 type CreateChannelMessageJSONRequestBody = CreateMessageRequest
 
 // UpdateChannelMessageJSONRequestBody defines body for UpdateChannelMessage for application/json ContentType.
 type UpdateChannelMessageJSONRequestBody = UpdateMessageRequest
+
+// UpdateChannelReadStateJSONRequestBody defines body for UpdateChannelReadState for application/json ContentType.
+type UpdateChannelReadStateJSONRequestBody = UpdateReadStateRequest
+
+// CreateChannelThreadJSONRequestBody defines body for CreateChannelThread for application/json ContentType.
+type CreateChannelThreadJSONRequestBody = CreateThreadRequest
+
+// JoinVoiceChannelJSONRequestBody defines body for JoinVoiceChannel for application/json ContentType.
+type JoinVoiceChannelJSONRequestBody = JoinVoiceChannelRequest
 
 // CreateGuildJSONRequestBody defines body for CreateGuild for application/json ContentType.
 type CreateGuildJSONRequestBody = CreateGuildRequest
@@ -1125,5 +1473,11 @@ type CreateGuildRoleJSONRequestBody = CreateRoleRequest
 // UpdateGuildRoleJSONRequestBody defines body for UpdateGuildRole for application/json ContentType.
 type UpdateGuildRoleJSONRequestBody = UpdateRoleRequest
 
+// CreateDirectChannelJSONRequestBody defines body for CreateDirectChannel for application/json ContentType.
+type CreateDirectChannelJSONRequestBody = CreateDirectChannelRequest
+
 // UpdateCurrentUserPresenceJSONRequestBody defines body for UpdateCurrentUserPresence for application/json ContentType.
 type UpdateCurrentUserPresenceJSONRequestBody = UpdatePresenceRequest
+
+// UpdateCurrentUserVoiceStateJSONRequestBody defines body for UpdateCurrentUserVoiceState for application/json ContentType.
+type UpdateCurrentUserVoiceStateJSONRequestBody = UpdateVoiceStateRequest

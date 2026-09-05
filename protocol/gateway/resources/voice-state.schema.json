@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/resources/voice-state.schema.json",
+  "title": "GatewayVoiceState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "user_id",
+    "channel_id",
+    "session_id",
+    "self_mute",
+    "self_deaf",
+    "self_video",
+    "self_stream",
+    "updated_at"
+  ],
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "channel_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "session_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "self_mute": {
+      "type": "boolean"
+    },
+    "self_deaf": {
+      "type": "boolean"
+    },
+    "self_video": {
+      "type": "boolean"
+    },
+    "self_stream": {
+      "type": "boolean"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
