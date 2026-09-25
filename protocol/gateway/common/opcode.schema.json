@@ -4,21 +4,56 @@
   "title": "GatewayOpcode",
   "description": "Gateway Message の処理種別を表す Opcode です。",
   "oneOf": [
-    { "$ref": "#/$defs/DISPATCH" },
-    { "$ref": "#/$defs/HEARTBEAT" },
-    { "$ref": "#/$defs/IDENTIFY" },
-    { "$ref": "#/$defs/RESUME" },
-    { "$ref": "#/$defs/INVALID_SESSION" },
-    { "$ref": "#/$defs/HELLO" },
-    { "$ref": "#/$defs/HEARTBEAT_ACK" }
+    {
+      "$ref": "#/$defs/DISPATCH"
+    },
+    {
+      "$ref": "#/$defs/HEARTBEAT"
+    },
+    {
+      "$ref": "#/$defs/IDENTIFY"
+    },
+    {
+      "$ref": "#/$defs/RESUME"
+    },
+    {
+      "$ref": "#/$defs/INVALID_SESSION"
+    },
+    {
+      "$ref": "#/$defs/HELLO"
+    },
+    {
+      "$ref": "#/$defs/HEARTBEAT_ACK"
+    }
   ],
   "$defs": {
-    "DISPATCH": { "const": 0, "description": "Server が Event を配信します。" },
-    "HEARTBEAT": { "const": 1, "description": "Client が接続を維持します。" },
-    "IDENTIFY": { "const": 2, "description": "Client が新しい Session を開始します。" },
-    "RESUME": { "const": 6, "description": "Client が既存 Session を再開します。" },
-    "INVALID_SESSION": { "const": 9, "description": "Server が Session の無効状態を通知します。" },
-    "HELLO": { "const": 10, "description": "Server が Heartbeat 間隔を通知します。" },
-    "HEARTBEAT_ACK": { "const": 11, "description": "Server が Heartbeat の受信を通知します。" }
+    "DISPATCH": {
+      "const": 0,
+      "description": "Server が Event を配信します。"
+    },
+    "HEARTBEAT": {
+      "const": 1,
+      "description": "Client が接続を維持します。"
+    },
+    "IDENTIFY": {
+      "const": 2,
+      "description": "Client が新しい Session を開始します。"
+    },
+    "RESUME": {
+      "const": 6,
+      "description": "Client が既存 Session を再開します。"
+    },
+    "INVALID_SESSION": {
+      "const": 9,
+      "description": "Server が Session の無効状態を通知します。"
+    },
+    "HELLO": {
+      "const": 10,
+      "description": "Server が Heartbeat 間隔を通知します。"
+    },
+    "HEARTBEAT_ACK": {
+      "const": 11,
+      "description": "Server が Heartbeat の受信を通知します。"
+    }
   }
 }

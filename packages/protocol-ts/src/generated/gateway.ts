@@ -26,7 +26,12 @@ export type AsterGatewayMessage =
   | MemberJoinEvent
   | MemberUpdateEvent
   | MemberLeaveEvent
-  | PresenceUpdateEvent;
+  | PresenceUpdateEvent
+  | ChannelCreateEvent
+  | ChannelUpdateEvent
+  | ChannelDeleteEvent
+  | ReadStateUpdateEvent
+  | VoiceStateUpdateEvent;
 /**
  * 購読する Gateway Event 群を表す32-bit Bitfield です。未割り当て Bit は Server が意味を定義するまで使用しません。
  */
@@ -219,6 +224,59 @@ export interface GatewayMessageResource {
    */
   reply_to: GatewayMessageReplyResource | null;
   /**
+   * @maxItems 10
+   */
+  attachments:
+    | []
+    | [GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment, GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment]
+    | [GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment, GatewayAttachment]
+    | [
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment
+      ]
+    | [
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment
+      ]
+    | [
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment
+      ]
+    | [
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment,
+        GatewayAttachment
+      ];
+  /**
    * Messageを作成した時刻です。
    */
   created_at: string;
@@ -269,6 +327,18 @@ export interface GatewayMessageReplyResource {
    * 返信元Messageを最後に編集した時刻です。未編集の場合はnullです。
    */
   edited_at: string | null;
+}
+export interface GatewayAttachment {
+  id: string;
+  uploader_id: string;
+  channel_id: string;
+  filename: string;
+  content_type: string;
+  size: number;
+  checksum_sha256: string;
+  status: "READY";
+  download_url: string;
+  created_at: string;
 }
 /**
  * Serverが購読中のClientまたはBotへ、更新後のMessage全体を配信します。
@@ -451,4 +521,122 @@ export interface PresenceUpdateEvent {
     guild_id: string;
     presence: GatewayPresence;
   };
+}
+export interface ChannelCreateEvent {
+  op: 0;
+  t: "CHANNEL_CREATE";
+  s: number;
+  d: GatewayChannel;
+}
+export interface GatewayChannel {
+  id: string;
+  guild_id: string | null;
+  parent_id: string | null;
+  type: "TEXT" | "VOICE" | "CATEGORY" | "THREAD" | "DIRECT";
+  name: string | null;
+  topic: string | null;
+  position: number;
+  created_at: string;
+  /**
+   * @maxItems 10
+   */
+  recipients:
+    | []
+    | [GatewayUserSummary]
+    | [GatewayUserSummary, GatewayUserSummary]
+    | [GatewayUserSummary, GatewayUserSummary, GatewayUserSummary]
+    | [GatewayUserSummary, GatewayUserSummary, GatewayUserSummary, GatewayUserSummary]
+    | [GatewayUserSummary, GatewayUserSummary, GatewayUserSummary, GatewayUserSummary, GatewayUserSummary]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ]
+    | [
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary,
+        GatewayUserSummary
+      ];
+}
+export interface ChannelUpdateEvent {
+  op: 0;
+  t: "CHANNEL_UPDATE";
+  s: number;
+  d: GatewayChannel;
+}
+export interface ChannelDeleteEvent {
+  op: 0;
+  t: "CHANNEL_DELETE";
+  s: number;
+  d: {
+    id: string;
+    guild_id: string | null;
+  };
+}
+export interface ReadStateUpdateEvent {
+  op: 0;
+  t: "READ_STATE_UPDATE";
+  s: number;
+  d: GatewayReadState;
+}
+export interface GatewayReadState {
+  channel_id: string;
+  last_read_message_id: string | null;
+  updated_at: string;
+}
+export interface VoiceStateUpdateEvent {
+  op: 0;
+  t: "VOICE_STATE_UPDATE";
+  s: number;
+  d: GatewayVoiceState;
+}
+export interface GatewayVoiceState {
+  user_id: string;
+  channel_id: string | null;
+  session_id: string | null;
+  self_mute: boolean;
+  self_deaf: boolean;
+  self_video: boolean;
+  self_stream: boolean;
+  updated_at: string;
 }

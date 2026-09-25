@@ -4,31 +4,126 @@
   "title": "GatewayEventName",
   "description": "DISPATCH MessageのEvent名です。既存の値を別の意味へ再割り当てしません。",
   "oneOf": [
-    { "$ref": "#/$defs/READY" },
-    { "$ref": "#/$defs/RESUMED" },
-    { "$ref": "#/$defs/MESSAGE_CREATE" },
-    { "$ref": "#/$defs/MESSAGE_UPDATE" },
-    { "$ref": "#/$defs/MESSAGE_DELETE" },
-    { "$ref": "#/$defs/MESSAGE_REACTION_ADD" },
-    { "$ref": "#/$defs/MESSAGE_REACTION_REMOVE" },
-    { "$ref": "#/$defs/TYPING_START" },
-    { "$ref": "#/$defs/MEMBER_JOIN" },
-    { "$ref": "#/$defs/MEMBER_UPDATE" },
-    { "$ref": "#/$defs/MEMBER_LEAVE" },
-    { "$ref": "#/$defs/PRESENCE_UPDATE" }
+    {
+      "$ref": "#/$defs/READY"
+    },
+    {
+      "$ref": "#/$defs/RESUMED"
+    },
+    {
+      "$ref": "#/$defs/MESSAGE_CREATE"
+    },
+    {
+      "$ref": "#/$defs/MESSAGE_UPDATE"
+    },
+    {
+      "$ref": "#/$defs/MESSAGE_DELETE"
+    },
+    {
+      "$ref": "#/$defs/MESSAGE_REACTION_ADD"
+    },
+    {
+      "$ref": "#/$defs/MESSAGE_REACTION_REMOVE"
+    },
+    {
+      "$ref": "#/$defs/TYPING_START"
+    },
+    {
+      "$ref": "#/$defs/MEMBER_JOIN"
+    },
+    {
+      "$ref": "#/$defs/MEMBER_UPDATE"
+    },
+    {
+      "$ref": "#/$defs/MEMBER_LEAVE"
+    },
+    {
+      "$ref": "#/$defs/PRESENCE_UPDATE"
+    },
+    {
+      "$ref": "#/$defs/CHANNEL_CREATE"
+    },
+    {
+      "$ref": "#/$defs/CHANNEL_UPDATE"
+    },
+    {
+      "$ref": "#/$defs/CHANNEL_DELETE"
+    },
+    {
+      "$ref": "#/$defs/READ_STATE_UPDATE"
+    },
+    {
+      "$ref": "#/$defs/VOICE_STATE_UPDATE"
+    }
   ],
   "$defs": {
-    "READY": { "const": "READY", "description": "新しいGateway Sessionが開始したことを通知します。" },
-    "RESUMED": { "const": "RESUMED", "description": "既存Gateway Sessionが再開したことを通知します。" },
-    "MESSAGE_CREATE": { "const": "MESSAGE_CREATE", "description": "Text ChannelにMessageが作成されたことを通知します。" },
-    "MESSAGE_UPDATE": { "const": "MESSAGE_UPDATE", "description": "Text ChannelのMessageが更新されたことを通知します。" },
-    "MESSAGE_DELETE": { "const": "MESSAGE_DELETE", "description": "Text ChannelのMessageが削除されたことを通知します。" },
-    "MESSAGE_REACTION_ADD": { "const": "MESSAGE_REACTION_ADD", "description": "MessageにReactionが追加されたことを通知します。" },
-    "MESSAGE_REACTION_REMOVE": { "const": "MESSAGE_REACTION_REMOVE", "description": "MessageからReactionが解除されたことを通知します。" },
-    "TYPING_START": { "const": "TYPING_START", "description": "Text ChannelでUserが入力を開始または継続したことを通知します。" },
-    "MEMBER_JOIN": { "const": "MEMBER_JOIN", "description": "UserがGuildへ参加したことを通知します。" },
-    "MEMBER_UPDATE": { "const": "MEMBER_UPDATE", "description": "Guild MemberのNicknameまたはRoleが変わったことを通知します。" },
-    "MEMBER_LEAVE": { "const": "MEMBER_LEAVE", "description": "UserがGuildから退出または削除されたことを通知します。" },
-    "PRESENCE_UPDATE": { "const": "PRESENCE_UPDATE", "description": "Guild Memberの短命なPresenceが変わったことを通知します。" }
+    "READY": {
+      "const": "READY",
+      "description": "新しいGateway Sessionが開始したことを通知します。"
+    },
+    "RESUMED": {
+      "const": "RESUMED",
+      "description": "既存Gateway Sessionが再開したことを通知します。"
+    },
+    "MESSAGE_CREATE": {
+      "const": "MESSAGE_CREATE",
+      "description": "Text ChannelにMessageが作成されたことを通知します。"
+    },
+    "MESSAGE_UPDATE": {
+      "const": "MESSAGE_UPDATE",
+      "description": "Text ChannelのMessageが更新されたことを通知します。"
+    },
+    "MESSAGE_DELETE": {
+      "const": "MESSAGE_DELETE",
+      "description": "Text ChannelのMessageが削除されたことを通知します。"
+    },
+    "MESSAGE_REACTION_ADD": {
+      "const": "MESSAGE_REACTION_ADD",
+      "description": "MessageにReactionが追加されたことを通知します。"
+    },
+    "MESSAGE_REACTION_REMOVE": {
+      "const": "MESSAGE_REACTION_REMOVE",
+      "description": "MessageからReactionが解除されたことを通知します。"
+    },
+    "TYPING_START": {
+      "const": "TYPING_START",
+      "description": "Text ChannelでUserが入力を開始または継続したことを通知します。"
+    },
+    "MEMBER_JOIN": {
+      "const": "MEMBER_JOIN",
+      "description": "UserがGuildへ参加したことを通知します。"
+    },
+    "MEMBER_UPDATE": {
+      "const": "MEMBER_UPDATE",
+      "description": "Guild MemberのNicknameまたはRoleが変わったことを通知します。"
+    },
+    "MEMBER_LEAVE": {
+      "const": "MEMBER_LEAVE",
+      "description": "UserがGuildから退出または削除されたことを通知します。"
+    },
+    "PRESENCE_UPDATE": {
+      "const": "PRESENCE_UPDATE",
+      "description": "Guild Memberの短命なPresenceが変わったことを通知します。"
+    },
+    "CHANNEL_CREATE": {
+      "const": "CHANNEL_CREATE",
+      "description": "参照可能なChannelが作成されたことを通知します。"
+    },
+    "CHANNEL_UPDATE": {
+      "const": "CHANNEL_UPDATE",
+      "description": "Channelの設定が変わったことを通知します。"
+    },
+    "CHANNEL_DELETE": {
+      "const": "CHANNEL_DELETE",
+      "description": "Channelが削除されたことを通知します。"
+    },
+    "READ_STATE_UPDATE": {
+      "const": "READ_STATE_UPDATE",
+      "description": "自分のChannel既読位置が変わったことを通知します。"
+    },
+    "VOICE_STATE_UPDATE": {
+      "const": "VOICE_STATE_UPDATE",
+      "description": "Voice Channelの参加者状態が変わったことを通知します。"
+    }
   }
 }

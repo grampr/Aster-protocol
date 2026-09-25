@@ -1,0 +1,11 @@
+title: JoinVoiceChannelRequest
+type: object
+additionalProperties: false
+properties:
+  self_mute:
+    type: boolean
+    default: false
+  self_deaf:
+    type: boolean
+    default: false
+

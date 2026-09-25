@@ -5,18 +5,42 @@
   "description": "Serverが購読中のClientまたはBotへ、削除されたMessageの識別情報を配信します。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["op", "t", "s", "d"],
+  "required": [
+    "op",
+    "t",
+    "s",
+    "d"
+  ],
   "properties": {
-    "op": { "$ref": "../../common/opcode.schema.json#/$defs/DISPATCH" },
-    "t": { "$ref": "../../common/event-name.schema.json#/$defs/MESSAGE_DELETE" },
-    "s": { "type": "integer", "minimum": 0, "description": "Gateway Session内で単調増加するEvent Sequenceです。" },
+    "op": {
+      "$ref": "../../common/opcode.schema.json#/$defs/DISPATCH"
+    },
+    "t": {
+      "$ref": "../../common/event-name.schema.json#/$defs/MESSAGE_DELETE"
+    },
+    "s": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Gateway Session内で単調増加するEvent Sequenceです。"
+    },
     "d": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "channel_id"],
+      "required": [
+        "id",
+        "channel_id"
+      ],
       "properties": {
-        "id": { "type": "string", "format": "uuid", "description": "削除されたMessage IDです。" },
-        "channel_id": { "type": "string", "format": "uuid", "description": "Messageが属していたText Channel IDです。" }
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "削除されたMessage IDです。"
+        },
+        "channel_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Messageが属していたText Channel IDです。"
+        }
       }
     }
   }

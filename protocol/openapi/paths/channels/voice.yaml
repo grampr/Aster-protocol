@@ -1,0 +1,54 @@
+parameters:
+  - $ref: ../../components/parameters/ChannelId.yaml
+
+get:
+  operationId: listVoiceChannelStates
+  tags:
+    - Voice
+  summary: Voice Channelの参加状態を取得する
+  description: 閲覧可能なVoice Channelに現在参加しているUserの状態を返します。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 現在の参加状態です。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/voice/VoiceStateList.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+
+post:
+  operationId: joinVoiceChannel
+  tags:
+    - Voice
+  summary: Voice Channelへ参加する
+  description: CONNECT権限を確認し、Voice Providerへ接続する短命Sessionを発行します。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: false
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/voice/JoinVoiceChannelRequest.yaml
+  responses:
+    "200":
+      description: 接続に使用するVoice Sessionです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/voice/VoiceSession.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

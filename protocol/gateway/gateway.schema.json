@@ -4,23 +4,74 @@
   "title": "AsterGatewayMessage",
   "description": "Aster Gatewayで送受信するLifecycle MessageとDispatch Eventの集合です。",
   "oneOf": [
-    { "$ref": "./lifecycle/hello.schema.json" },
-    { "$ref": "./lifecycle/identify.schema.json" },
-    { "$ref": "./lifecycle/ready.schema.json" },
-    { "$ref": "./lifecycle/heartbeat.schema.json" },
-    { "$ref": "./lifecycle/heartbeat-ack.schema.json" },
-    { "$ref": "./lifecycle/resume.schema.json" },
-    { "$ref": "./lifecycle/resumed.schema.json" },
-    { "$ref": "./lifecycle/invalid-session.schema.json" },
-    { "$ref": "./events/messages/message-create.schema.json" },
-    { "$ref": "./events/messages/message-update.schema.json" },
-    { "$ref": "./events/messages/message-delete.schema.json" },
-    { "$ref": "./events/messages/message-reaction-add.schema.json" },
-    { "$ref": "./events/messages/message-reaction-remove.schema.json" },
-    { "$ref": "./events/channels/typing-start.schema.json" },
-    { "$ref": "./events/guilds/member-join.schema.json" },
-    { "$ref": "./events/guilds/member-update.schema.json" },
-    { "$ref": "./events/guilds/member-leave.schema.json" },
-    { "$ref": "./events/guilds/presence-update.schema.json" }
+    {
+      "$ref": "./lifecycle/hello.schema.json"
+    },
+    {
+      "$ref": "./lifecycle/identify.schema.json"
+    },
+    {
+      "$ref": "./lifecycle/ready.schema.json"
+    },
+    {
+      "$ref": "./lifecycle/heartbeat.schema.json"
+    },
+    {
+      "$ref": "./lifecycle/heartbeat-ack.schema.json"
+    },
+    {
+      "$ref": "./lifecycle/resume.schema.json"
+    },
+    {
+      "$ref": "./lifecycle/resumed.schema.json"
+    },
+    {
+      "$ref": "./lifecycle/invalid-session.schema.json"
+    },
+    {
+      "$ref": "./events/messages/message-create.schema.json"
+    },
+    {
+      "$ref": "./events/messages/message-update.schema.json"
+    },
+    {
+      "$ref": "./events/messages/message-delete.schema.json"
+    },
+    {
+      "$ref": "./events/messages/message-reaction-add.schema.json"
+    },
+    {
+      "$ref": "./events/messages/message-reaction-remove.schema.json"
+    },
+    {
+      "$ref": "./events/channels/typing-start.schema.json"
+    },
+    {
+      "$ref": "./events/guilds/member-join.schema.json"
+    },
+    {
+      "$ref": "./events/guilds/member-update.schema.json"
+    },
+    {
+      "$ref": "./events/guilds/member-leave.schema.json"
+    },
+    {
+      "$ref": "./events/guilds/presence-update.schema.json"
+    },
+    {
+      "$ref": "./events/channels/channel-create.schema.json"
+    },
+    {
+      "$ref": "./events/channels/channel-update.schema.json"
+    },
+    {
+      "$ref": "./events/channels/channel-delete.schema.json"
+    },
+    {
+      "$ref": "./events/channels/read-state-update.schema.json"
+    },
+    {
+      "$ref": "./events/voice/voice-state-update.schema.json"
+    }
   ]
 }

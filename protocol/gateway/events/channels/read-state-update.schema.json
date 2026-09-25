@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/events/channels/read-state-update.schema.json",
+  "title": "ReadStateUpdateEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "op",
+    "t",
+    "s",
+    "d"
+  ],
+  "properties": {
+    "op": {
+      "const": 0
+    },
+    "t": {
+      "const": "READ_STATE_UPDATE"
+    },
+    "s": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "d": {
+      "$ref": "../../resources/read-state.schema.json"
+    }
+  }
+}

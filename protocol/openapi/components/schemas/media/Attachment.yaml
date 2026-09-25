@@ -1,0 +1,51 @@
+title: Attachment
+description: Messageへ添付できるObject Storage上のファイルです。
+type: object
+additionalProperties: false
+required:
+  - id
+  - uploader_id
+  - channel_id
+  - filename
+  - content_type
+  - size
+  - checksum_sha256
+  - status
+  - download_url
+  - created_at
+properties:
+  id:
+    $ref: ../common/UUID.yaml
+  uploader_id:
+    $ref: ../common/UUID.yaml
+  channel_id:
+    $ref: ../common/UUID.yaml
+  filename:
+    type: string
+    minLength: 1
+    maxLength: 255
+    description: Userへ表示する元のファイル名です。Object Keyには使用しません。
+  content_type:
+    type: string
+    minLength: 3
+    maxLength: 255
+    description: 検証済みのIANA Media Typeです。
+  size:
+    type: integer
+    format: int64
+    minimum: 1
+    maximum: 26214400
+    description: File size in bytes. MVPでは25 MiB以下です。
+  checksum_sha256:
+    type: string
+    pattern: '^[A-Fa-f0-9]{64}$'
+    description: ファイル全体のSHA-256を16進数で表した値です。
+  status:
+    $ref: ./AttachmentStatus.yaml
+  download_url:
+    type: string
+    format: uri-reference
+    description: 認証とChannel権限確認後にObject StorageへRedirectするAster API URLです。
+  created_at:
+    $ref: ../common/Timestamp.yaml
+

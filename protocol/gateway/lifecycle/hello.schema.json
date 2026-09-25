@@ -5,13 +5,20 @@
   "description": "Server が接続直後に Heartbeat 間隔を通知します。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["op", "d"],
+  "required": [
+    "op",
+    "d"
+  ],
   "properties": {
-    "op": { "$ref": "../common/opcode.schema.json#/$defs/HELLO" },
+    "op": {
+      "$ref": "../common/opcode.schema.json#/$defs/HELLO"
+    },
     "d": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["heartbeat_interval_ms"],
+      "required": [
+        "heartbeat_interval_ms"
+      ],
       "properties": {
         "heartbeat_interval_ms": {
           "type": "integer",

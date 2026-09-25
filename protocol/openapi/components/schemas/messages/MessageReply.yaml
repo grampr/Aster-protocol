@@ -22,7 +22,6 @@ properties:
     $ref: ../users/UserSummary.yaml
   content:
     type: string
-    minLength: 1
     maxLength: 4000
     description: 返信元MessageのUTF-8本文です。
   created_at:

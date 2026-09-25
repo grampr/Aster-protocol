@@ -1,0 +1,8 @@
+title: CreateDirectChannelRequest
+description: 指定したUserとのDirect Message Channelを作成または取得します。
+type: object
+additionalProperties: false
+required: [recipient_id]
+properties:
+  recipient_id:
+    $ref: ../common/UUID.yaml

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aster.dev/gateway/v1/resources/attachment.schema.json",
+  "title": "GatewayAttachment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "uploader_id",
+    "channel_id",
+    "filename",
+    "content_type",
+    "size",
+    "checksum_sha256",
+    "status",
+    "download_url",
+    "created_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "uploader_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "channel_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "filename": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "content_type": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 255
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 26214400
+    },
+    "checksum_sha256": {
+      "type": "string",
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "status": {
+      "const": "READY"
+    },
+    "download_url": {
+      "type": "string",
+      "format": "uri-reference"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+parameters:
+  - $ref: ../../components/parameters/ChannelId.yaml
+
+post:
+  operationId: createAttachmentUploadIntent
+  tags:
+    - Media
+  summary: Attachmentの直接Upload URLを発行する
+  description: |
+    Channelの送信権限とUpload quotaを確認し、単一ObjectだけへPUTできる短命URLを返します。
+    ファイル本体はAster Serverを経由しません。Upload後はFinalizeが必要です。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/media/CreateAttachmentUploadIntentRequest.yaml
+  responses:
+    "201":
+      description: Upload Intentを発行しました。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/media/AttachmentUploadIntent.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "403":
+      $ref: ../../components/responses/Forbidden.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+

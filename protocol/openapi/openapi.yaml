@@ -31,6 +31,10 @@ tags:
     description: Guildへ参加するためのInviteを扱うOperation
   - name: Messages
     description: Text Channel 内の Message を扱う Operation
+  - name: Media
+    description: Object Storageへ直接転送するAttachmentを扱うOperation
+  - name: Voice
+    description: Voice Providerへ接続するControl Plane Operation
   - name: System
     description: Instance の稼働状態を確認する Operation
 
@@ -77,12 +81,36 @@ paths:
     $ref: ./paths/invites/accept.yaml
   /users/@me/presence:
     $ref: ./paths/users/presence.yaml
+  /users/@me/channels:
+    $ref: ./paths/users/channels.yaml
+  /users/@me/read-states:
+    $ref: ./paths/users/read-states.yaml
+  /guilds/{guild_id}/messages/search:
+    $ref: ./paths/guilds/message-search.yaml
   /channels/{channel_id}:
     $ref: ./paths/channels/channel.yaml
   /channels/{channel_id}/messages:
     $ref: ./paths/channels/messages.yaml
   /channels/{channel_id}/typing:
     $ref: ./paths/channels/typing.yaml
+  /channels/{channel_id}/threads:
+    $ref: ./paths/channels/threads.yaml
+  /channels/{channel_id}/read-state:
+    $ref: ./paths/channels/read-state.yaml
+  /channels/{channel_id}/attachments/intents:
+    $ref: ./paths/channels/attachment-intents.yaml
+  /attachments/{attachment_id}:
+    $ref: ./paths/attachments/attachment.yaml
+  /attachments/{attachment_id}/finalize:
+    $ref: ./paths/attachments/finalize.yaml
+  /attachments/{attachment_id}/content:
+    $ref: ./paths/attachments/content.yaml
+  /attachments/{attachment_id}/download-intents:
+    $ref: ./paths/attachments/download-intents.yaml
+  /channels/{channel_id}/voice:
+    $ref: ./paths/channels/voice.yaml
+  /voice/sessions/@me:
+    $ref: ./paths/voice/session-me.yaml
   /channels/{channel_id}/messages/{message_id}:
     $ref: ./paths/messages/message.yaml
   /channels/{channel_id}/messages/{message_id}/reactions/{emoji}:
@@ -108,6 +136,8 @@ components:
     RetryAfter:
       $ref: ./components/headers/RetryAfter.yaml
   parameters:
+    AttachmentId:
+      $ref: ./components/parameters/AttachmentId.yaml
     ChannelId:
       $ref: ./components/parameters/ChannelId.yaml
     Cursor:
@@ -128,6 +158,8 @@ components:
       $ref: ./components/parameters/UserId.yaml
     ReactionEmoji:
       $ref: ./components/parameters/ReactionEmoji.yaml
+    SearchQuery:
+      $ref: ./components/parameters/SearchQuery.yaml
   responses:
     EmailAlreadyRegistered:
       $ref: ./components/responses/EmailAlreadyRegistered.yaml
@@ -152,6 +184,16 @@ components:
   schemas:
     AccessToken:
       $ref: ./components/schemas/auth/AccessToken.yaml
+    Attachment:
+      $ref: ./components/schemas/media/Attachment.yaml
+    AttachmentStatus:
+      $ref: ./components/schemas/media/AttachmentStatus.yaml
+    AttachmentUploadIntent:
+      $ref: ./components/schemas/media/AttachmentUploadIntent.yaml
+    AttachmentDownloadIntent:
+      $ref: ./components/schemas/media/AttachmentDownloadIntent.yaml
+    CreateAttachmentUploadIntentRequest:
+      $ref: ./components/schemas/media/CreateAttachmentUploadIntentRequest.yaml
     AuthenticationMethod:
       $ref: ./components/schemas/auth/AuthenticationMethod.yaml
     Channel:
@@ -162,6 +204,26 @@ components:
       $ref: ./components/schemas/channels/ChannelType.yaml
     CreateChannelRequest:
       $ref: ./components/schemas/channels/CreateChannelRequest.yaml
+    CreateDirectChannelRequest:
+      $ref: ./components/schemas/channels/CreateDirectChannelRequest.yaml
+    CreateThreadRequest:
+      $ref: ./components/schemas/channels/CreateThreadRequest.yaml
+    ReadState:
+      $ref: ./components/schemas/channels/ReadState.yaml
+    ReadStateList:
+      $ref: ./components/schemas/channels/ReadStateList.yaml
+    UpdateReadStateRequest:
+      $ref: ./components/schemas/channels/UpdateReadStateRequest.yaml
+    VoiceSession:
+      $ref: ./components/schemas/voice/VoiceSession.yaml
+    VoiceState:
+      $ref: ./components/schemas/voice/VoiceState.yaml
+    VoiceStateList:
+      $ref: ./components/schemas/voice/VoiceStateList.yaml
+    JoinVoiceChannelRequest:
+      $ref: ./components/schemas/voice/JoinVoiceChannelRequest.yaml
+    UpdateVoiceStateRequest:
+      $ref: ./components/schemas/voice/UpdateVoiceStateRequest.yaml
     CreateGuildRequest:
       $ref: ./components/schemas/guilds/CreateGuildRequest.yaml
     CreateMessageRequest:
@@ -224,6 +286,10 @@ components:
       $ref: ./components/schemas/messages/MessageReaction.yaml
     MessageList:
       $ref: ./components/schemas/messages/MessageList.yaml
+    MessageSearchResult:
+      $ref: ./components/schemas/messages/MessageSearchResult.yaml
+    MessageSearchResultList:
+      $ref: ./components/schemas/messages/MessageSearchResultList.yaml
     PageInfo:
       $ref: ./components/schemas/common/PageInfo.yaml
     PaginationCursor:

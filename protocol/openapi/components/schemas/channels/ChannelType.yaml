@@ -4,5 +4,8 @@ type: string
 enum:
   - TEXT
   - VOICE
+  - CATEGORY
+  - THREAD
+  - DIRECT
 examples:
   - TEXT

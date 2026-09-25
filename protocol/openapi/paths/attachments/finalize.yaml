@@ -1,0 +1,29 @@
+parameters:
+  - $ref: ../../components/parameters/AttachmentId.yaml
+
+post:
+  operationId: finalizeAttachmentUpload
+  tags:
+    - Media
+  summary: 直接UploadしたAttachmentを確定する
+  description: Object Storage上のsize、Content-Type、checksumを宣言値と照合してREADYにします。
+  security:
+    - BearerAuth: []
+  responses:
+    "200":
+      description: 確定したAttachmentです。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/media/Attachment.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "409":
+      description: Objectが未Uploadまたは宣言したMetadataと一致しません。
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/Error.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+

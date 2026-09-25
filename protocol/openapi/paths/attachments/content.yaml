@@ -1,0 +1,27 @@
+parameters:
+  - $ref: ../../components/parameters/AttachmentId.yaml
+
+get:
+  operationId: downloadAttachment
+  tags:
+    - Media
+  summary: Attachmentの短命なObject Storage URLへ移動する
+  description: Channelの閲覧権限を確認してから、短命な署名付きGET URLへ303 Redirectします。
+  security:
+    - BearerAuth: []
+  responses:
+    "303":
+      description: Object Storageの短命なDownload URLです。
+      headers:
+        Location:
+          description: 署名付きDownload URLです。
+          schema:
+            type: string
+            format: uri
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml
+

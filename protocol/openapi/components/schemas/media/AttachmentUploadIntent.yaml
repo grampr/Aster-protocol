@@ -1,0 +1,27 @@
+title: AttachmentUploadIntent
+description: 単一Objectへの短命な直接アップロード指示です。URLはBearer Tokenとして扱います。
+type: object
+additionalProperties: false
+required:
+  - attachment
+  - upload_url
+  - upload_method
+  - upload_headers
+  - expires_at
+properties:
+  attachment:
+    $ref: ./Attachment.yaml
+  upload_url:
+    type: string
+    format: uri
+  upload_method:
+    type: string
+    const: PUT
+  upload_headers:
+    type: object
+    additionalProperties:
+      type: string
+    description: 署名に含まれるため、ClientがPUT時にそのまま送るHeaderです。
+  expires_at:
+    $ref: ../common/Timestamp.yaml
+

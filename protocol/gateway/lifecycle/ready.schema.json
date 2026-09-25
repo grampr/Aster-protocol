@@ -5,15 +5,31 @@
   "description": "Server が新しい Gateway Session の開始を通知します。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["op", "t", "s", "d"],
+  "required": [
+    "op",
+    "t",
+    "s",
+    "d"
+  ],
   "properties": {
-    "op": { "$ref": "../common/opcode.schema.json#/$defs/DISPATCH" },
-    "t": { "$ref": "../common/event-name.schema.json#/$defs/READY" },
-    "s": { "type": "integer", "minimum": 0, "description": "Event Sequence です。" },
+    "op": {
+      "$ref": "../common/opcode.schema.json#/$defs/DISPATCH"
+    },
+    "t": {
+      "$ref": "../common/event-name.schema.json#/$defs/READY"
+    },
+    "s": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Event Sequence です。"
+    },
     "d": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["session_id", "resume_gateway_url"],
+      "required": [
+        "session_id",
+        "resume_gateway_url"
+      ],
       "properties": {
         "session_id": {
           "type": "string",

@@ -1,0 +1,35 @@
+title: VoiceState
+description: Userの現在のVoice Channel参加状態です。
+type: object
+additionalProperties: false
+required:
+  - user_id
+  - channel_id
+  - session_id
+  - self_mute
+  - self_deaf
+  - self_video
+  - self_stream
+  - updated_at
+properties:
+  user_id:
+    $ref: ../common/UUID.yaml
+  channel_id:
+    oneOf:
+      - $ref: ../common/UUID.yaml
+      - type: "null"
+  session_id:
+    oneOf:
+      - $ref: ../common/UUID.yaml
+      - type: "null"
+  self_mute:
+    type: boolean
+  self_deaf:
+    type: boolean
+  self_video:
+    type: boolean
+  self_stream:
+    type: boolean
+  updated_at:
+    $ref: ../common/Timestamp.yaml
+

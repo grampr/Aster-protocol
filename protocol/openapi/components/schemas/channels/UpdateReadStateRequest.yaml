@@ -1,0 +1,7 @@
+title: UpdateReadStateRequest
+type: object
+additionalProperties: false
+required: [last_read_message_id]
+properties:
+  last_read_message_id:
+    $ref: ../common/UUID.yaml

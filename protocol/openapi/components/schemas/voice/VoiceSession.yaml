@@ -1,0 +1,32 @@
+title: VoiceSession
+description: Voice Providerへ接続するための短命なSessionです。Credentialはログへ記録しません。
+type: object
+additionalProperties: false
+required:
+  - id
+  - provider
+  - endpoint
+  - credential
+  - expires_at
+  - state
+properties:
+  id:
+    $ref: ../common/UUID.yaml
+  provider:
+    type: string
+    minLength: 1
+    maxLength: 64
+    description: Clientが対応する接続Adapterを選択するProvider識別子です。
+  endpoint:
+    type: string
+    format: uri
+    description: Media signaling endpointです。Media PacketはAster Serverを経由しません。
+  credential:
+    type: string
+    minLength: 1
+    description: Providerへ提示する短命かつ不透明なCredentialです。
+  expires_at:
+    $ref: ../common/Timestamp.yaml
+  state:
+    $ref: ./VoiceState.yaml
+

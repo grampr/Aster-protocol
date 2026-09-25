@@ -4,18 +4,38 @@
   "title": "PresenceUpdateEvent",
   "type": "object",
   "additionalProperties": false,
-  "required": ["op", "t", "s", "d"],
+  "required": [
+    "op",
+    "t",
+    "s",
+    "d"
+  ],
   "properties": {
-    "op": { "const": 0 },
-    "t": { "const": "PRESENCE_UPDATE" },
-    "s": { "type": "integer", "minimum": 0 },
+    "op": {
+      "const": 0
+    },
+    "t": {
+      "const": "PRESENCE_UPDATE"
+    },
+    "s": {
+      "type": "integer",
+      "minimum": 0
+    },
     "d": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["guild_id", "presence"],
+      "required": [
+        "guild_id",
+        "presence"
+      ],
       "properties": {
-        "guild_id": { "type": "string", "format": "uuid" },
-        "presence": { "$ref": "../../resources/presence.schema.json" }
+        "guild_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "presence": {
+          "$ref": "../../resources/presence.schema.json"
+        }
       }
     }
   }

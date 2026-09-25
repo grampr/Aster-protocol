@@ -5,38 +5,88 @@
   "description": "MESSAGE_CREATEとMESSAGE_UPDATEで配信するText ChannelのMessageです。MESSAGE_CONTENT Intentが許可されない接続ではcontentをnullにします。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "channel_id", "author", "content", "reply_to_message_id", "reply_to", "created_at", "edited_at"],
+  "required": [
+    "id",
+    "channel_id",
+    "author",
+    "content",
+    "reply_to_message_id",
+    "reply_to",
+    "attachments",
+    "created_at",
+    "edited_at"
+  ],
   "properties": {
-    "id": { "type": "string", "format": "uuid", "description": "Message IDです。" },
-    "channel_id": { "type": "string", "format": "uuid", "description": "Messageが属するText Channel IDです。" },
-    "author": { "$ref": "./user-summary.schema.json" },
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Message IDです。"
+    },
+    "channel_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Messageが属するText Channel IDです。"
+    },
+    "author": {
+      "$ref": "./user-summary.schema.json"
+    },
     "content": {
       "description": "UTF-8のMessage本文です。MESSAGE_CONTENT Intentが許可されない場合はnullです。",
       "oneOf": [
-        { "type": "string", "minLength": 1, "maxLength": 4000 },
-        { "type": "null" }
+        {
+          "type": "string",
+          "maxLength": 4000
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "reply_to_message_id": {
       "description": "返信元Message IDです。通常のMessageではnullです。返信元が削除済みまたは参照不能でもIDは保持します。",
       "oneOf": [
-        { "type": "string", "format": "uuid" },
-        { "type": "null" }
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "reply_to": {
       "description": "表示可能な返信元Messageです。通常のMessage、削除済み、または参照不能の場合はnullです。",
       "oneOf": [
-        { "$ref": "./message-reply.schema.json" },
-        { "type": "null" }
+        {
+          "$ref": "./message-reply.schema.json"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
-    "created_at": { "type": "string", "format": "date-time", "description": "Messageを作成した時刻です。" },
+    "attachments": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "$ref": "./attachment.schema.json"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Messageを作成した時刻です。"
+    },
     "edited_at": {
       "description": "最後に本文を編集した時刻です。未編集の場合はnullです。",
       "oneOf": [
-        { "type": "string", "format": "date-time" },
-        { "type": "null" }
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
       ]
     }
   }

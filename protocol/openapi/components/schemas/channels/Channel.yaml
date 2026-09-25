@@ -1,28 +1,39 @@
 title: Channel
-description: Guild内のText ChannelまたはVoice Channelです。
+description: Guild内のChannel、Thread、またはUser間のDirect Message Channelです。
 type: object
 additionalProperties: false
 required:
   - id
   - guild_id
+  - parent_id
   - type
   - name
   - topic
   - position
   - created_at
+  - recipients
 properties:
   id:
     $ref: ../common/UUID.yaml
   guild_id:
-    allOf:
+    description: Channelが属するGuild IDです。Direct Messageの場合はnullです。
+    oneOf:
       - $ref: ../common/UUID.yaml
-    description: Channelが属するGuild IDです。
+      - type: "null"
+  parent_id:
+    description: CategoryまたはThreadの親Channel IDです。親がない場合はnullです。
+    oneOf:
+      - $ref: ../common/UUID.yaml
+      - type: "null"
   type:
     $ref: ./ChannelType.yaml
   name:
-    type: string
-    minLength: 1
-    maxLength: 100
+    description: Guild Channelの名前です。Direct Messageの場合はnullです。
+    oneOf:
+      - type: string
+        minLength: 1
+        maxLength: 100
+      - type: "null"
   topic:
     description: Text Channelの説明です。未設定またはVoice Channelの場合はnullです。
     oneOf:
@@ -35,11 +46,19 @@ properties:
     description: 同じGuild内での表示順です。小さい値を先に表示します。
   created_at:
     $ref: ../common/Timestamp.yaml
+  recipients:
+    description: Direct Messageの参加Userです。それ以外では空配列です。
+    type: array
+    maxItems: 10
+    items:
+      $ref: ../users/UserSummary.yaml
 examples:
   - id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
     guild_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    parent_id: null
     type: TEXT
     name: イベント企画
     topic: 次回イベントの日程と内容を相談します
     position: 2
     created_at: 2026-08-17T06:05:00Z
+    recipients: []

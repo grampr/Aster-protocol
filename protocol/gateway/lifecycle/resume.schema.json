@@ -5,13 +5,22 @@
   "description": "Client が切断前の Gateway Session と Event 配信を再開します。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["op", "d"],
+  "required": [
+    "op",
+    "d"
+  ],
   "properties": {
-    "op": { "$ref": "../common/opcode.schema.json#/$defs/RESUME" },
+    "op": {
+      "$ref": "../common/opcode.schema.json#/$defs/RESUME"
+    },
     "d": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["token", "session_id", "sequence"],
+      "required": [
+        "token",
+        "session_id",
+        "sequence"
+      ],
       "properties": {
         "token": {
           "type": "string",

@@ -17,6 +17,11 @@ properties:
   position:
     type: integer
     minimum: 0
+  parent_id:
+    description: nullを指定するとCategoryとの関連を解除します。
+    oneOf:
+      - $ref: ../common/UUID.yaml
+      - type: "null"
 examples:
   - name: 秋のイベント企画
     position: 3

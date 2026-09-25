@@ -29,6 +29,10 @@ tags:
     description: Guildへ参加するためのInviteを扱うOperation
   - name: Messages
     description: Text Channel 内の Message を扱う Operation
+  - name: Media
+    description: Object Storageへ直接転送するAttachmentを扱うOperation
+  - name: Voice
+    description: Voice Providerへ接続するControl Plane Operation
   - name: System
     description: Instance の稼働状態を確認する Operation
 paths:
@@ -1005,6 +1009,112 @@ paths:
           $ref: '#/components/responses/RateLimited'
         default:
           $ref: '#/components/responses/Error'
+  /users/@me/channels:
+    get:
+      operationId: listCurrentUserDirectChannels
+      tags:
+        - Channels
+      summary: Direct Message Channelを取得する
+      description: 認証済みUserが参加しているDirect Message Channelを更新順で返します。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Direct Message ChannelのPageです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createDirectChannel
+      tags:
+        - Channels
+      summary: Direct Message Channelを開始する
+      description: 同じ2 UserのDirect Message Channelが存在する場合は既存Channelを返します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDirectChannelRequest'
+      responses:
+        '200':
+          description: 作成または取得したDirect Message Channelです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /users/@me/read-states:
+    get:
+      operationId: listCurrentUserReadStates
+      tags:
+        - Channels
+      summary: 自分の既読位置を取得する
+      description: 認証済みUserが参照できるChannelの既読位置をまとめて返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Channelごとの既読位置です。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadStateList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+  /guilds/{guild_id}/messages/search:
+    parameters:
+      - $ref: '#/components/parameters/GuildId'
+    get:
+      operationId: searchGuildMessages
+      tags:
+        - Messages
+      summary: Guild内のMessageを検索する
+      description: 閲覧権限を持つText Channelだけを対象に、Message本文を新しい順で検索します。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SearchQuery'
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - name: channel_id
+          in: query
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: author_id
+          in: query
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: 検索結果のPageです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageSearchResultList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
   /channels/{channel_id}:
     parameters:
       - $ref: '#/components/parameters/ChannelId'
@@ -1194,6 +1304,347 @@ paths:
           $ref: '#/components/responses/ResourceNotFound'
         '429':
           $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /channels/{channel_id}/threads:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    get:
+      operationId: listChannelThreads
+      tags:
+        - Channels
+      summary: ChannelのThreadを取得する
+      description: 指定したText Channelを親とするThreadを更新順で返します。
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: ThreadのPageです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createChannelThread
+      tags:
+        - Channels
+      summary: Threadを作成する
+      description: Text ChannelまたはそのMessageを起点にThreadを作成します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateThreadRequest'
+      responses:
+        '201':
+          description: 作成したThreadです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /channels/{channel_id}/read-state:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    put:
+      operationId: updateChannelReadState
+      tags:
+        - Channels
+      summary: Channelの既読位置を更新する
+      description: 指定したChannel内のMessageまで読んだことを記録し、既読位置を後方へは戻しません。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReadStateRequest'
+      responses:
+        '200':
+          description: 更新後の既読位置です。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadState'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /channels/{channel_id}/attachments/intents:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    post:
+      operationId: createAttachmentUploadIntent
+      tags:
+        - Media
+      summary: Attachmentの直接Upload URLを発行する
+      description: |
+        Channelの送信権限とUpload quotaを確認し、単一ObjectだけへPUTできる短命URLを返します。
+        ファイル本体はAster Serverを経由しません。Upload後はFinalizeが必要です。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAttachmentUploadIntentRequest'
+      responses:
+        '201':
+          description: Upload Intentを発行しました。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentUploadIntent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /attachments/{attachment_id}:
+    parameters:
+      - $ref: '#/components/parameters/AttachmentId'
+    get:
+      operationId: getAttachment
+      tags:
+        - Media
+      summary: Attachment metadataを取得する
+      description: 参照可能なChannelに属するAttachment metadataを返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Attachment metadataです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: deleteAttachment
+      tags:
+        - Media
+      summary: 未使用または自分が投稿したAttachmentを削除する
+      description: Uploader本人がMessageへ未使用のAttachmentを削除します。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Attachmentを削除しました。
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /attachments/{attachment_id}/finalize:
+    parameters:
+      - $ref: '#/components/parameters/AttachmentId'
+    post:
+      operationId: finalizeAttachmentUpload
+      tags:
+        - Media
+      summary: 直接UploadしたAttachmentを確定する
+      description: Object Storage上のsize、Content-Type、checksumを宣言値と照合してREADYにします。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 確定したAttachmentです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Objectが未Uploadまたは宣言したMetadataと一致しません。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /attachments/{attachment_id}/content:
+    parameters:
+      - $ref: '#/components/parameters/AttachmentId'
+    get:
+      operationId: downloadAttachment
+      tags:
+        - Media
+      summary: Attachmentの短命なObject Storage URLへ移動する
+      description: Channelの閲覧権限を確認してから、短命な署名付きGET URLへ303 Redirectします。
+      security:
+        - BearerAuth: []
+      responses:
+        '303':
+          description: Object Storageの短命なDownload URLです。
+          headers:
+            Location:
+              description: 署名付きDownload URLです。
+              schema:
+                type: string
+                format: uri
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /attachments/{attachment_id}/download-intents:
+    parameters:
+      - $ref: '#/components/parameters/AttachmentId'
+    post:
+      operationId: createAttachmentDownloadIntent
+      tags:
+        - Media
+      summary: Attachmentの直接ダウンロード指示を作成する
+      description: Channelの閲覧権限を確認し、Object Storageから直接取得するための短命な署名付きURLを返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 短命な直接ダウンロード指示です。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentDownloadIntent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /channels/{channel_id}/voice:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    get:
+      operationId: listVoiceChannelStates
+      tags:
+        - Voice
+      summary: Voice Channelの参加状態を取得する
+      description: 閲覧可能なVoice Channelに現在参加しているUserの状態を返します。
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 現在の参加状態です。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoiceStateList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: joinVoiceChannel
+      tags:
+        - Voice
+      summary: Voice Channelへ参加する
+      description: CONNECT権限を確認し、Voice Providerへ接続する短命Sessionを発行します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JoinVoiceChannelRequest'
+      responses:
+        '200':
+          description: 接続に使用するVoice Sessionです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoiceSession'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+  /voice/sessions/@me:
+    patch:
+      operationId: updateCurrentUserVoiceState
+      tags:
+        - Voice
+      summary: 自分のMute・Deafen・Camera・Screen Share状態を更新する
+      description: 現在参加中のVoice Sessionに対する自分の公開状態を更新します。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVoiceStateRequest'
+      responses:
+        '200':
+          description: 更新後のVoice Stateです。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoiceState'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: leaveCurrentUserVoiceChannel
+      tags:
+        - Voice
+      summary: 現在のVoice Channelから退出する
+      description: Provider Sessionを閉じ、退出状態をGuild Memberへ配信します。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Voice Channelから退出しました。
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
         default:
           $ref: '#/components/responses/Error'
   /channels/{channel_id}/messages/{message_id}:
@@ -1439,6 +1890,13 @@ components:
         minimum: 0
       example: 2
   parameters:
+    AttachmentId:
+      name: attachment_id
+      in: path
+      required: true
+      description: 対象AttachmentのUUIDv7です。
+      schema:
+        $ref: '#/components/schemas/UUID'
     ChannelId:
       name: channel_id
       in: path
@@ -1521,6 +1979,15 @@ components:
       schema:
         $ref: '#/components/schemas/ReactionEmoji'
       example: 👍
+    SearchQuery:
+      name: query
+      in: query
+      required: true
+      description: 大文字小文字を区別せずMessage本文から探す文字列です。
+      schema:
+        type: string
+        minLength: 2
+        maxLength: 100
   responses:
     EmailAlreadyRegistered:
       description: 指定された Email Address は登録済みです。
@@ -1678,6 +2145,132 @@ components:
       maxLength: 4096
       examples:
         - example-access-token
+    Attachment:
+      title: Attachment
+      description: Messageへ添付できるObject Storage上のファイルです。
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - uploader_id
+        - channel_id
+        - filename
+        - content_type
+        - size
+        - checksum_sha256
+        - status
+        - download_url
+        - created_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        uploader_id:
+          $ref: '#/components/schemas/UUID'
+        channel_id:
+          $ref: '#/components/schemas/UUID'
+        filename:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Userへ表示する元のファイル名です。Object Keyには使用しません。
+        content_type:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: 検証済みのIANA Media Typeです。
+        size:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 26214400
+          description: File size in bytes. MVPでは25 MiB以下です。
+        checksum_sha256:
+          type: string
+          pattern: ^[A-Fa-f0-9]{64}$
+          description: ファイル全体のSHA-256を16進数で表した値です。
+        status:
+          $ref: '#/components/schemas/AttachmentStatus'
+        download_url:
+          type: string
+          format: uri-reference
+          description: 認証とChannel権限確認後にObject StorageへRedirectするAster API URLです。
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+    AttachmentStatus:
+      title: AttachmentStatus
+      description: Attachmentのアップロード状態です。
+      type: string
+      enum:
+        - PENDING
+        - READY
+    AttachmentUploadIntent:
+      title: AttachmentUploadIntent
+      description: 単一Objectへの短命な直接アップロード指示です。URLはBearer Tokenとして扱います。
+      type: object
+      additionalProperties: false
+      required:
+        - attachment
+        - upload_url
+        - upload_method
+        - upload_headers
+        - expires_at
+      properties:
+        attachment:
+          $ref: '#/components/schemas/Attachment'
+        upload_url:
+          type: string
+          format: uri
+        upload_method:
+          type: string
+          const: PUT
+        upload_headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: 署名に含まれるため、ClientがPUT時にそのまま送るHeaderです。
+        expires_at:
+          $ref: '#/components/schemas/Timestamp'
+    AttachmentDownloadIntent:
+      title: AttachmentDownloadIntent
+      description: 単一Objectへの短命な直接ダウンロード指示です。URLはBearer Tokenとして扱います。
+      type: object
+      additionalProperties: false
+      required:
+        - download_url
+        - expires_at
+      properties:
+        download_url:
+          type: string
+          format: uri
+        expires_at:
+          $ref: '#/components/schemas/Timestamp'
+    CreateAttachmentUploadIntentRequest:
+      title: CreateAttachmentUploadIntentRequest
+      description: ClientからObject Storageへ直接アップロードするファイルの宣言です。
+      type: object
+      additionalProperties: false
+      required:
+        - filename
+        - content_type
+        - size
+        - checksum_sha256
+      properties:
+        filename:
+          type: string
+          minLength: 1
+          maxLength: 255
+        content_type:
+          type: string
+          minLength: 3
+          maxLength: 255
+        size:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 26214400
+        checksum_sha256:
+          type: string
+          pattern: ^[A-Fa-f0-9]{64}$
     AuthenticationMethod:
       title: AuthenticationMethod
       description: User Account に Link された認証方法です。
@@ -1692,30 +2285,41 @@ components:
         - PASSWORD
     Channel:
       title: Channel
-      description: Guild内のText ChannelまたはVoice Channelです。
+      description: Guild内のChannel、Thread、またはUser間のDirect Message Channelです。
       type: object
       additionalProperties: false
       required:
         - id
         - guild_id
+        - parent_id
         - type
         - name
         - topic
         - position
         - created_at
+        - recipients
       properties:
         id:
           $ref: '#/components/schemas/UUID'
         guild_id:
-          allOf:
+          description: Channelが属するGuild IDです。Direct Messageの場合はnullです。
+          oneOf:
             - $ref: '#/components/schemas/UUID'
-          description: Channelが属するGuild IDです。
+            - type: 'null'
+        parent_id:
+          description: CategoryまたはThreadの親Channel IDです。親がない場合はnullです。
+          oneOf:
+            - $ref: '#/components/schemas/UUID'
+            - type: 'null'
         type:
           $ref: '#/components/schemas/ChannelType'
         name:
-          type: string
-          minLength: 1
-          maxLength: 100
+          description: Guild Channelの名前です。Direct Messageの場合はnullです。
+          oneOf:
+            - type: string
+              minLength: 1
+              maxLength: 100
+            - type: 'null'
         topic:
           description: Text Channelの説明です。未設定またはVoice Channelの場合はnullです。
           oneOf:
@@ -1728,14 +2332,22 @@ components:
           description: 同じGuild内での表示順です。小さい値を先に表示します。
         created_at:
           $ref: '#/components/schemas/Timestamp'
+        recipients:
+          description: Direct Messageの参加Userです。それ以外では空配列です。
+          type: array
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/UserSummary'
       examples:
         - id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
           guild_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+          parent_id: null
           type: TEXT
           name: イベント企画
           topic: 次回イベントの日程と内容を相談します
           position: 2
           created_at: '2026-08-17T06:05:00Z'
+          recipients: []
     ChannelList:
       title: ChannelList
       description: Guild内のChannelをpositionの昇順で返すPageです。
@@ -1755,11 +2367,13 @@ components:
         - items:
             - id: 0198b8f1-3e7f-7d56-a14f-a3f40304d2b1
               guild_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+              parent_id: null
               type: TEXT
               name: イベント企画
               topic: 次回イベントの日程と内容を相談します
               position: 2
               created_at: '2026-08-17T06:05:00Z'
+              recipients: []
           page:
             has_more: false
             next_cursor: null
@@ -1770,6 +2384,9 @@ components:
       enum:
         - TEXT
         - VOICE
+        - CATEGORY
+        - THREAD
+        - DIRECT
       examples:
         - TEXT
     CreateChannelRequest:
@@ -1782,7 +2399,11 @@ components:
         - name
       properties:
         type:
-          $ref: '#/components/schemas/ChannelType'
+          type: string
+          enum:
+            - TEXT
+            - VOICE
+            - CATEGORY
         name:
           type: string
           minLength: 1
@@ -1790,10 +2411,177 @@ components:
         topic:
           type: string
           maxLength: 1024
+        parent_id:
+          $ref: '#/components/schemas/UUID'
       examples:
         - type: TEXT
           name: イベント企画
           topic: 次回イベントの日程と内容を相談します
+    CreateDirectChannelRequest:
+      title: CreateDirectChannelRequest
+      description: 指定したUserとのDirect Message Channelを作成または取得します。
+      type: object
+      additionalProperties: false
+      required:
+        - recipient_id
+      properties:
+        recipient_id:
+          $ref: '#/components/schemas/UUID'
+    CreateThreadRequest:
+      title: CreateThreadRequest
+      description: Text ChannelまたはMessageを起点にThreadを作成します。
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        message_id:
+          $ref: '#/components/schemas/UUID'
+    ReadState:
+      title: ReadState
+      description: UserごとのChannel最終既読位置です。
+      type: object
+      additionalProperties: false
+      required:
+        - channel_id
+        - last_read_message_id
+        - updated_at
+      properties:
+        channel_id:
+          $ref: '#/components/schemas/UUID'
+        last_read_message_id:
+          oneOf:
+            - $ref: '#/components/schemas/UUID'
+            - type: 'null'
+        updated_at:
+          $ref: '#/components/schemas/Timestamp'
+    ReadStateList:
+      title: ReadStateList
+      type: object
+      additionalProperties: false
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadState'
+    UpdateReadStateRequest:
+      title: UpdateReadStateRequest
+      type: object
+      additionalProperties: false
+      required:
+        - last_read_message_id
+      properties:
+        last_read_message_id:
+          $ref: '#/components/schemas/UUID'
+    VoiceSession:
+      title: VoiceSession
+      description: Voice Providerへ接続するための短命なSessionです。Credentialはログへ記録しません。
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - provider
+        - endpoint
+        - credential
+        - expires_at
+        - state
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        provider:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: Clientが対応する接続Adapterを選択するProvider識別子です。
+        endpoint:
+          type: string
+          format: uri
+          description: Media signaling endpointです。Media PacketはAster Serverを経由しません。
+        credential:
+          type: string
+          minLength: 1
+          description: Providerへ提示する短命かつ不透明なCredentialです。
+        expires_at:
+          $ref: '#/components/schemas/Timestamp'
+        state:
+          $ref: '#/components/schemas/VoiceState'
+    VoiceState:
+      title: VoiceState
+      description: Userの現在のVoice Channel参加状態です。
+      type: object
+      additionalProperties: false
+      required:
+        - user_id
+        - channel_id
+        - session_id
+        - self_mute
+        - self_deaf
+        - self_video
+        - self_stream
+        - updated_at
+      properties:
+        user_id:
+          $ref: '#/components/schemas/UUID'
+        channel_id:
+          oneOf:
+            - $ref: '#/components/schemas/UUID'
+            - type: 'null'
+        session_id:
+          oneOf:
+            - $ref: '#/components/schemas/UUID'
+            - type: 'null'
+        self_mute:
+          type: boolean
+        self_deaf:
+          type: boolean
+        self_video:
+          type: boolean
+        self_stream:
+          type: boolean
+        updated_at:
+          $ref: '#/components/schemas/Timestamp'
+    VoiceStateList:
+      title: VoiceStateList
+      type: object
+      additionalProperties: false
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/VoiceState'
+    JoinVoiceChannelRequest:
+      title: JoinVoiceChannelRequest
+      type: object
+      additionalProperties: false
+      properties:
+        self_mute:
+          type: boolean
+          default: false
+        self_deaf:
+          type: boolean
+          default: false
+    UpdateVoiceStateRequest:
+      title: UpdateVoiceStateRequest
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        self_mute:
+          type: boolean
+        self_deaf:
+          type: boolean
+        self_video:
+          type: boolean
+        self_stream:
+          type: boolean
     CreateGuildRequest:
       title: CreateGuildRequest
       description: 新しいGuildを作成するときの設定です。
@@ -1814,16 +2602,22 @@ components:
           description: 創作とイベント企画のためのコミュニティ
     CreateMessageRequest:
       title: CreateMessageRequest
-      description: Text Channelへ投稿するMessage本文です。
+      description: Text Channelへ投稿する本文とAttachmentです。contentまたは1件以上のattachment_idsを必ず指定します。
       type: object
       additionalProperties: false
-      required:
-        - content
       properties:
         content:
           type: string
           minLength: 1
           maxLength: 4000
+        attachment_ids:
+          type: array
+          minItems: 1
+          maxItems: 10
+          uniqueItems: true
+          description: UploadをFinalize済みで、同じChannel用に作成したAttachment IDです。
+          items:
+            $ref: '#/components/schemas/UUID'
         reply_to_message_id:
           allOf:
             - $ref: '#/components/schemas/UUID'
@@ -2370,6 +3164,7 @@ components:
         - reply_to_message_id
         - reply_to
         - reactions
+        - attachments
         - created_at
         - edited_at
       properties:
@@ -2383,9 +3178,8 @@ components:
           $ref: '#/components/schemas/UserSummary'
         content:
           type: string
-          minLength: 1
           maxLength: 4000
-          description: UTF-8のMessage本文です。
+          description: UTF-8のMessage本文です。AttachmentのみのMessageでは空文字列です。
         reply_to_message_id:
           description: |
             返信元Message IDです。通常のMessageではnullです。
@@ -2405,6 +3199,11 @@ components:
           description: 絵文字ごとのReaction集計です。Reactionがない場合は空配列です。
           items:
             $ref: '#/components/schemas/MessageReaction'
+        attachments:
+          type: array
+          description: Messageへ紐付いたREADY状態のAttachmentです。
+          items:
+            $ref: '#/components/schemas/Attachment'
         created_at:
           $ref: '#/components/schemas/Timestamp'
         edited_at:
@@ -2435,6 +3234,7 @@ components:
             - emoji: 👍
               count: 3
               me: true
+          attachments: []
           created_at: '2026-08-17T06:12:00Z'
           edited_at: null
     MessageReply:
@@ -2462,7 +3262,6 @@ components:
           $ref: '#/components/schemas/UserSummary'
         content:
           type: string
-          minLength: 1
           maxLength: 4000
           description: 返信元MessageのUTF-8本文です。
         created_at:
@@ -2522,11 +3321,40 @@ components:
               reply_to_message_id: null
               reply_to: null
               reactions: []
+              attachments: []
               created_at: '2026-08-17T06:12:00Z'
               edited_at: null
           page:
             has_more: true
             next_cursor: eyJpZCI6IjAxOThiOGYyLTRmODAtN2U2Ny1iMjUwLWI0MDUxNDE1ZTNjMiJ9
+    MessageSearchResult:
+      title: MessageSearchResult
+      type: object
+      additionalProperties: false
+      required:
+        - message
+        - excerpt
+      properties:
+        message:
+          $ref: '#/components/schemas/Message'
+        excerpt:
+          description: 検索語の周辺をServerが安全に切り出したPlain Textです。
+          type: string
+          maxLength: 500
+    MessageSearchResultList:
+      title: MessageSearchResultList
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - page
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageSearchResult'
+        page:
+          $ref: '#/components/schemas/PageInfo'
     PageInfo:
       title: PageInfo
       description: Cursor Pagination の継続情報です。
@@ -2745,6 +3573,11 @@ components:
         position:
           type: integer
           minimum: 0
+        parent_id:
+          description: nullを指定するとCategoryとの関連を解除します。
+          oneOf:
+            - $ref: '#/components/schemas/UUID'
+            - type: 'null'
       examples:
         - name: 秋のイベント企画
           position: 3

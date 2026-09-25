@@ -1,0 +1,13 @@
+title: AttachmentDownloadIntent
+description: 単一Objectへの短命な直接ダウンロード指示です。URLはBearer Tokenとして扱います。
+type: object
+additionalProperties: false
+required:
+  - download_url
+  - expires_at
+properties:
+  download_url:
+    type: string
+    format: uri
+  expires_at:
+    $ref: ../common/Timestamp.yaml
