@@ -1,0 +1,6 @@
+name: method
+in: path
+required: true
+description: 対象の認証方法です。
+schema:
+  $ref: ../schemas/auth/AuthenticationMethod.yaml

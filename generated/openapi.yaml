@@ -131,7 +131,13 @@ paths:
         Desktop Clientが生成したPKCE S256 ChallengeとClient Stateを短時間のLogin試行へ保存し、
         System Browserで開くGoogle Authorization URLを返します。
         ServerはGoogle向けのOAuth StateとOpenID Connect Nonceを別に生成し、Clientへ秘密情報を返しません。
-      security: []
+
+        Bearer Access Tokenを付けて呼ぶと、サインイン中のAccountへGoogle IdentityをLinkするための試行になります。
+        その場合のExchange Codeは`POST /auth/google/link`だけで使用できます。
+        Access Tokenを付けない場合は、通常のGoogle Loginです。
+      security:
+        - {}
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -287,6 +293,194 @@ paths:
           $ref: '#/components/responses/RateLimited'
         default:
           $ref: '#/components/responses/Error'
+  /auth/google/link:
+    post:
+      operationId: linkGoogleIdentity
+      tags:
+        - Authentication
+      summary: Google Identityをサインイン中のAccountへLinkする
+      description: |
+        Bearer Access Tokenを付けて`POST /auth/google/authorize`を呼ぶと、そのLogin試行はLink用になります。
+        Link用のExchange Codeは、このOperationだけが同じUserに対して一度だけ使用できます。
+        通常のGoogle Login（`POST /auth/google/exchange`）では使用できません。
+        Email Addressが違っていても、サインイン中のUserが明示的に行うため自動Linkには当たりません。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleExchangeRequest'
+      responses:
+        '200':
+          description: Google Identityを追加した後のAccountです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSelf'
+        '400':
+          $ref: '#/components/responses/InvalidAuthorizationGrant'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: このGoogle Identityはすでに別のAccountへLinkされているか、このAccountに既にLinkされています。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: IDENTITY_ALREADY_LINKED
+                message: This Google identity is already linked to an account
+                request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /auth/email/verification:
+    post:
+      operationId: requestEmailVerification
+      tags:
+        - Authentication
+      summary: Email Addressの所有確認Emailを送る
+      description: |
+        認証済みUserの現在のEmail Addressへ、24時間有効な確認Tokenを送ります。
+        すでに確認済みの場合は何も送らず成功を返します。
+        以前に送った未使用のTokenは、新しいTokenを送ると無効になります。
+        同じUserへ短時間に何度も送信することはできず、その場合も成功を返してEmailを送りません。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: 確認Emailを送信キューへ入れたか、送信が不要でした。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/MailUnavailable'
+        default:
+          $ref: '#/components/responses/Error'
+  /auth/email/verify:
+    post:
+      operationId: verifyEmail
+      tags:
+        - Authentication
+      summary: Email Addressの所有確認を完了する
+      description: |
+        Emailで届いたTokenを使い、Accountの`email_verified`を`true`にします。
+        Tokenは一度だけ使用でき、成功・失敗を問わず再利用できません。
+        Token発行後にEmail Addressが変わっていた場合は無効です。
+        Tokenが所有確認の根拠なので、Sessionがなくても使用できます。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+      responses:
+        '204':
+          description: Email Addressを確認済みにしました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '400':
+          description: Tokenが無効、失効済み、または使用済みです。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: INVALID_VERIFICATION_TOKEN
+                message: Verification token is invalid or expired
+                request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /auth/password/reset-request:
+    post:
+      operationId: requestPasswordReset
+      tags:
+        - Authentication
+      summary: Password再設定Emailを送る
+      description: |
+        Password認証を持つAccountのEmail Addressへ、1時間有効な再設定Tokenを送ります。
+        Accountの存在を推測できないよう、Accountがない場合やPassword認証がない場合も同じ`202`を返し、
+        応答時間も変わらないようにEmailは非同期で送ります。
+        新しいTokenを送ると、以前の未使用Tokenは無効になります。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPasswordResetRequest'
+      responses:
+        '202':
+          description: 条件に合うAccountがあればEmailを送ります。Response Bodyはありません。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/MailUnavailable'
+        default:
+          $ref: '#/components/responses/Error'
+  /auth/password/reset:
+    post:
+      operationId: resetPassword
+      tags:
+        - Authentication
+      summary: Tokenを使ってPasswordを再設定する
+      description: |
+        新しいPasswordを設定し、そのUserの全てのAster Sessionを破棄します。
+        TokenでEmail Addressの所有を確認できたため、`email_verified`も`true`になります。
+        Tokenは一度だけ使用でき、成功・失敗を問わず再利用できません。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '204':
+          description: Passwordを再設定し、既存のSessionを破棄しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '400':
+          description: Tokenが無効、失効済み、使用済み、または新しいPasswordが要件を満たしません。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: INVALID_RESET_TOKEN
+                message: Reset token is invalid or expired
+                request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
   /auth/token/refresh:
     post:
       operationId: refreshSession
@@ -391,6 +585,47 @@ paths:
                 created_at: '2026-08-17T06:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        default:
+          $ref: '#/components/responses/Error'
+  /users/@me/authentication-methods/{method}:
+    parameters:
+      - $ref: '#/components/parameters/AuthenticationMethod'
+    delete:
+      operationId: unlinkAuthenticationMethod
+      tags:
+        - Users
+      summary: 認証方法のLinkを解除する
+      description: |
+        Accountに残る認証方法が1つだけになる解除は、Accountに入れなくなるため拒否します。
+        Password認証を解除するとPasswordを削除し、Password再設定ではPassword認証を作り直せません。
+        Google Identityを解除しても、すでに発行したAster Sessionは有効です。
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: 認証方法のLinkを解除しました。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/ResourceNotFound'
+        '409':
+          description: Accountに残る最後の認証方法のため解除できません。
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: LAST_AUTHENTICATION_METHOD
+                message: The last authentication method cannot be unlinked
+                request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
         '429':
           $ref: '#/components/responses/RateLimited'
         default:
@@ -1988,6 +2223,13 @@ components:
         type: string
         minLength: 2
         maxLength: 100
+    AuthenticationMethod:
+      name: method
+      in: path
+      required: true
+      description: 対象の認証方法です。
+      schema:
+        $ref: '#/components/schemas/AuthenticationMethod'
   responses:
     EmailAlreadyRegistered:
       description: 指定された Email Address は登録済みです。
@@ -2135,6 +2377,19 @@ components:
           example:
             code: UNAUTHORIZED
             message: Authentication is required
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    MailUnavailable:
+      description: このInstanceにはEmail送信が設定されていないため、Requestを処理しませんでした。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: MAIL_UNAVAILABLE
+            message: Email delivery is not available
             request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
   schemas:
     AccessToken:
@@ -3697,3 +3952,48 @@ components:
         - id: 0198b8ef-1c5d-7b34-892e-81d2e1e2b090
           display_name: Alice
           avatar_url: https://cdn.example.com/avatars/alice.png
+    OneTimeToken:
+      title: OneTimeToken
+      description: |
+        Email Addressの所有確認やPassword再設定のためにServerがEmailで送る、一度だけ使用できる不透明なTokenです。
+        Serverは推測できない値を発行し、Hashだけを保存します。URLやLogへ残さないでください。
+      type: string
+      minLength: 32
+      maxLength: 512
+      examples:
+        - example-one-time-token-from-an-email-message
+    VerifyEmailRequest:
+      title: VerifyEmailRequest
+      description: Emailで届いたTokenを送り、Email Addressの所有確認を完了します。
+      type: object
+      additionalProperties: false
+      required:
+        - token
+      properties:
+        token:
+          $ref: '#/components/schemas/OneTimeToken'
+    RequestPasswordResetRequest:
+      title: RequestPasswordResetRequest
+      description: Password再設定用のTokenをEmailで受け取るためのRequestです。
+      type: object
+      additionalProperties: false
+      required:
+        - email
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+      examples:
+        - email: alice@example.com
+    ResetPasswordRequest:
+      title: ResetPasswordRequest
+      description: Emailで届いたTokenを使い、新しいPasswordを設定します。
+      type: object
+      additionalProperties: false
+      required:
+        - token
+        - new_password
+      properties:
+        token:
+          $ref: '#/components/schemas/OneTimeToken'
+        new_password:
+          $ref: '#/components/schemas/Password'

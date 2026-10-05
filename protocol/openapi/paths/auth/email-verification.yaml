@@ -1,0 +1,26 @@
+post:
+  operationId: requestEmailVerification
+  tags:
+    - Authentication
+  summary: Email Addressの所有確認Emailを送る
+  description: |
+    認証済みUserの現在のEmail Addressへ、24時間有効な確認Tokenを送ります。
+    すでに確認済みの場合は何も送らず成功を返します。
+    以前に送った未使用のTokenは、新しいTokenを送ると無効になります。
+    同じUserへ短時間に何度も送信することはできず、その場合も成功を返してEmailを送りません。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: 確認Emailを送信キューへ入れたか、送信が不要でした。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    "503":
+      $ref: ../../components/responses/MailUnavailable.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

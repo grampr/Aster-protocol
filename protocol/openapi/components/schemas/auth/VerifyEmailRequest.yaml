@@ -1,0 +1,9 @@
+title: VerifyEmailRequest
+description: Emailで届いたTokenを送り、Email Addressの所有確認を完了します。
+type: object
+additionalProperties: false
+required:
+  - token
+properties:
+  token:
+    $ref: ./OneTimeToken.yaml

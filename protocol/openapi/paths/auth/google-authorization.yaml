@@ -7,7 +7,13 @@ post:
     Desktop Clientが生成したPKCE S256 ChallengeとClient Stateを短時間のLogin試行へ保存し、
     System Browserで開くGoogle Authorization URLを返します。
     ServerはGoogle向けのOAuth StateとOpenID Connect Nonceを別に生成し、Clientへ秘密情報を返しません。
-  security: []
+
+    Bearer Access Tokenを付けて呼ぶと、サインイン中のAccountへGoogle IdentityをLinkするための試行になります。
+    その場合のExchange Codeは`POST /auth/google/link`だけで使用できます。
+    Access Tokenを付けない場合は、通常のGoogle Loginです。
+  security:
+    - {}
+    - BearerAuth: []
   requestBody:
     required: true
     content:
