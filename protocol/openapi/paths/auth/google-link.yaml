@@ -1,0 +1,49 @@
+post:
+  operationId: linkGoogleIdentity
+  tags:
+    - Authentication
+  summary: Google Identityをサインイン中のAccountへLinkする
+  description: |
+    Bearer Access Tokenを付けて`POST /auth/google/authorize`を呼ぶと、そのLogin試行はLink用になります。
+    Link用のExchange Codeは、このOperationだけが同じUserに対して一度だけ使用できます。
+    通常のGoogle Login（`POST /auth/google/exchange`）では使用できません。
+    Email Addressが違っていても、サインイン中のUserが明示的に行うため自動Linkには当たりません。
+  security:
+    - BearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/GoogleExchangeRequest.yaml
+  responses:
+    "200":
+      description: Google Identityを追加した後のAccountです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/users/UserSelf.yaml
+    "400":
+      $ref: ../../components/responses/InvalidAuthorizationGrant.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "409":
+      description: このGoogle Identityはすでに別のAccountへLinkされているか、このAccountに既にLinkされています。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/Error.yaml
+          example:
+            code: IDENTITY_ALREADY_LINKED
+            message: This Google identity is already linked to an account
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

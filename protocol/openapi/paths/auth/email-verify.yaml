@@ -1,0 +1,40 @@
+post:
+  operationId: verifyEmail
+  tags:
+    - Authentication
+  summary: Email Addressの所有確認を完了する
+  description: |
+    Emailで届いたTokenを使い、Accountの`email_verified`を`true`にします。
+    Tokenは一度だけ使用でき、成功・失敗を問わず再利用できません。
+    Token発行後にEmail Addressが変わっていた場合は無効です。
+    Tokenが所有確認の根拠なので、Sessionがなくても使用できます。
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/auth/VerifyEmailRequest.yaml
+  responses:
+    "204":
+      description: Email Addressを確認済みにしました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+    "400":
+      description: Tokenが無効、失効済み、または使用済みです。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/Error.yaml
+          example:
+            code: INVALID_VERIFICATION_TOKEN
+            message: Verification token is invalid or expired
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

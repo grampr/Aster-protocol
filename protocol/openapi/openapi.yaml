@@ -49,12 +49,24 @@ paths:
     $ref: ./paths/auth/google-callback.yaml
   /auth/google/exchange:
     $ref: ./paths/auth/google-exchange.yaml
+  /auth/google/link:
+    $ref: ./paths/auth/google-link.yaml
+  /auth/email/verification:
+    $ref: ./paths/auth/email-verification.yaml
+  /auth/email/verify:
+    $ref: ./paths/auth/email-verify.yaml
+  /auth/password/reset-request:
+    $ref: ./paths/auth/password-reset-request.yaml
+  /auth/password/reset:
+    $ref: ./paths/auth/password-reset.yaml
   /auth/token/refresh:
     $ref: ./paths/auth/token-refresh.yaml
   /auth/logout:
     $ref: ./paths/auth/logout.yaml
   /users/@me:
     $ref: ./paths/users/me.yaml
+  /users/@me/authentication-methods/{method}:
+    $ref: ./paths/users/authentication-method.yaml
   /guilds:
     $ref: ./paths/guilds/guilds.yaml
   /guilds/{guild_id}:

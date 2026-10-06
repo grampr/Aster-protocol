@@ -90,6 +90,19 @@ Desktop Login は次の3段階です。
 Desktop Redirect URIは`aster://auth/callback`に固定します。
 CallbackのDeep LinkにはGoogleのTokenを含めません。
 
+### Email 確認、Password 再設定、Link
+
+- `POST /auth/email/verification`：認証済み User の Email Address へ確認 Token を送る
+- `POST /auth/email/verify`：Token で `email_verified` を `true` にする
+- `POST /auth/password/reset-request`：Password 再設定 Token を Email で送る。Account の有無に関わらず `202`
+- `POST /auth/password/reset`：Token で新しい Password を設定し、既存の Session を全て破棄する
+- `POST /auth/google/link`：サインイン中の Account へ Google Identity を Link する
+- `DELETE /users/@me/authentication-methods/{method}`：認証方法を解除する。最後の1つは解除できない
+
+メールで送る Token は一度だけ使用でき、Server は Hash だけを保存します。
+Link は、`POST /auth/google/authorize` に Bearer Access Token を付けて始めます。
+Email Address が同じというだけの自動 Link は引き続き行いません。
+
 この境界の判断理由と将来追加する Flow は [ADR-0001](docs/decisions/0001-provider-neutral-authentication.md) に記録しています。
 
 ## Guild、Channel、Message

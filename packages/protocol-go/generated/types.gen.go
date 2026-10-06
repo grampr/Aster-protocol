@@ -820,6 +820,12 @@ type MessageSearchResultList struct {
 // Examples: yxE4J7vB63qQj8VWfKE7i3wmMl7E2kY5gD0hT2uS9_A
 type OAuthClientState = string
 
+// OneTimeToken Email Addressの所有確認やPassword再設定のためにServerがEmailで送る、一度だけ使用できる不透明なTokenです。
+// Serverは推測できない値を発行し、Hashだけを保存します。URLやLogへ残さないでください。
+//
+// Examples: example-one-time-token-from-an-email-message
+type OneTimeToken = string
+
 // PageInfo Cursor Pagination の継続情報です。
 //
 // Examples: {"has_more":true,"next_cursor":"eyJpZCI6IjAxOThiOGYwLTJkNmUtN2M0NS05YTNmLTkyZTNmMmYzYzFhMCJ9"}
@@ -981,6 +987,33 @@ type RegisterPasswordRequest struct {
 //
 // Examples: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
 type RequestId = openapi_types.UUID
+
+// RequestPasswordResetRequest Password再設定用のTokenをEmailで受け取るためのRequestです。
+//
+// Examples: {"email":"alice@example.com"}
+type RequestPasswordResetRequest struct {
+	// Email Login と通知に使用する Email Address です。比較時の正規化は Server が行います。
+	//
+	// Examples: alice@example.com
+	Email Email `json:"email"`
+}
+
+// ResetPasswordRequest Emailで届いたTokenを使い、新しいPasswordを設定します。
+type ResetPasswordRequest struct {
+	// NewPassword User が設定する Password です。空白を含む Unicode 文字列を許可します。
+	// Client は文字種の組み合わせを強制せず、Server は漏えい Password を拒否できます。
+	//
+	//
+	// Examples: <password-with-15-or-more-characters>
+	NewPassword Password `json:"new_password"`
+
+	// Token Email Addressの所有確認やPassword再設定のためにServerがEmailで送る、一度だけ使用できる不透明なTokenです。
+	// Serverは推測できない値を発行し、Hashだけを保存します。URLやLogへ残さないでください。
+	//
+	//
+	// Examples: example-one-time-token-from-an-email-message
+	Token OneTimeToken `json:"token"`
+}
 
 // Role Guild Memberへ権限をまとめて割り当てるRoleです。
 type Role struct {
@@ -1197,6 +1230,16 @@ type UserSummary struct {
 	Id UUID `json:"id"`
 }
 
+// VerifyEmailRequest Emailで届いたTokenを送り、Email Addressの所有確認を完了します。
+type VerifyEmailRequest struct {
+	// Token Email Addressの所有確認やPassword再設定のためにServerがEmailで送る、一度だけ使用できる不透明なTokenです。
+	// Serverは推測できない値を発行し、Hashだけを保存します。URLやLogへ残さないでください。
+	//
+	//
+	// Examples: example-one-time-token-from-an-email-message
+	Token OneTimeToken `json:"token"`
+}
+
 // VoiceSession Voice Providerへ接続するための短命なSessionです。Credentialはログへ記録しません。
 type VoiceSession struct {
 	// Credential Providerへ提示する短命かつ不透明なCredentialです。
@@ -1314,6 +1357,9 @@ type InvalidCredentials = Error
 // InvalidRefreshToken API Error の共通形式です。
 type InvalidRefreshToken = Error
 
+// MailUnavailable API Error の共通形式です。
+type MailUnavailable = Error
+
 // RateLimited Rate Limit を超えた Request に返す Error です。
 type RateLimited = RateLimitError
 
@@ -1413,11 +1459,17 @@ type ListCurrentUserDirectChannelsParams struct {
 	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// VerifyEmailJSONRequestBody defines body for VerifyEmail for application/json ContentType.
+type VerifyEmailJSONRequestBody = VerifyEmailRequest
+
 // BeginGoogleAuthorizationJSONRequestBody defines body for BeginGoogleAuthorization for application/json ContentType.
 type BeginGoogleAuthorizationJSONRequestBody = GoogleAuthorizationRequest
 
 // ExchangeGoogleAuthorizationJSONRequestBody defines body for ExchangeGoogleAuthorization for application/json ContentType.
 type ExchangeGoogleAuthorizationJSONRequestBody = GoogleExchangeRequest
+
+// LinkGoogleIdentityJSONRequestBody defines body for LinkGoogleIdentity for application/json ContentType.
+type LinkGoogleIdentityJSONRequestBody = GoogleExchangeRequest
 
 // DeleteCurrentSessionJSONRequestBody defines body for DeleteCurrentSession for application/json ContentType.
 type DeleteCurrentSessionJSONRequestBody = LogoutRequest
@@ -1427,6 +1479,12 @@ type CreatePasswordSessionJSONRequestBody = LoginPasswordRequest
 
 // RegisterWithPasswordJSONRequestBody defines body for RegisterWithPassword for application/json ContentType.
 type RegisterWithPasswordJSONRequestBody = RegisterPasswordRequest
+
+// ResetPasswordJSONRequestBody defines body for ResetPassword for application/json ContentType.
+type ResetPasswordJSONRequestBody = ResetPasswordRequest
+
+// RequestPasswordResetJSONRequestBody defines body for RequestPasswordReset for application/json ContentType.
+type RequestPasswordResetJSONRequestBody = RequestPasswordResetRequest
 
 // RefreshSessionJSONRequestBody defines body for RefreshSession for application/json ContentType.
 type RefreshSessionJSONRequestBody = RefreshSessionRequest

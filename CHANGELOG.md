@@ -8,6 +8,10 @@ Aster Protocol の利用者に影響する変更を記録します。
 
 ### Added
 
+- Email Addressの所有確認（`POST /auth/email/verification`、`POST /auth/email/verify`）の契約
+- Password再設定（`POST /auth/password/reset-request`、`POST /auth/password/reset`）の契約
+- Google Identityをサインイン中のAccountへLinkする`POST /auth/google/link`と、Link用の`POST /auth/google/authorize`
+- 認証方法のLinkを解除する`DELETE /users/@me/authentication-methods/{method}`
 - AttachmentのUpload Intent、Finalize、権限付きDownload契約
 - Web/Tauriが署名URLを安全に取得するAttachment Download Intent契約
 - Messageへ最大10件のAttachmentを紐付ける契約

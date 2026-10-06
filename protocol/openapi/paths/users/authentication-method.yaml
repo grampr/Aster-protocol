@@ -1,0 +1,41 @@
+parameters:
+  - $ref: ../../components/parameters/AuthenticationMethod.yaml
+
+delete:
+  operationId: unlinkAuthenticationMethod
+  tags:
+    - Users
+  summary: 認証方法のLinkを解除する
+  description: |
+    Accountに残る認証方法が1つだけになる解除は、Accountに入れなくなるため拒否します。
+    Password認証を解除するとPasswordを削除し、Password再設定ではPassword認証を作り直せません。
+    Google Identityを解除しても、すでに発行したAster Sessionは有効です。
+  security:
+    - BearerAuth: []
+  responses:
+    "204":
+      description: 認証方法のLinkを解除しました。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+    "401":
+      $ref: ../../components/responses/Unauthorized.yaml
+    "404":
+      $ref: ../../components/responses/ResourceNotFound.yaml
+    "409":
+      description: Accountに残る最後の認証方法のため解除できません。
+      headers:
+        X-Request-ID:
+          $ref: ../../components/headers/RequestId.yaml
+      content:
+        application/json:
+          schema:
+            $ref: ../../components/schemas/common/Error.yaml
+          example:
+            code: LAST_AUTHENTICATION_METHOD
+            message: The last authentication method cannot be unlinked
+            request_id: 0198b8f0-2d6e-7c45-9a3f-92e3f2f3c1a0
+    "429":
+      $ref: ../../components/responses/RateLimited.yaml
+    default:
+      $ref: ../../components/responses/Error.yaml

@@ -1,0 +1,9 @@
+title: OneTimeToken
+description: |
+  Email Addressの所有確認やPassword再設定のためにServerがEmailで送る、一度だけ使用できる不透明なTokenです。
+  Serverは推測できない値を発行し、Hashだけを保存します。URLやLogへ残さないでください。
+type: string
+minLength: 32
+maxLength: 512
+examples:
+  - example-one-time-token-from-an-email-message

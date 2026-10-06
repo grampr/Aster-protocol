@@ -37,6 +37,9 @@ Desktop Client は Exchange Code と PKCE Verifier を Aster Session Token へ�
 - Provider を追加しても、通常の API と Gateway の認可方式は変わりません。
 - Google Login の Desktop Redirect URI は `aster://auth/callback` に固定し、Callback と Exchange Endpoint は Protocol で定義します。
 - Account Link、Unlink、Email Verification、Password Reset は、この ADR の境界を守る独立した Flow として定義します。
+  - Email Verification と Password Reset は、Email で送る一度限りの Token を根拠にします。Token の Hash だけを保存し、再設定の成功時は全 Session を破棄します。
+  - Link は、サインイン中の User が Google Login を明示的に行った場合だけ許可し、Email Address の一致による自動 Link はしません。
+  - Account に入れなくなる Unlink は拒否します。
 
 ## References
 
